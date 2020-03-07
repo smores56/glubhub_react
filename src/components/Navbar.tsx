@@ -1,7 +1,7 @@
 import React, { useContext, useState, useCallback } from "react";
-import { GlubHubContext, useGlubRoute } from "../utils/context";
-import { DocumentLink, Member } from "../utils/models";
-import { visibleAdminTabs, fullName } from "../utils/utils";
+import { GlubHubContext, useGlubRoute } from "utils/context";
+import { DocumentLink, Member } from "state/models";
+import { visibleAdminTabs, fullName } from "utils/helpers";
 import {
   AdminRoute,
   routeEvents,
@@ -12,10 +12,10 @@ import {
   routeRoster,
   routeMinutes,
   routeProfile
-} from "../utils/route";
+} from "state/route";
 
 export const Navbar: React.FC = () => {
-  const currentRoute = useGlubRoute();
+  const { location } = useGlubRoute();
   const { user, info } = useContext(GlubHubContext);
   const [expanded, setExpanded] = useState(false);
   const toggleExpanded = useCallback(() => {
@@ -24,7 +24,9 @@ export const Navbar: React.FC = () => {
 
   const singleLink = (route: GlubRoute) => (
     <a
-      className={"navbar-item" + (route == currentRoute ? " is-active" : "")}
+      className={
+        "navbar-item" + (route.route == location?.route ? " is-active" : "")
+      }
       href={renderRoute(route)}
     >
       {route.name}
@@ -59,7 +61,7 @@ export const Navbar: React.FC = () => {
             <a
               className={
                 "navbar-item" +
-                (currentRoute?.route === "profile" ? " is-active" : "")
+                (location?.route === "profile" ? " is-active" : "")
               }
               href={renderRoute(routeProfile(user.email, null))}
             >

@@ -1,7 +1,7 @@
 import React from "react";
-import { SubmissionState } from "../utils/state";
+import { SubmissionState } from "state/types";
 import ErrorBox from "./ErrorBox";
-import { DeleteButton } from "./Buttons";
+import { DeleteButton, Button } from "./Buttons";
 
 export interface DeleteModalProps {
   title: String;
@@ -26,20 +26,15 @@ const DeleteModal: React.FC<DeleteModalProps> = props => (
 
 const ModalButtons: React.FC<DeleteModalProps> = props => (
   <footer className="modal-card-foot">
-    {/* [ Buttons.button
-            { content = "Delete"
-            , onClick = Just data.confirm
-            , attrs =
-                [ Buttons.IsLoading (data.state == Sending)
-                , Buttons.Color Buttons.IsDanger
-                ]
-            }
-        , Buttons.button
-            { content = "Cancel"
-            , onClick = Just data.cancel
-            , attrs = []
-            } */}
-    {props.state.state === "errorSending" && (
+    <Button
+      onClick={props.confirm}
+      loading={props.state.status === "sending"}
+      color="is-danger"
+    >
+      Delete
+    </Button>
+    <Button onClick={props.cancel}>Cancel</Button>
+    {props.state.status === "errorSending" && (
       <ErrorBox error={props.state.error} />
     )}
   </footer>

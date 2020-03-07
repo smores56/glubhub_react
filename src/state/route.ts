@@ -214,13 +214,13 @@ export type AdminRoute =
   | { name: "Create Event"; route: "create-event"; gigRequestId: number | null }
   | { name: "Gig Requests"; route: "gig-requests" }
   | { name: "Absence Requests"; route: "absence-requests" }
-  | { name: "Edit Semester"; route: "edit-semester" }
-  | { name: "Officer Positions"; route: "officer-positions" }
-  | { name: "Site Permissions"; route: "site-permissions" }
-  | { name: "Document Links"; route: "document-links" }
-  | { name: "Webmaster Tools"; route: "webmaster-tools" }
+  | { name: "Edit the Semester"; route: "edit-semester" }
+  | { name: "Edit Officers"; route: "officer-positions" }
+  | { name: "Edit Permissions"; route: "site-permissions" }
+  | { name: "Edit Documents"; route: "document-links" }
+  | { name: "Upload API or Site"; route: "webmaster-tools" }
   | { name: "Uniforms"; route: "uniforms" }
-  | { name: "Dues"; route: "dues" };
+  | { name: "Money"; route: "money"; tab: MoneyTab | null };
 
 // Admin Tab Constructors
 
@@ -238,30 +238,59 @@ export const adminAbsenceRequests: AdminRoute = {
   route: "absence-requests"
 };
 export const adminEditSemester: AdminRoute = {
-  name: "Edit Semester",
+  name: "Edit the Semester",
   route: "edit-semester"
 };
 export const adminOfficerPositions: AdminRoute = {
-  name: "Officer Positions",
+  name: "Edit Officers",
   route: "officer-positions"
 };
 export const adminSitePermissions: AdminRoute = {
-  name: "Site Permissions",
+  name: "Edit Permissions",
   route: "site-permissions"
 };
 export const adminDocumentLinks: AdminRoute = {
-  name: "Document Links",
+  name: "Edit Documents",
   route: "document-links"
 };
 export const adminWebmasterTools: AdminRoute = {
-  name: "Webmaster Tools",
+  name: "Upload API or Site",
   route: "webmaster-tools"
 };
 export const adminUniforms: AdminRoute = {
   name: "Uniforms",
   route: "uniforms"
 };
-export const adminDues: AdminRoute = { name: "Dues", route: "dues" };
+export const adminMoney = (tab: MoneyTab | null): AdminRoute => ({
+  name: "Money",
+  route: "money",
+  tab
+});
+
+// Money Tabs //////////////////////////
+
+export type MoneyTab =
+  | { route: "assign-dues"; name: "Assign everyone dues" }
+  | { route: "assign-late-dues"; name: "Make remaining dues late" }
+  | {
+      route: "batch-transactions";
+      name: "Bake a batch of chocolate chip transactions";
+    };
+
+// Money Tab Constructors
+
+export const moneyAssignDues: MoneyTab = {
+  route: "assign-dues",
+  name: "Assign everyone dues"
+};
+export const moneyAssignLateDues: MoneyTab = {
+  route: "assign-late-dues",
+  name: "Make remaining dues late"
+};
+export const moneyBatchTransactions: MoneyTab = {
+  route: "batch-transactions",
+  name: "Bake a batch of chocolate chip transactions"
+};
 
 // Parsing Routes //////////////////////////
 
@@ -474,8 +503,25 @@ const parseAdminRoute = (segments: string[]): GlubRoute | null => {
     case adminUniforms.route:
       return routeAdmin(adminUniforms);
 
-    case adminDues.route:
-      return routeAdmin(adminDues);
+    case adminMoney(null).route:
+      if (segments.length === 1) {
+        return routeAdmin(adminMoney(null));
+      }
+
+      const tab = segments[1];
+      switch (segments[1]) {
+        case moneyAssignDues.route:
+          return routeAdmin(adminMoney(moneyAssignDues));
+
+        case moneyAssignLateDues.route:
+          return routeAdmin(adminMoney(moneyAssignLateDues));
+
+        case moneyBatchTransactions.route:
+          return routeAdmin(adminMoney(moneyBatchTransactions));
+
+        default:
+          return null;
+      }
 
     case adminCreateEvent(null).route:
       if (segments.length === 1) {
@@ -506,6 +552,8 @@ const buildAdminRoute = (base: string, tab: AdminRoute | null): string[] => {
     return [base];
   } else if (tab.route === "create-event" && tab.gigRequestId !== null) {
     return [base, tab.route, `${tab.gigRequestId}`];
+  } else if (tab.route === "money" && tab.tab !== null) {
+    return [base, tab.route, `${tab.tab.route}`];
   } else {
     return [base, tab.route];
   }

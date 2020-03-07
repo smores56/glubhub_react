@@ -1,6 +1,6 @@
-import { API_URL } from "./constants";
-import { parseError, unknownError, GlubHubError } from "./error";
-import { getToken } from "./utils";
+import { API_URL } from "state/constants";
+import { parseError, unknownError, GlubHubError } from "state/error";
+import { getToken } from "./helpers";
 
 export interface NewId {
   id: number;
@@ -63,6 +63,82 @@ const makeRequest = async <T extends any, R>(
     return {
       successful: false,
       error: unknownError(0, "failed to make request")
+    };
+  }
+};
+
+export type GlubRequest<T> = Promise<ResponseType<T>>;
+
+export const chain = async <T, U>(
+  req1: GlubRequest<T>,
+  req2: (u: T) => GlubRequest<U>
+): Promise<ResponseType<U>> => {
+  const result = await req1;
+  if (!result.successful) {
+    return result;
+  }
+
+  return req2(result.data);
+};
+
+export const collect2 = async <T, U>(
+  req1: GlubRequest<T>,
+  req2: GlubRequest<U>
+): Promise<ResponseType<[T, U]>> => {
+  const [result1, result2] = await Promise.all([req1, req2]);
+  if (!result1.successful) {
+    return result1;
+  } else if (!result2.successful) {
+    return result2;
+  } else {
+    return { successful: true, data: [result1.data, result2.data] };
+  }
+};
+
+export const collect3 = async <T, U, V>(
+  req1: GlubRequest<T>,
+  req2: GlubRequest<U>,
+  req3: GlubRequest<V>
+): Promise<ResponseType<[T, U, V]>> => {
+  const [result1, result2, result3] = await Promise.all([req1, req2, req3]);
+  if (!result1.successful) {
+    return result1;
+  } else if (!result2.successful) {
+    return result2;
+  } else if (!result3.successful) {
+    return result3;
+  } else {
+    return {
+      successful: true,
+      data: [result1.data, result2.data, result3.data]
+    };
+  }
+};
+
+export const collect4 = async <T, U, V, W>(
+  req1: GlubRequest<T>,
+  req2: GlubRequest<U>,
+  req3: GlubRequest<V>,
+  req4: GlubRequest<W>
+): Promise<ResponseType<[T, U, V, W]>> => {
+  const [result1, result2, result3, result4] = await Promise.all([
+    req1,
+    req2,
+    req3,
+    req4
+  ]);
+  if (!result1.successful) {
+    return result1;
+  } else if (!result2.successful) {
+    return result2;
+  } else if (!result3.successful) {
+    return result3;
+  } else if (!result4.successful) {
+    return result4;
+  } else {
+    return {
+      successful: true,
+      data: [result1.data, result2.data, result3.data, result4.data]
     };
   }
 };

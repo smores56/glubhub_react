@@ -1,4 +1,4 @@
-import { Uniform, GlubEvent } from "../../../utils/models";
+import { Uniform, GlubEvent } from "state/models";
 
 export interface EventForm {
   name: string;
@@ -60,20 +60,20 @@ export const gigFormFromEvent = (
   event: GlubEvent,
   allUniforms: Uniform[]
 ): GigForm => {
-  if (!isGig(event)) {
+  if (!event.gig) {
     return emptyGigForm;
   }
 
   return {
-    performanceTime: twentyFourHourTimeFormatter(event.performanceTime),
-    uniform: allUniforms.find(u => u.id === event.uniform) || null,
-    contactName: event.contactName || "",
-    contactEmail: event.contactEmail || "",
-    contactPhone: event.contactPhone || "",
-    price: event.price,
-    public: event.public,
-    summary: event.summary || "",
-    description: event.description || ""
+    performanceTime: twentyFourHourTimeFormatter(event.gig.performanceTime),
+    uniform: allUniforms.find(u => u.id === event.gig?.uniform) || null,
+    contactName: event.gig.contactName || "",
+    contactEmail: event.gig.contactEmail || "",
+    contactPhone: event.gig.contactPhone || "",
+    price: event.gig.price,
+    public: event.gig.public,
+    summary: event.gig.summary || "",
+    description: event.gig.description || ""
   };
 };
 

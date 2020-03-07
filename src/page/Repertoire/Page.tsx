@@ -10,26 +10,26 @@ import {
   sending,
   errorSending,
   mapLoaded
-} from "../../utils/state";
-import { Song } from "../../utils/models";
-import { RouteRepertoire, routeRepertoire } from "../../utils/route";
-import { get, postReturning, NewId, deleteRequest } from "../../utils/request";
-import { useGlubRoute } from "../../utils/context";
+} from "state/types";
 import {
   Container,
   Section,
   Columns,
   Sidebar,
   RequiresPermission
-} from "../../components/Basics";
-import DeleteModal from "../../components/DeleteModal";
-import { editRepertoire } from "../../utils/permissions";
-import ErrorBox from "../../components/ErrorBox";
-import { SelectableList } from "../../components/List";
-import { BackButton, ButtonGroup } from "../../components/Buttons";
+} from "components/Basics";
+import { Song } from "state/models";
 import SongSidebar from "./Sidebar";
+import ErrorBox from "components/ErrorBox";
+import { useGlubRoute } from "utils/context";
+import { SelectableList } from "components/List";
+import DeleteModal from "components/DeleteModal";
+import { editRepertoire } from "state/permissions";
+import { BackButton, ButtonGroup, Button } from "components/Buttons";
+import { RouteRepertoire, routeRepertoire } from "state/route";
+import { get, postReturning, NewId, deleteRequest } from "utils/request";
 
-const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
+export const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
   const { replaceRoute } = useGlubRoute();
 
   const [songs, setSongs] = useState<RemoteData<Song[]>>(loading);
@@ -50,7 +50,7 @@ const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
 
       if (
         resp.successful &&
-        songs.state === "loaded" &&
+        songs.status === "loaded" &&
         !songs.data.some(song => song.id === songId)
       ) {
         setSongs(loaded([...songs.data, resp.data]));
@@ -104,7 +104,7 @@ const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
     }
   }, [route, loadSong, loadSongs]);
 
-  const selectedId = selected.state === "loaded" ? selected.data.id : null;
+  const selectedId = selected.status === "loaded" ? selected.data.id : null;
   const columns: [
     string,
     (songs: Song[]) => Song[],
@@ -141,7 +141,7 @@ const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
           </Columns>
         </Container>
       </Section>
-      {selected.state === "loaded" ? (
+      {selected.status === "loaded" ? (
         <Sidebar
           data={loaded(null)}
           close={unselectSong}
@@ -163,7 +163,7 @@ const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
           tryToDelete={() => setDeleteState(notSentYet)}
         />
       )}
-      {selected.state === "loaded" && deleteState ? (
+      {selected.status === "loaded" && deleteState ? (
         <DeleteModal
           title={`Are you sure you want to delete ${selected.data.title}?`}
           cancel={() => setDeleteState(null)}
@@ -181,8 +181,6 @@ const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
     </div>
   );
 };
-
-export default Repertoire;
 
 // Song Filters
 
@@ -217,16 +215,15 @@ const CreateSongButton: React.FC<CreateSongButtonProps> = ({
   <RequiresPermission permission={editRepertoire}>
     <div style={{ paddingTop: "5px" }}>
       <ButtonGroup alignment="is-centered">
-        <button
+        <Button
+          color="is-primary"
+          loading={state.status === "sending"}
           onClick={createSong}
-          className={
-            "is-primary" + (state.state === "sending") ? " is-loading" : ""
-          }
         >
           + Add New Song
-        </button>
+        </Button>
       </ButtonGroup>
-      {state.state === "errorSending" && <ErrorBox error={state.error} />}
+      {state.status === "errorSending" && <ErrorBox error={state.error} />}
     </div>
   </RequiresPermission>
 );

@@ -1,9 +1,9 @@
 import React, { useContext, PropsWithChildren } from "react";
-import { formatPhone, eventIsOver, permittedTo } from "../utils/utils";
-import { Member, GlubEvent } from "../utils/models";
-import { RemoteData, SubmissionState } from "../utils/state";
+import { formatPhone, eventIsOver, permittedTo, fullName } from "utils/helpers";
+import { GlubEvent } from "state/models";
+import { RemoteData, SubmissionState } from "state/types";
 import ErrorBox from "./ErrorBox";
-import { GlubHubContext } from "../utils/context";
+import { GlubHubContext } from "utils/context";
 
 export const Spinner: React.FC = () => (
   <div className="spinner">
@@ -40,13 +40,10 @@ export const Columns: React.FC = ({ children }) => (
   <div className="columns">{children}</div>
 );
 
-export const Column: React.FC = ({ children }) => (
-  <div className="column">{children}</div>
-);
-
-export const NarrowColumn: React.FC = ({ children }) => (
-  <div className="column is-narrow">{children}</div>
-);
+export const Column: React.FC<{ narrow?: boolean }> = ({
+  narrow,
+  children
+}) => <div className={"column" + (narrow ? " is-narrow" : "")}>{children}</div>;
 
 export const Box: React.FC = ({ children }) => (
   <div className="box">{children}</div>
@@ -136,7 +133,7 @@ export const RemoteContent = <T extends any>({
   render,
   notAsked
 }: PropsWithChildren<RemoteContentProps<T>>) => {
-  switch (data.state) {
+  switch (data.status) {
     case "notAsked":
       return notAsked || <></>;
 
@@ -171,7 +168,7 @@ export const Sidebar = <T extends any>({
   render,
   close
 }: PropsWithChildren<SidebarProps<T>>) => {
-  if (data.state === "notAsked") {
+  if (data.status === "notAsked") {
     return <div className="sidenav" hidden />;
   }
 
@@ -179,9 +176,9 @@ export const Sidebar = <T extends any>({
     <div>
       <div className="transparent-overlay" onClick={close} />
       <div className="sidenav" style={{ padding: "20px", paddingTop: "80px" }}>
-        {data.state === "loading" ? (
+        {data.status === "loading" ? (
           <Spinner />
-        ) : data.state === "loaded" ? (
+        ) : data.status === "loaded" ? (
           render(data.data)
         ) : (
           <ErrorBox error={data.error} />
@@ -194,7 +191,7 @@ export const Sidebar = <T extends any>({
 export const SubmissionStateBox: React.FC<{ state: SubmissionState }> = ({
   state
 }) => {
-  switch (state.state) {
+  switch (state.status) {
     case "notSentYet":
       return <></>;
 
@@ -214,3 +211,14 @@ export const Modal: React.FC<{ close: () => void }> = ({ close, children }) => (
     </div>
   </div>
 );
+
+export const MemberName: React.FC<{ email: string }> = ({ email }) => {
+  const { members } = useContext(GlubHubContext);
+  const member = members.find(member => member.email === email);
+
+  if (member) {
+    return <>{fullName(member)}</>;
+  } else {
+    return <i>{email}</i>;
+  }
+};

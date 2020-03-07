@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { RemoteData, loading, resultToRemote } from "../../utils/state";
 import {
   EventCarpool,
   Member,
   GlubEvent,
-  SimpleAttendance
-} from "../../utils/models";
-import { get } from "../../utils/request";
+  SimpleAttendance,
+  UpdatedCarpool
+} from "state/models";
 import {
   RemoteContent,
   RequiresPermission,
   AttendanceIcon
-} from "../../components/Basics";
-import { editCarpool } from "../../utils/permissions";
-import { renderRoute, routeEditCarpools } from "../../utils/route";
-import { fullName } from "../../utils/utils";
+} from "components/Basics";
+import { get } from "utils/request";
+import { fullName } from "utils/helpers";
+import { editCarpool } from "state/permissions";
+import { routeEditCarpools } from "state/route";
+import { RemoteData, loading, resultToRemote } from "state/types";
+import { LinkButton } from "components/Buttons";
 
 export const Carpools: React.FC<{ event: GlubEvent }> = ({ event }) => {
   const [carpools, setCarpools] = useState<RemoteData<EventCarpool[]>>(loading);
@@ -46,12 +48,9 @@ export const Carpools: React.FC<{ event: GlubEvent }> = ({ event }) => {
           )}
           <RequiresPermission permission={editCarpool}>
             <div style={{ padding: "10px" }}>
-              <a
-                className="button"
-                href={renderRoute(routeEditCarpools(event.id))}
-              >
+              <LinkButton route={routeEditCarpools(event.id)}>
                 Edit Carpools
-              </a>
+              </LinkButton>
             </div>
           </RequiresPermission>
         </>
@@ -60,10 +59,10 @@ export const Carpools: React.FC<{ event: GlubEvent }> = ({ event }) => {
   );
 };
 
-interface EditCarpoolSelection {
-  selectedMembers: Member[];
-  select: (member: Member) => void;
-  selectEmptyCarpool: (carpool: EventCarpool) => void;
+export interface EditCarpoolSelection {
+  selected: string[];
+  select: (member: string) => void;
+  selectEmptyCarpool: (driver: string) => void;
 }
 
 interface CarpoolTableBaseProps {
@@ -73,7 +72,7 @@ interface CarpoolTableBaseProps {
 }
 
 interface CarpoolTablesProps extends CarpoolTableBaseProps {
-  carpools: EventCarpool[];
+  carpools: UpdatedCarpool[];
 }
 
 export const CarpoolTables: React.FC<CarpoolTablesProps> = props => (
@@ -85,7 +84,7 @@ export const CarpoolTables: React.FC<CarpoolTablesProps> = props => (
 );
 
 interface CarpoolTableProps extends CarpoolTableBaseProps {
-  carpool: EventCarpool;
+  carpool: UpdatedCarpool;
 }
 
 export const CarpoolTable: React.FC<CarpoolTableProps> = props => (
@@ -94,7 +93,7 @@ export const CarpoolTable: React.FC<CarpoolTableProps> = props => (
   </table>
 );
 
-const CarpoolPartialTable: React.FC<CarpoolTableProps> = ({
+export const CarpoolPartialTable: React.FC<CarpoolTableProps> = ({
   event,
   carpool,
   selection,
@@ -112,7 +111,9 @@ const CarpoolPartialTable: React.FC<CarpoolTableProps> = ({
     </thead>
     <tbody>
       {carpool.passengers.length === 0 ? (
-        <NoMembersRow select={() => selection?.selectEmptyCarpool(carpool)} />
+        <NoMembersRow
+          select={() => selection?.selectEmptyCarpool(carpool.driver.email)}
+        />
       ) : (
         <>
           {carpool.passengers.map((passenger, index) => (
@@ -145,9 +146,9 @@ interface CarpoolRowProps extends CarpoolTableBaseProps {
   isDriver?: boolean;
 }
 
-const CarpoolRow: React.FC<CarpoolRowProps> = props => {
-  const isSelected = props.selection?.selectedMembers.some(
-    m => m.email === props.member.email
+export const CarpoolRow: React.FC<CarpoolRowProps> = props => {
+  const isSelected = props.selection?.selected.some(
+    email => email === props.member.email
   );
   const passengerCount = props.member.passengers
     ? `${props.member.passengers}`
@@ -157,7 +158,7 @@ const CarpoolRow: React.FC<CarpoolRowProps> = props => {
 
   return (
     <tr
-      onClick={() => props.selection?.select(props.member)}
+      onClick={() => props.selection?.select(props.member.email)}
       style={{ cursor: "pointer", width: "100%", minWidth: "100%" }}
       className={isSelected ? "is-selected" : undefined}
     >

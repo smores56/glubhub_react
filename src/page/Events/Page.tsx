@@ -8,8 +8,7 @@ import {
   eventCarpools,
   eventAttendees,
   eventAttendance
-} from "../../utils/route";
-import { useGlubRoute } from "../../utils/context";
+} from "state/route";
 import {
   RemoteData,
   loading,
@@ -18,9 +17,7 @@ import {
   errorLoading,
   resultToRemote,
   mapLoaded
-} from "../../utils/state";
-import { GlubEvent, GlubEventType } from "../../utils/models";
-import { get } from "../../utils/request";
+} from "state/types";
 import {
   Section,
   Sidebar,
@@ -29,17 +26,22 @@ import {
   Columns,
   AttendanceIcon,
   Divider
-} from "../../components/Basics";
-import { BackButton } from "../../components/Buttons";
-import Attendance from "./Attendance";
-import Attendees from "./Attendees";
+} from "components/Basics";
+import { get } from "utils/request";
+import { eventIsOver } from "utils/helpers";
+import { useGlubRoute } from "utils/context";
+import { BackButton } from "components/Buttons";
+import { SelectableList } from "components/List";
+import { editAttendance } from "state/permissions";
+import { GlubEvent, GlubEventType } from "state/models";
+
+import { Details } from "./Details";
 import { Setlist } from "./Setlist";
 import { Carpools } from "./Carpools";
+import { EditEvent } from "./edit/Page";
+import { Attendees } from "./Attendees";
+import { Attendance } from "./Attendance";
 import { RequestAbsence } from "./RequestAbsence";
-import { editAttendance } from "../../utils/permissions";
-import { SelectableList } from "../../components/List";
-import { eventIsOver } from "../../utils/utils";
-import { EditEvent } from "./Edit/Page";
 
 export const Events: React.FC<{ route: RouteEvents }> = ({ route }) => {
   const { replaceRoute } = useGlubRoute();
@@ -62,7 +64,7 @@ export const Events: React.FC<{ route: RouteEvents }> = ({ route }) => {
 
   const changeTab = useCallback(
     (tab: EventTab) => {
-      if (selected.state === "loaded") {
+      if (selected.status === "loaded") {
         replaceRoute(routeEvents(selected.data.id, tab));
       }
     },
@@ -95,7 +97,9 @@ export const Events: React.FC<{ route: RouteEvents }> = ({ route }) => {
   useEffect(() => {
     const loadEvents = async () => {
       const result = await get<GlubEvent[]>("events?attendance=true");
-      setEvents(mapLoaded(resultToRemote(result), events => events.reverse()));
+      setEvents(
+        mapLoaded(resultToRemote<GlubEvent[]>(result), e => e.reverse())
+      );
     };
 
     loadEvents();
@@ -104,7 +108,7 @@ export const Events: React.FC<{ route: RouteEvents }> = ({ route }) => {
     }
   }, [setEvents, route, loadEvent]);
 
-  const selectedId = selected.state === "loaded" ? selected.data.id : null;
+  const selectedId = selected.status === "loaded" ? selected.data.id : null;
   const upcomingEvents = mapLoaded(events, x =>
     x.filter(event => !eventIsOver(event))
   );
@@ -217,25 +221,19 @@ interface EventTabsProps {
   changeTab: (tab: EventTab) => void;
 }
 
-const EventTabs: React.FC<EventTabsProps> = props => {
-  const isGig = !!(
-    "performanceTime" in props.event && props.event.performanceTime
-  );
-
-  return (
-    <div className="tabs">
-      <ul>
-        <TabLink tab={eventDetails} {...props} />
-        <TabLink tab={eventAttendees} {...props} />
-        {isGig && <TabLink tab={eventSetlist} {...props} />}
-        {isGig && <TabLink tab={eventCarpools} {...props} />}
-        <RequiresPermission permission={editAttendance}>
-          <TabLink tab={eventAttendance} {...props} />
-        </RequiresPermission>
-      </ul>
-    </div>
-  );
-};
+const EventTabs: React.FC<EventTabsProps> = props => (
+  <div className="tabs">
+    <ul>
+      <TabLink tab={eventDetails} {...props} />
+      <TabLink tab={eventAttendees} {...props} />
+      <TabLink tab={eventSetlist} {...props} />
+      <TabLink tab={eventCarpools} {...props} />
+      <RequiresPermission permission={editAttendance}>
+        <TabLink tab={eventAttendance} {...props} />
+      </RequiresPermission>
+    </ul>
+  </div>
+);
 
 interface TabLinkProps {
   tab: EventTab;

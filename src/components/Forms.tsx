@@ -1,5 +1,6 @@
 import React, { PropsWithChildren } from "react";
-import { Info, Enrollment, Uniform } from "../utils/models";
+import { Info, Enrollment, Uniform, Member } from "state/models";
+import { fullName } from "utils/helpers";
 
 export interface FormInputType<T> {
   toString: (t: T) => string;
@@ -46,6 +47,12 @@ export const passwordType: FormInputType<string> = {
   textType: "password"
 };
 
+export const phoneType: FormInputType<string> = {
+  toString: x => x,
+  fromString: x => x,
+  textType: "tel"
+};
+
 export const numberType: FormInputType<number | null> = {
   toString: x => (x ? `${x}` : ""),
   fromString: x => (parseInt(x) !== NaN ? parseInt(x) : null),
@@ -66,6 +73,14 @@ export const uniformType = (
   toString: u => u?.name || "(no uniform)",
   fromString: u =>
     (info?.uniforms || []).find(uniform => uniform.name === u) || null,
+  textType: "text"
+});
+
+export const memberType = (
+  members: Member[]
+): FormInputType<Member | null> => ({
+  toString: member => (member ? fullName(member) : "(nobody)"),
+  fromString: name => members.find(m => fullName(m) === name) || null,
   textType: "text"
 });
 
@@ -95,46 +110,40 @@ export interface InputAttributes {
   autocomplete?: boolean;
 }
 
-const InputWrapper: React.FC<{ attrs: InputAttributes }> = ({
-  attrs,
-  children
-}) => (
-  <div className={"field" + attrs.horizontal ? " is-horizontal" : ""}>
-    {attrs.title &&
-      (attrs.horizontal ? (
+export const InputWrapper: React.FC<InputAttributes> = props => (
+  <div className={"field" + props.horizontal ? " is-horizontal" : ""}>
+    {props.title &&
+      (props.horizontal ? (
         <div className="field-label is-normal">
-          <label className="label">{attrs.title}</label>
+          <label className="label">{props.title}</label>
         </div>
       ) : (
-        <label className="label">{attrs.title}</label>
+        <label className="label">{props.title}</label>
       ))}
-    {children}
-    {attrs.helpText && <p className="help">{attrs.helpText}</p>}
+    {props.children}
+    {props.helpText && <p className="help">{props.helpText}</p>}
   </div>
 );
 
-export const FieldWrapper: React.FC<{ attrs: InputAttributes }> = ({
-  attrs,
-  children
-}) => {
+export const FieldWrapper: React.FC<InputAttributes> = props => {
   const classes = [
     "field",
-    attrs.expanded ? "is-expanded" : null,
-    attrs.loading ? "is-loading" : null,
-    attrs.prefix || attrs.suffix ? "has-addons" : null
+    props.expanded ? "is-expanded" : null,
+    props.loading ? "is-loading" : null,
+    props.prefix || props.suffix ? "has-addons" : null
   ];
 
   return (
     <div className={classes.filter(c => !!c).join(" ")}>
-      {attrs.prefix && (
+      {props.prefix && (
         <Control>
-          <a className="button is-static">{attrs.prefix}</a>
+          <a className="button is-static">{props.prefix}</a>
         </Control>
       )}
-      {children}
-      {attrs.suffix && (
+      {props.children}
+      {props.suffix && (
         <Control>
-          <a className="button is-static">{attrs.suffix}</a>
+          <a className="button is-static">{props.suffix}</a>
         </Control>
       )}
     </div>
@@ -150,8 +159,8 @@ export interface TextInputProps<T> extends InputAttributes {
 export const TextInput = <T extends any>(
   props: PropsWithChildren<TextInputProps<T>>
 ) => (
-  <InputWrapper attrs={props}>
-    <FieldWrapper attrs={props}>
+  <InputWrapper {...props}>
+    <FieldWrapper {...props}>
       <Control>
         <input
           className={"input" + (props.loading ? " is-loading" : "")}
@@ -175,8 +184,8 @@ export interface TextareaInputProps extends InputAttributes {
 }
 
 export const TextareaInput: React.FC<TextareaInputProps> = props => (
-  <InputWrapper attrs={props}>
-    <FieldWrapper attrs={props}>
+  <InputWrapper {...props}>
+    <FieldWrapper {...props}>
       <Control>
         <textarea
           className={"textarea" + (props.loading ? " is-loading" : "")}
@@ -201,8 +210,8 @@ export interface SelectInputProps<T> extends InputAttributes {
 export const SelectInput = <T extends any>(
   props: PropsWithChildren<SelectInputProps<T>>
 ) => (
-  <InputWrapper attrs={props}>
-    <FieldWrapper attrs={props}>
+  <InputWrapper {...props}>
+    <FieldWrapper {...props}>
       <div className={"select control" + (props.loading ? " is-loading" : "")}>
         <select
           onInput={event =>
@@ -235,8 +244,8 @@ export interface RadioInputProps<T> extends InputAttributes {
 export const RadioInput = <T extends any>(
   props: PropsWithChildren<RadioInputProps<T>>
 ) => (
-  <InputWrapper attrs={props}>
-    <FieldWrapper attrs={props}>
+  <InputWrapper {...props}>
+    <FieldWrapper {...props}>
       {props.values.map((val, index) => (
         <>
           <label className="radio">

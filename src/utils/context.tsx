@@ -5,9 +5,9 @@ import React, {
   useState,
   useCallback
 } from "react";
-import { Member, Info, Semester } from "./models";
-import { getToken } from "./utils";
-import { GlubRoute, parseRoute, renderRoute } from "./route";
+import { Member, Info, Semester } from "state/models";
+import { getToken } from "./helpers";
+import { GlubRoute, parseRoute, renderRoute } from "state/route";
 import { useLocation, useHistory } from "react-router-dom";
 import { get, success } from "./request";
 

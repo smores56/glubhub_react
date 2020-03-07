@@ -1,22 +1,13 @@
 import React, { useState, useCallback, useContext } from "react";
-import { notSentYet, sending, errorSending } from "../utils/state";
-import { GlubHubContext, useGlubRoute } from "../utils/context";
 import { Md5 } from "ts-md5";
-import { postReturning, NewToken } from "../utils/request";
-import { setToken } from "../utils/utils";
-import {
-  routeHome,
-  renderRoute,
-  routeForgotPassword,
-  routeEditProfile
-} from "../utils/route";
-import { NarrowColumn, Box } from "../components/Basics";
-import {
-  TextInput,
-  emailType,
-  passwordType,
-  Control
-} from "../components/Forms";
+import { setToken } from "utils/helpers";
+import { Column, Box } from "components/Basics";
+import { postReturning, NewToken } from "utils/request";
+import { GlubHubContext, useGlubRoute } from "utils/context";
+import { SubmitButton, LinkButton } from "components/Buttons";
+import { notSentYet, sending, errorSending } from "state/types";
+import { TextInput, emailType, passwordType, Control } from "components/Forms";
+import { routeHome, routeForgotPassword, routeEditProfile } from "state/route";
 
 const Login: React.FC = () => {
   const { refreshAll } = useContext(GlubHubContext);
@@ -56,7 +47,7 @@ const Login: React.FC = () => {
         className="columns is-centered is-vcentered"
         style={{ display: "flex" }}
       >
-        <NarrowColumn>
+        <Column narrow>
           <Box>
             <form onSubmit={submit}>
               <img style={{ width: "100%" }} src="./glubhub.svg" />
@@ -76,38 +67,34 @@ const Login: React.FC = () => {
               />
 
               <div>
-                <button
-                  type="submit"
-                  className={
-                    "is-primary is-fullwidth" +
-                    (state.state === "sending" ? " is-loading" : "")
-                  }
+                <SubmitButton
+                  color="is-primary"
+                  fullwidth
+                  loading={state.status === "sending"}
                 >
                   I posit that I am worthy
-                </button>
+                </SubmitButton>
                 <br />
                 <div className="field is-grouped is-grouped-centered is-expanded">
                   <Control>
-                    <a
-                      className="button"
-                      href={renderRoute(routeForgotPassword)}
-                    >
+                    <LinkButton route={routeForgotPassword}>
                       I have forgotten who I am
-                    </a>
+                    </LinkButton>
                   </Control>
                   <Control>
-                    <a
-                      className="button is-primary is-outlined"
-                      href={renderRoute(routeEditProfile)}
+                    <LinkButton
+                      route={routeEditProfile}
+                      color="is-primary"
+                      outlined
                     >
                       I am not anyone yet
-                    </a>
+                    </LinkButton>
                   </Control>
                 </div>
               </div>
             </form>
           </Box>
-        </NarrowColumn>
+        </Column>
       </div>
     </div>
   );

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { RemoteData, loading, resultToRemote } from "../../utils/state";
-import { EventAttendee } from "../../utils/models";
-import { get } from "../../utils/request";
-import { RemoteContent, Column, Title } from "../../components/Basics";
-import { fullName } from "../../utils/utils";
+import { get } from "utils/request";
+import { fullName } from "utils/helpers";
+import { EventAttendee } from "state/models";
+import { RemoteContent, Column, Title } from "components/Basics";
+import { RemoteData, loading, resultToRemote } from "state/types";
 
-const Attendees: React.FC<{ eventId: number }> = ({ eventId }) => {
+export const Attendees: React.FC<{ eventId: number }> = ({ eventId }) => {
   const [attendees, setAttendees] = useState<RemoteData<EventAttendee[]>>(
     loading
   );
@@ -101,5 +101,3 @@ const separateAttendees = (attendees: EventAttendee[]): SeparateByAttending => {
     }
   };
 };
-
-export default Attendees;

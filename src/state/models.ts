@@ -35,6 +35,7 @@ export interface GlubSimpleEvent {
   gigCount: boolean;
   defaultAttend: boolean;
   section: string | null;
+  gig?: Gig | null;
 }
 
 export type GlubEventType =
@@ -64,16 +65,7 @@ interface GlubEventAttendanceFields {
   absenceRequest: AbsenceRequest | null;
 }
 
-export interface GlubEventWithoutGig
-  extends GlubSimpleEvent,
-    GlubEventAttendanceFields {}
-
-export interface GlubEventWithGig
-  extends GlubSimpleEvent,
-    GlubEventAttendanceFields,
-    Gig {}
-
-export type GlubEvent = GlubEventWithGig | GlubEventWithoutGig;
+export interface GlubEvent extends GlubSimpleEvent, GlubEventAttendanceFields {}
 
 export interface SimpleGradeChange {
   change: number;
@@ -118,7 +110,6 @@ export interface EventCarpool {
 }
 
 export interface UpdatedCarpool {
-  id: number | null;
   driver: Member;
   passengers: Member[];
 }
@@ -170,6 +161,8 @@ export interface DocumentLink {
   url: string;
 }
 
+export const emptyDocumentLink = { name: "", url: "" };
+
 export type Enrollment = "Class" | "Club";
 
 export interface MediaType {
@@ -205,6 +198,8 @@ export interface Uniform {
   color: string | null;
   description: string | null;
 }
+
+export const emptyUniform = { name: "", description: "", color: null, id: 0 };
 
 export interface Semester {
   name: string;
@@ -285,6 +280,20 @@ export interface GigRequest {
 }
 
 export type GigRequestStatus = "Accepted" | "Dismissed" | "Pending";
+
+export interface TransactionBatch {
+  members: string[];
+  amount: number | null;
+  type: string;
+  description: string;
+}
+
+export const emptyTransactionBatch: TransactionBatch = {
+  members: [],
+  amount: null,
+  type: "Expense",
+  description: ""
+};
 
 export interface Song {
   id: number;

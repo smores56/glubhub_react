@@ -7,15 +7,15 @@ import {
   sending,
   resultToSubmissionState,
   mapLoaded
-} from "../../utils/state";
-import { EventAttendee } from "../../utils/models";
-import { get, post } from "../../utils/request";
-import { RemoteContent, SubmissionStateBox } from "../../components/Basics";
-import { fullName } from "../../utils/utils";
-import { CheckboxInput, TextInput, numberType } from "../../components/Forms";
-import { GlubHubContext } from "../../utils/context";
+} from "state/types";
+import { fullName } from "utils/helpers";
+import { get, post } from "utils/request";
+import { EventAttendee } from "state/models";
+import { GlubHubContext } from "utils/context";
+import { RemoteContent, SubmissionStateBox } from "components/Basics";
+import { CheckboxInput, TextInput, numberType } from "components/Forms";
 
-const Attendance: React.FC<{ eventId: number }> = ({ eventId }) => {
+export const Attendance: React.FC<{ eventId: number }> = ({ eventId }) => {
   const { info } = useContext(GlubHubContext);
 
   const [state, setState] = useState(notSentYet);
@@ -172,5 +172,3 @@ const groupAttendees = (
     .sort()
     .map(section => ({ section, attendees: groups.get(section)! }));
 };
-
-export default Attendance;

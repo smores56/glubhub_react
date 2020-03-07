@@ -1,16 +1,16 @@
 import React, { useContext } from "react";
-import { GlubHubContext } from "../utils/context";
 import {
   Section,
   Container,
   Box,
   EmailLink,
   PhoneLink
-} from "../components/Basics";
-import { fullName } from "../utils/utils";
-import { Member } from "../utils/models";
+} from "components/Basics";
+import { Member } from "state/models";
+import { fullName } from "utils/helpers";
+import { GlubHubContext } from "utils/context";
 
-const Roster: React.FC = () => {
+export const Roster: React.FC = () => {
   const { members } = useContext(GlubHubContext);
 
   const memberRow = (member: Member) => (
@@ -50,5 +50,3 @@ const Roster: React.FC = () => {
     </Section>
   );
 };
-
-export default Roster;

@@ -1,6 +1,6 @@
-import { GlubHubError } from "../utils/error";
 import React from "react";
-import { SUBMISSION_STATE_BOX_ID } from "../utils/constants";
+import { GlubHubError } from "state/error";
+import { SUBMISSION_STATE_BOX_ID } from "state/constants";
 
 interface ErrorBoxProps {
   error: GlubHubError;

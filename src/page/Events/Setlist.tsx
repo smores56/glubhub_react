@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { RemoteData, loading, resultToRemote } from "../../utils/state";
-import { Song } from "../../utils/models";
-import { get } from "../../utils/request";
-import { RemoteContent } from "../../components/Basics";
-import { renderRoute, routeRepertoire } from "../../utils/route";
-import { pitchToUnicode } from "../../utils/utils";
+import { Song } from "state/models";
+import { get } from "utils/request";
+import { pitchToUnicode } from "utils/helpers";
+import { RemoteContent } from "components/Basics";
+import { renderRoute, routeRepertoire } from "state/route";
+import { RemoteData, loading, resultToRemote } from "state/types";
 
 export const Setlist: React.FC<{ eventId: number }> = ({ eventId }) => {
   const [songs, setSongs] = useState<RemoteData<Song[]>>(loading);

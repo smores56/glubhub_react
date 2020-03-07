@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
-import { GlubEvent, Semester, Info } from "../../../utils/models";
+import { GlubEvent, Semester, Info } from "state/models";
 import {
   RemoteData,
   loading,
@@ -8,10 +8,10 @@ import {
   sending,
   errorSending,
   SubmissionState
-} from "../../../utils/state";
-import { get, post } from "../../../utils/request";
-import { GlubHubContext } from "../../../utils/context";
-import { Title, Column } from "../../../components/Basics";
+} from "state/types";
+import { get, post } from "utils/request";
+import { GlubHubContext } from "utils/context";
+import { Title, Column } from "components/Basics";
 import {
   TextInput,
   stringType,
@@ -23,15 +23,16 @@ import {
   uniformType,
   TextareaInput,
   CheckboxInput
-} from "../../../components/Forms";
-import ErrorBox from "../../../components/ErrorBox";
+} from "components/Forms";
+import ErrorBox from "components/ErrorBox";
 import {
   gigFormFromEvent,
   eventFormFromEvent,
   buildUpdateBody,
   GigForm,
   EventForm
-} from "./State";
+} from "./state";
+import { SubmitButton } from "components/Buttons";
 
 interface EditEventProps {
   event: GlubEvent;
@@ -180,7 +181,7 @@ const LeftColumn: React.FC<FormData> = ({
 );
 
 const allSemesters = (data: FormData): string[] =>
-  data.semesters.state === "loaded"
+  data.semesters.status === "loaded"
     ? data.semesters.data.map(s => s.name)
     : [data.currentSemester?.name || ""];
 
@@ -199,7 +200,7 @@ const MiddleColumn: React.FC<FormData> = props => (
       type={stringType}
       onInput={semester => props.updateEvent({ ...props.event, semester })}
       title="Semester"
-      loading={props.semesters.state === "loading"}
+      loading={props.semesters.status === "loading"}
     />
     <SelectInput
       values={[null, ...(props.info?.uniforms || [])]}
@@ -262,14 +263,9 @@ const RightColumn: React.FC<FormData> = ({
     />
     <br />
     <br />
-    <button
-      type="submit"
-      className={
-        "is-primary" + (state.state === "sending" ? " is-loading" : "")
-      }
-    >
+    <SubmitButton color="is-primary" loading={state.status === "sending"}>
       Update
-    </button>
-    {state.state === "errorSending" && <ErrorBox error={state.error} />}
+    </SubmitButton>
+    {state.status === "errorSending" && <ErrorBox error={state.error} />}
   </Column>
 );

@@ -1,5 +1,4 @@
-import { Pitch, Member, GlubEvent, GlubEventWithGig } from "./models";
-import { GREASE_TOKEN_NAME } from "./constants";
+import { Pitch, Member, GlubEvent } from "state/models";
 import {
   AdminRoute,
   adminCreateEvent,
@@ -8,13 +7,14 @@ import {
   adminEditSemester,
   adminDocumentLinks,
   adminOfficerPositions,
-  adminDues,
   adminUniforms,
   adminSitePermissions,
-  adminWebmasterTools
-} from "./route";
-import * as Permissions from "./permissions";
+  adminWebmasterTools,
+  adminMoney
+} from "state/route";
 import Tone from "tone";
+import * as Permissions from "state/permissions";
+import { GREASE_TOKEN_NAME, GREASE_OLD_TOKEN_NAME } from "state/constants";
 
 export const fullName = (member: Member) =>
   `${member.preferredName || member.firstName} ${member.lastName}`;
@@ -37,13 +37,17 @@ export const setToken = (token: string | null) =>
     ? localStorage.setItem(GREASE_TOKEN_NAME, token)
     : localStorage.removeItem(GREASE_TOKEN_NAME);
 
+export const getOldToken = () => localStorage.getItem(GREASE_OLD_TOKEN_NAME);
+
+export const setOldToken = (oldToken: string | null) =>
+  oldToken
+    ? localStorage.setItem(GREASE_OLD_TOKEN_NAME, oldToken)
+    : localStorage.removeItem(GREASE_OLD_TOKEN_NAME);
+
 export const playPitch = (pitch: Pitch): void => {
   const synth = new Tone.Synth().toMaster();
   synth.triggerAttackRelease(Tone.Midi(`${pitchToUnicode(pitch)}4`), "1n");
 };
-
-export const isGig = (event: GlubEvent): event is GlubEventWithGig =>
-  !!("performanceTime" in event && event.performanceTime);
 
 export const visibleAdminTabs = (user: Member): AdminRoute[][] => {
   const eventTabs: [AdminRoute, boolean][] = [
@@ -57,7 +61,7 @@ export const visibleAdminTabs = (user: Member): AdminRoute[][] => {
   const dataTabs: [AdminRoute, boolean][] = [
     [adminEditSemester, permittedTo(user, Permissions.editSemester)],
     [adminDocumentLinks, permittedTo(user, Permissions.editLinks)],
-    [adminDues, permittedTo(user, Permissions.editTransaction)],
+    [adminMoney(null), permittedTo(user, Permissions.editTransaction)],
     [adminOfficerPositions, permittedTo(user, Permissions.editOfficers)],
     [adminUniforms, permittedTo(user, Permissions.editUniforms)],
     [adminSitePermissions, permittedTo(user, Permissions.editPermissions)]

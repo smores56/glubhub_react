@@ -1,7 +1,7 @@
 import React, { PropsWithChildren } from "react";
-import { RemoteData } from "../utils/state";
-import { NarrowColumn, Box, RemoteContent, Title } from "./Basics";
-import { GOLD_COLOR } from "../utils/constants";
+import { RemoteData } from "state/types";
+import { Box, RemoteContent, Title, Column } from "./Basics";
+import { GOLD_COLOR } from "../state/constants";
 
 interface SelectableListProps<T> {
   listItems: RemoteData<T[][]>;
@@ -17,7 +17,7 @@ interface SelectableListProps<T> {
 export const SelectableList = <T extends any>(
   props: PropsWithChildren<SelectableListProps<T>>
 ) => (
-  <NarrowColumn>
+  <Column narrow>
     {props.title && <Title>{props.title}</Title>}
     <Box>
       {props.contentAtTop}
@@ -53,7 +53,7 @@ export const SelectableList = <T extends any>(
       />
       {props.contentAtBottom}
     </Box>
-  </NarrowColumn>
+  </Column>
 );
 
 const singleRow = <T extends any>(

@@ -1,13 +1,12 @@
-import { GlubEvent, AbsenceRequest } from "../../utils/models";
-import { useState, useCallback, useContext } from "react";
-import { notSentYet, errorSending, sending } from "../../utils/state";
-import { post, success } from "../../utils/request";
-import { BackButton, ButtonGroup } from "../../components/Buttons";
-import { Subtitle, Title } from "../../components/Basics";
-import React from "react";
-import { TextareaInput } from "../../components/Forms";
-import ErrorBox from "../../components/ErrorBox";
-import { GlubHubContext } from "../../utils/context";
+import React, { useState, useCallback, useContext } from "react";
+import ErrorBox from "components/ErrorBox";
+import { post, success } from "utils/request";
+import { GlubHubContext } from "utils/context";
+import { TextareaInput } from "components/Forms";
+import { Subtitle, Title } from "components/Basics";
+import { GlubEvent, AbsenceRequest } from "state/models";
+import { BackButton, ButtonGroup, SubmitButton } from "components/Buttons";
+import { notSentYet, errorSending, sending } from "state/types";
 
 interface RequestAbsenceProps {
   event: GlubEvent;
@@ -57,17 +56,12 @@ export const RequestAbsence: React.FC<RequestAbsenceProps> = props => {
           required
         />
         <ButtonGroup alignment="is-right">
-          <button
-            type="submit"
-            className={
-              "is-primary" + state.state === "loading" ? " is-loading" : ""
-            }
-          >
+          <SubmitButton color="is-primary" loading={state.status === "sending"}>
             Beg for Mercy
-          </button>
+          </SubmitButton>
         </ButtonGroup>
       </form>
-      {state.state === "errorSending" && <ErrorBox error={state.error} />}
+      {state.status === "errorSending" && <ErrorBox error={state.error} />}
     </div>
   );
 };

@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { EventTab } from '../../utils/route';
-import { SubmissionState, notSentYet, sending, errorSending } from '../../utils/state';
-import { post, deleteRequest } from '../../utils/request';
-import { GlubEvent, SimpleAttendance, Uniform, Gig } from '../../utils/models';
-import { eventIsOver, isGig } from '../../utils/utils';
-import { RequiresPermission, Divider, PhoneLink, EmailLink } from '../../components/Basics';
-import { viewEventPrivateDetails } from '../../utils/permissions';
-import DeleteModal from '../../components/DeleteModal';
+import { EventTab } from 'state/route';
+import DeleteModal from 'components/DeleteModal';
+import { eventIsOver, isGig } from 'utils/helpers';
+import { post, deleteRequest } from 'utils/request';
+import { viewEventPrivateDetails } from 'state/permissions';
+import { GlubEvent, SimpleAttendance, Uniform, Gig } from 'state/models';
+import { SubmissionState, notSentYet, sending, errorSending } from 'state/types';
+import { RequiresPermission, Divider, PhoneLink, EmailLink } from 'components/Basics';
 
 interface DetailsProps {
     event: GlubEvent;

@@ -1,15 +1,11 @@
 import React from "react";
-import { RemoteData } from "../../utils/state";
-import { Song, SongLinkSection, Pitch, SongMode } from "../../utils/models";
-import SongLinkButton from "./Links";
-import { BackButton } from "../../components/Buttons";
-import {
-  CenteredTitle,
-  Sidebar,
-  RequiresPermission
-} from "../../components/Basics";
-import { editRepertoire } from "../../utils/permissions";
-import { playPitch, pitchToUnicode } from "../../utils/utils";
+import { RemoteData } from "state/types";
+import { SongLinkButton } from "./Links";
+import { BackButton, Button } from "components/Buttons";
+import { editRepertoire } from "state/permissions";
+import { playPitch, pitchToUnicode } from "utils/helpers";
+import { Song, SongLinkSection, Pitch, SongMode } from "state/models";
+import { Sidebar, RequiresPermission, Title } from "components/Basics";
 
 interface SongSidebarProps {
   song: RemoteData<Song>;
@@ -18,7 +14,7 @@ interface SongSidebarProps {
   tryToDelete: () => void;
 }
 
-const SongSidebar: React.FC<SongSidebarProps> = props => {
+export const SongSidebar: React.FC<SongSidebarProps> = props => {
   const linkSection = (section: SongLinkSection) => (
     <tr style={{ border: "none" }}>
       <td style={{ border: "none" }}>{section.name}</td>
@@ -39,7 +35,7 @@ const SongSidebar: React.FC<SongSidebarProps> = props => {
       render={song => (
         <div>
           <BackButton content="all songs" click={props.close} />
-          <CenteredTitle>{song.title}</CenteredTitle>
+          <Title centered>{song.title}</Title>
           {song.info && (
             <p>
               {song.info}
@@ -58,12 +54,12 @@ const SongSidebar: React.FC<SongSidebarProps> = props => {
           </table>
           <RequiresPermission permission={editRepertoire}>
             <div>
-              <button onClick={props.edit}>Edit Song</button>
+              <Button onClick={props.edit}>Edit Song</Button>
               <br />
               <br />
-              <button className="is-danger" onClick={props.tryToDelete}>
+              <Button color="is-danger" onClick={props.tryToDelete}>
                 Delete Song
-              </button>
+              </Button>
             </div>
           </RequiresPermission>
         </div>

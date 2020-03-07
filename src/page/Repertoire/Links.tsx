@@ -1,5 +1,5 @@
 import React from "react";
-import { SongLink } from "../../utils/models";
+import { SongLink } from "state/models";
 
 interface SongLinkProps {
   link: SongLink;
@@ -11,7 +11,7 @@ interface LinkButtonProps {
   name: string;
 }
 
-const SongLinkButton: React.FC<SongLinkProps> = ({ link, onDelete }) => {
+export const SongLinkButton: React.FC<SongLinkProps> = ({ link, onDelete }) => {
   let baseButton: JSX.Element;
   if (link.type === "Sheet Music") {
     baseButton = (
@@ -89,5 +89,3 @@ const DefaultLink: React.FC<LinkButtonProps> = ({ url, name }) => (
     {name}
   </a>
 );
-
-export default SongLinkButton;
