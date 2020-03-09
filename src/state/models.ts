@@ -61,7 +61,7 @@ export interface Gig {
 interface GlubEventAttendanceFields {
   rsvpIssue: string | null;
   attendance: SimpleAttendance | null;
-  gradeChange: SimpleGradeChange | null;
+  change: SimpleGradeChange | null;
   absenceRequest: AbsenceRequest | null;
 }
 
@@ -174,7 +174,7 @@ export interface MediaType {
 export type StorageType = "Local" | "Remote";
 
 export interface EventType {
-  name: string;
+  name: GlubEventType;
   weight: number;
 }
 

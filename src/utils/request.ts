@@ -45,7 +45,11 @@ const makeRequest = async <T extends any, R>(
   try {
     const token = getToken();
     const headers = token ? { token } : undefined;
-    const config = method === "POST" ? { body, headers } : { headers };
+    const config = {
+      method,
+      headers,
+      body: method === "POST" ? JSON.stringify(body) : undefined
+    };
     const resp = await fetch(API_URL + url, config);
 
     if (resp.status === 200) {

@@ -15,6 +15,8 @@ import { get, post } from "utils/request";
 import { RemoteContent, SubmissionStateBox } from "components/Basics";
 import { renderRoute, routeEvents } from "state/route";
 import { CheckboxInput, TextInput, numberType } from "components/Forms";
+import { dateFormatter } from "utils/datetime";
+import { useGlubRoute } from "utils/context";
 
 export const Attendance: React.FC<{ member: Member }> = ({ member }) => {
   const [grades, updateGrades] = useState<RemoteData<Grades>>(loading);
@@ -22,7 +24,7 @@ export const Attendance: React.FC<{ member: Member }> = ({ member }) => {
 
   const loadAttendance = useCallback(async () => {
     const result = await get<{ grades: Grades }>(
-      `member/${member.email}?grades=true`
+      `members/${member.email}?grades=true`
     );
     updateGrades(mapLoaded(resultToRemote(result), member => member.grades));
   }, [updateGrades, member]);
@@ -49,12 +51,12 @@ export const Attendance: React.FC<{ member: Member }> = ({ member }) => {
         loadAttendance();
       }
     },
-    [grades, setState, loadAttendance]
+    [grades, member.email, setState, loadAttendance]
   );
 
   useEffect(() => {
     loadAttendance();
-  }, [loadAttendance]);
+  }, []);
 
   return (
     <>
@@ -69,7 +71,7 @@ export const Attendance: React.FC<{ member: Member }> = ({ member }) => {
                 <th>Type</th>
                 <th>Should Attend?</th>
                 <th>Did Attend?</th>
-                <th>Mins Late</th>
+                <th>Minutes Late</th>
                 <th>Point Change</th>
                 <th>Partial Score</th>
                 <th>Rationale</th>
@@ -94,6 +96,8 @@ interface AttendanceRowProps {
 }
 
 const AttendanceRow: React.FC<AttendanceRowProps> = ({ event, update }) => {
+  const { goToRoute } = useGlubRoute();
+
   const attendance = event.attendance || {
     shouldAttend: false,
     didAttend: false,
@@ -105,7 +109,9 @@ const AttendanceRow: React.FC<AttendanceRowProps> = ({ event, update }) => {
     <tr className="no-bottom-border">
       <td>{dateFormatter(event.callTime)}</td>
       <td>
-        <a href={renderRoute(routeEvents(event.id, null))}>{event.name}</a>
+        <a onClick={() => goToRoute(routeEvents(event.id, null))}>
+          {event.name}
+        </a>
       </td>
       <td>{event.type}</td>
       <td>
@@ -134,9 +140,9 @@ const AttendanceRow: React.FC<AttendanceRowProps> = ({ event, update }) => {
           placeholder="0"
         />
       </td>
-      <td>{event.gradeChange?.change}</td>
-      <td>{event.gradeChange?.partialScore}</td>
-      <td>{event.gradeChange?.reason}</td>
+      <td>{event.change?.change}</td>
+      <td>{event.change?.partialScore}</td>
+      <td>{event.change?.reason}</td>
     </tr>
   );
 };

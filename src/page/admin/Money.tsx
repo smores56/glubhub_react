@@ -6,7 +6,8 @@ import {
   resultToSubmissionState,
   sending,
   SubmissionState,
-  errorSending
+  errorSending,
+  isSending
 } from "state/types";
 import { Transaction, Fee, emptyTransactionBatch, Member } from "state/models";
 import { useGlubRoute, GlubHubContext } from "utils/context";
@@ -40,8 +41,9 @@ import {
   CheckboxInput
 } from "components/Forms";
 import ErrorBox from "components/ErrorBox";
-import { BackButton } from "components/Buttons";
+import { BackButton, LinkButton, Button } from "components/Buttons";
 import { fullName } from "utils/helpers";
+import { simpleDateWithYearFormatter } from "utils/datetime";
 
 export const Money: React.FC<{ tab: MoneyTab | null }> = ({ tab }) => {
   const [fees, updateFees] = useState<RemoteData<Fee[]>>(loading);
@@ -97,8 +99,9 @@ export const Money: React.FC<{ tab: MoneyTab | null }> = ({ tab }) => {
       updateTransactions(resultToRemote(transactions));
     };
 
-    Promise.all([loadFees, loadTransactions]);
-  }, [updateFees, updateTransactions]);
+    loadFees();
+    loadTransactions();
+  }, []);
 
   return (
     <div>
@@ -171,7 +174,6 @@ const MoneyActionButton: React.FC<{ tab: MoneyTab }> = ({ tab }) => {
         onClick={() => replaceRoute(routeAdmin(adminMoney(tab)))}
       >
         {tab.name}
-        {tab?.name}
       </button>
     </li>
   );
@@ -188,7 +190,7 @@ const SingleFee: React.FC<SingleFeeProps> = ({ fee, update }) => (
     value={fee.amount}
     onInput={amount => update({ ...fee, amount: amount || 0 })}
     horizontal
-    title={fee.name}
+    title={fee.description}
   />
 );
 
@@ -249,18 +251,11 @@ const BeholdThe: React.FC<{ text: string }> = ({ text }) => (
   </p>
 );
 
-const CancelButton: React.FC = () => {
-  const { replaceRoute } = useGlubRoute();
-
-  return (
-    <a
-      className="button is-pulled-right"
-      onClick={() => replaceRoute(routeAdmin(adminMoney(null)))}
-    >
-      ABORT! ABORT!
-    </a>
-  );
-};
+const CancelButton: React.FC = () => (
+  <LinkButton className="is-pulled-right" route={routeAdmin(adminMoney(null))}>
+    ABORT! ABORT!
+  </LinkButton>
+);
 
 const AssignDuesModal: React.FC = () => {
   const { replaceRoute } = useGlubRoute();
@@ -289,15 +284,15 @@ const AssignDuesModal: React.FC = () => {
         <BeholdThe text="folksy phrasing" />
         {state.status === "errorSending" && <ErrorBox error={state.error} />}
         <br />
-        <a
-          className={
-            "button is-primary is-pulled-left" +
-            (state.status === "sending" ? " is-loading" : "")
-          }
+        <Button
+          element="a"
+          color="is-primary"
+          className="is-pulled-left"
+          loading={isSending(state)}
           onClick={assignDues}
         >
           Dolla dolla bill, y'all
-        </a>
+        </Button>
         <CancelButton />
         <br />
       </div>
@@ -332,15 +327,15 @@ const AssignLateDuesModal: React.FC = () => {
         <BeholdThe text="folksy phrasing" />
         {state.status === "errorSending" && <ErrorBox error={state.error} />}
         <br />
-        <a
-          className={
-            "button is-primary is-pulled-left" +
-            (state.status === "sending" ? " is-loading" : "")
-          }
+        <Button
+          element="a"
+          color="is-primary"
+          className="is-pulled-left"
+          loading={isSending(state)}
           onClick={assignLateDues}
         >
           Dolla dolla bill, y'all
-        </a>
+        </Button>
         <CancelButton />
         <br />
       </div>
@@ -355,7 +350,10 @@ const BatchTransactions: React.FC = () => {
   const [batch, updateBatch] = useState(emptyTransactionBatch);
   const [state, setState] = useState(notSentYet);
 
-  const closeSidebar = () => replaceRoute(routeAdmin(adminMoney(null)));
+  const closeSidebar = useCallback(
+    () => replaceRoute(routeAdmin(adminMoney(null))),
+    [replaceRoute]
+  );
 
   const toggleMember = useCallback(
     (email: string) => {
@@ -380,7 +378,7 @@ const BatchTransactions: React.FC = () => {
     } else {
       setState(errorSending(result.error));
     }
-  }, [setState, replaceRoute]);
+  }, [setState, batch, closeSidebar]);
 
   return (
     <Sidebar
@@ -414,7 +412,7 @@ const BatchTransactions: React.FC = () => {
             placeholder="420"
             required
           />
-          <InputWrapper attrs={{ title: "Whomdst" }}>
+          <InputWrapper title="Whomdst">
             <Box>
               <ul style={{ columnCount: 3, columnGap: "20px" }}>
                 {members.map(member => (

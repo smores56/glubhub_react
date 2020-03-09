@@ -83,6 +83,7 @@ export const Minutes: React.FC<MinutesProps> = ({ minutesId, tab }) => {
 
   const loadMinutes = useCallback(
     async (id: number) => {
+      replaceRoute(routeMinutes(id, null));
       updateSelected(loading);
 
       const result = await get<MeetingMinutes>(`meeting_minutes/${id}`);
@@ -100,7 +101,7 @@ export const Minutes: React.FC<MinutesProps> = ({ minutesId, tab }) => {
       );
       updateSelected(loaded(updated));
     },
-    [updateMinutes, updateSelected]
+    [updateMinutes, minutes, updateSelected]
   );
 
   const savedMinutes = useCallback(
@@ -131,7 +132,7 @@ export const Minutes: React.FC<MinutesProps> = ({ minutesId, tab }) => {
     if (minutesId) {
       loadMinutes(minutesId);
     }
-  }, [updateMinutes, minutesId, loadMinutes]);
+  }, []);
 
   return (
     <Section>

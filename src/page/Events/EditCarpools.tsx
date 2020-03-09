@@ -49,7 +49,9 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
   const [selected, setSelected] = useState<string[]>([]);
   const [updateState, setUpdateState] = useState(notSentYet);
 
-  const getSelectedIfAllUnassigned = (): [CarpoolData, Member[]] | null => {
+  const getSelectedIfAllUnassigned = useCallback(():
+    | [CarpoolData, Member[]]
+    | null => {
     if (data.status !== "loaded" || !selected.length) {
       return null;
     }
@@ -64,13 +66,16 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
     } else {
       return null;
     }
-  };
+  }, [data, selected, members]);
 
-  const selectMember = useCallback((email: string) => {
-    if (selected.includes(email)) {
-      setSelected(selected.filter(s => s !== email));
-    }
-  }, []);
+  const selectMember = useCallback(
+    (email: string) => {
+      if (selected.includes(email)) {
+        setSelected(selected.filter(s => s !== email));
+      }
+    },
+    [selected, setSelected]
+  );
 
   // const selectEmptyCarpool;
 
@@ -108,7 +113,7 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
         carpools: [...loadedData.carpools, { driver, passengers }]
       })
     );
-  }, [data, selected, members, setData, setSelected]);
+  }, [setData, setSelected, getSelectedIfAllUnassigned]);
 
   const updateCarpools = useCallback(async () => {
     if (data.status !== "loaded") return;
@@ -125,7 +130,7 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
     } else {
       setUpdateState(errorSending(update.error));
     }
-  }, [data, setUpdateState, goToRoute]);
+  }, [data, setUpdateState, eventId, goToRoute]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -152,7 +157,7 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
   const selection: EditCarpoolSelection = {
     selected,
     select: selectMember,
-    selectEmptyCarpool
+    selectEmptyCarpool: () => {} // TODO
   };
 
   return (

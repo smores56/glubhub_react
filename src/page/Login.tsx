@@ -28,7 +28,7 @@ const Login: React.FC = () => {
 
   const submit = useCallback(async () => {
     setState(sending);
-    const body = { email, password: Md5.hashStr(password) };
+    const body = { email, passHash: Md5.hashStr(password) };
     const resp = await postReturning<typeof body, NewToken>("login", body);
 
     if (resp.successful) {
@@ -50,7 +50,7 @@ const Login: React.FC = () => {
         <Column narrow>
           <Box>
             <form onSubmit={submit}>
-              <img style={{ width: "100%" }} src="./glubhub.svg" />
+              <img style={{ width: "100%" }} alt="" src="./glubhub.svg" />
               <TextInput
                 type={emailType}
                 value={email}

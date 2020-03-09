@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from "react";
-import { Info, Enrollment, Uniform, Member } from "state/models";
+import { Info, Enrollment, Uniform, Member, Semester } from "state/models";
 import { fullName } from "utils/helpers";
 
 export interface FormInputType<T> {
@@ -55,7 +55,7 @@ export const phoneType: FormInputType<string> = {
 
 export const numberType: FormInputType<number | null> = {
   toString: x => (x ? `${x}` : ""),
-  fromString: x => (parseInt(x) !== NaN ? parseInt(x) : null),
+  fromString: x => (isNaN(parseInt(x)) ? null : parseInt(x)),
   textType: "number"
 };
 
@@ -89,6 +89,14 @@ export const enrollmentType: FormInputType<Enrollment | null> = {
   fromString: x => (x === "Class" || x === "Club" ? x : null),
   textType: "text"
 };
+
+export const semesterType = (
+  semesters: Semester[]
+): FormInputType<Semester | null> => ({
+  toString: x => x?.name || "(no semester)",
+  fromString: x => semesters.find(s => s.name === x) || null,
+  textType: "text"
+});
 
 export const Control: React.FC<{ expanded?: boolean }> = ({
   expanded,
@@ -286,52 +294,30 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
   </div>
 );
 
-// type alias FileInput msg =
-//     { file : Maybe File
-//     , selectFile : Maybe File -> msg
-//     , attrs : List FormAttribute
-//     }
+interface FileInputProps extends InputAttributes {
+  file: File | null;
+  selectFile: (file: File | null) => void;
+}
 
-// filesDecoder : Decode.Decoder (Maybe File)
-// filesDecoder =
-//     Decode.at [ "target", "files" ]
-//         (Decode.list File.decoder |> Decode.map List.head)
-
-// fileInput : FileInput msg -> Html msg
-// fileInput data =
-//     let
-//         uploadButton =
-//             span [ class "file-cta" ]
-//                 [ span [ class "file-icon" ]
-//                     [ i [ class "fas fa-upload" ] [] ]
-//                 , span [ class "file-label" ]
-//                     [ text "Choose a file..." ]
-//                 ]
-
-//         inputElement =
-//             input
-//                 [ class "file-input"
-//                 , type_ "file"
-//                 , on "change" (Decode.map data.selectFile filesDecoder)
-//                 ]
-//                 []
-
-//         maybeFileName =
-//             data.file
-//                 |> Maybe.map
-//                     (\file ->
-//                         span
-//                             [ class "file-name" ]
-//                             [ text (File.name file) ]
-//                     )
-//                 |> Maybe.withDefault (text "")
-//     in
-//     inputWrapper data.attrs <|
-//         [ div [ class "file has-name" ]
-//             [ label [ class "file-label" ]
-//                 [ inputElement
-//                 , uploadButton
-//                 , maybeFileName
-//                 ]
-//             ]
-//         ]
+export const FileInput: React.FC<FileInputProps> = props => (
+  <InputWrapper {...props}>
+    <div className="file has-name">
+      <label className="file-label">
+        <input
+          className="file-input"
+          type="file"
+          onChange={event =>
+            props.selectFile(event.target.files?.item(0) || null)
+          }
+        />
+        <span className="file-cta">
+          <span className="file-icon">
+            <i className="fas fa-upload" />
+          </span>
+          <span className="file-label">Choose a file...</span>
+        </span>
+        {props.file && <span className="file-name">{props.file.name}</span>}
+      </label>
+    </div>
+  </InputWrapper>
+);

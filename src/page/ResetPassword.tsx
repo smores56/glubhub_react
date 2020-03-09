@@ -34,7 +34,7 @@ export const ResetPassword: React.FC<{ token: string | null }> = ({
     } else {
       setState(errorSending(result.error));
     }
-  }, [password, confirmPassword, setState, goToRoute]);
+  }, [password, token, confirmPassword, setState, goToRoute]);
 
   return (
     <div className="container fullheight">

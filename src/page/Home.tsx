@@ -10,10 +10,12 @@ import {
   Title,
   Column,
   Box,
-  Spinner
+  Spinner,
+  Tooltip
 } from "components/Basics";
 import { GlubHubContext } from "utils/context";
-import { eventIsOver } from "utils/helpers";
+import { eventIsOver, romanNumeral } from "utils/helpers";
+import { fullDateTimeFormatter, dateFormatter } from "utils/datetime";
 
 export const Home: React.FC = () => {
   const [events, setEvents] = useState<RemoteData<GlubEvent[]>>(loading);
@@ -44,10 +46,14 @@ export const Home: React.FC = () => {
       data={events}
       render={events => {
         const [pastEvents, futureEvents] = organizeEvents(events);
+        const finalGrade = events[events.length - 1].change?.partialScore;
 
         return (
           <>
-            <GradesBlock pastEvents={pastEvents} />
+            <GradesBlock
+              finalGrade={finalGrade !== undefined ? finalGrade : 100}
+              pastEvents={pastEvents}
+            />
             {hovered && <EventHoverBox hovered={hovered} />}
             <Section>
               <Container>
@@ -122,7 +128,7 @@ const GradesBlock: React.FC<GradesBlockProps> = ({
         </p>
         {pastEvents.length ? (
           <>
-            {graphGrades}
+            {/* {graphGrades} TODO: this */}
             <p>
               <br />
               Do you have an issue? Do you need a daddy tissue?{" "}
@@ -157,14 +163,14 @@ const EventHoverBox: React.FC<{ hovered: HoveredEvent }> = ({ hovered }) => (
     </p>
     <p>{fullDateTimeFormatter(hovered.event.callTime)}</p>
     <p>
-      {hovered.event.gradeChange?.change || 0.0} points{" "}
+      {hovered.event.change?.change || 0.0} points{" "}
       <span className="icon is-primary has-text-primary">
         <i className="fas fa-arrow-right" />
       </span>{" "}
-      {hovered.event.gradeChange?.partialScore}%
+      {hovered.event.change?.partialScore}%
     </p>
     <p>
-      <em>{hovered.event.gradeChange?.reason}</em>
+      <em>{hovered.event.change?.reason}</em>
     </p>
   </div>
 );
@@ -237,22 +243,19 @@ interface GigIconProps {
 const GigIcon: React.FC<GigIconProps> = ({ gig }) => {
   if (gig) {
     return (
-      <span
-        className="icon is-large has-text-primary"
-        tooltip={`${gig.name} on ${dateFormatter(gig.callTime)}`}
-      >
-        <i className="far fa-2x fa-check-circle" />
-      </span>
+      <Tooltip content={`${gig.name} on ${dateFormatter(gig.callTime)}`}>
+        <span className="icon is-large has-text-primary">
+          <i className="far fa-2x fa-check-circle" />
+        </span>
+      </Tooltip>
     );
   } else {
     return (
-      <span
-        className="icon is-large"
-        style={{ color: "gray" }}
-        tooltip="Hopefully something soon..."
-      >
-        <i className="far fa-2x fa-frown" />
-      </span>
+      <Tooltip content="Hopefully something soon...">
+        <span className="icon is-large" style={{ color: "gray" }}>
+          <i className="far fa-2x fa-frown" />
+        </span>
+      </Tooltip>
     );
   }
 };

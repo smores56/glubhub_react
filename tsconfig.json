@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -14,14 +18,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "baseUrl": "src",
-    "paths": {
-      "@components": ["src/components"],
-      "@state": ["src/state"],
-      "@utils": ["src/utils"],
-      "@page": ["src/page"],
-      "@": ["src"]
-    }
+    "baseUrl": "src"
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

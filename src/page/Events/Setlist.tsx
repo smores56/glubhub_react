@@ -16,7 +16,7 @@ export const Setlist: React.FC<{ eventId: number }> = ({ eventId }) => {
     };
 
     loadSongs();
-  }, [setSongs]);
+  }, [setSongs, eventId]);
 
   return (
     <RemoteContent

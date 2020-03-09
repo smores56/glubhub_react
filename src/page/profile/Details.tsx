@@ -46,7 +46,7 @@ export const Details: React.FC<DetailsProps> = ({ member, update }) => {
       update(updatedMember.data);
       updateForm(null);
     }
-  }, [form, setState, update]);
+  }, [form, member.email, setState, update]);
 
   if (form) {
     return (

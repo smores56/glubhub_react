@@ -57,20 +57,24 @@ export const Container: React.FC = ({ children }) => (
   <div className="container">{children}</div>
 );
 
-// tooltip : String -> List (Html.Attribute msg)
-// tooltip content =
-//     [ class "tooltip is-tooltip"
-//     , style "cursor" "pointer"
-//     , attribute "data-tooltip" content
-//     ]
+interface TooltipProps {
+  content: string;
+  type?: "left" | "right" | "multiline";
+}
 
-// tooltipRight : String -> List (Html.Attribute msg)
-// tooltipRight content =
-//     class "is-tooltip-right" :: tooltip content
-
-// multilineTooltip : String -> List (Html.Attribute msg)
-// multilineTooltip content =
-//     class "is-tooltip-multiline" :: tooltip content
+export const Tooltip: React.FC<TooltipProps> = ({
+  content,
+  type,
+  children
+}) => (
+  <span
+    style={{ cursor: "pointer" }}
+    data-tooltip={content}
+    className={"tooltip is-tooltip" + (type ? `is-tooltip-${type}` : "")}
+  >
+    {children}
+  </span>
+);
 
 export const CheckOrCross: React.FC<{ checked: boolean }> = ({ checked }) => (
   <span className="icon is-medium">
@@ -113,11 +117,11 @@ export const AttendanceIcon: React.FC<{ event: GlubEvent }> = ({ event }) => {
     event.attendance.confirmed ? "confirmed" : "unconfirmed"
   }, ${event.attendance.shouldAttend ? "attending" : "not attending"}`;
 
-  // TODO: tooltip right with the above content
-
   return (
     <div className={colorClass}>
-      <CheckOrCross checked={event.attendance.shouldAttend} />
+      <Tooltip content={tooltipContent} type="right">
+        <CheckOrCross checked={event.attendance.shouldAttend} />
+      </Tooltip>
     </div>
   );
 };

@@ -8,15 +8,19 @@ import {
 } from "components/Basics";
 import { Member } from "state/models";
 import { fullName } from "utils/helpers";
-import { GlubHubContext } from "utils/context";
+import { GlubHubContext, useGlubRoute } from "utils/context";
+import { routeProfile } from "state/route";
 
 export const Roster: React.FC = () => {
+  const { goToRoute } = useGlubRoute();
   const { members } = useContext(GlubHubContext);
 
   const memberRow = (member: Member) => (
-    <tr>
+    <tr key={member.email}>
       <td>
-        <a href={"/profile/" + member.email}>{fullName(member)}</a>
+        <a onClick={() => goToRoute(routeProfile(member.email, null))}>
+          {fullName(member)}
+        </a>
       </td>
       <td>{member.section || "Homeless"}</td>
       <td>

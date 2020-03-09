@@ -11,7 +11,8 @@ import {
   routeRepertoire,
   routeRoster,
   routeMinutes,
-  routeProfile
+  routeProfile,
+  routeHome
 } from "state/route";
 
 export const Navbar: React.FC = () => {
@@ -25,7 +26,7 @@ export const Navbar: React.FC = () => {
   const singleLink = (route: GlubRoute) => (
     <a
       className={
-        "navbar-item" + (route.route == location?.route ? " is-active" : "")
+        "navbar-item" + (route.route === location?.route ? " is-active" : "")
       }
       href={renderRoute(route)}
     >
@@ -90,9 +91,7 @@ const AdminLinks: React.FC<{ user: Member | null }> = ({ user }) => {
 
   return (
     <div className="navbar-item has-dropdown is-hoverable">
-      <a className="navbar-link" href="/admin">
-        Admin
-      </a>
+      <a className="navbar-link">Admin</a>
       <div className="navbar-dropdown">
         {adminTabs.map((tabGroup, index) => [
           ...tabGroup.map(adminTab),
@@ -110,7 +109,12 @@ const DocumentLinks: React.FC<{ documents: DocumentLink[] }> = ({
     <a className="navbar-link">Documents</a>
     <div className="navbar-dropdown">
       {documents.map(document => (
-        <a className="navbar-item" target="_blank" href={document.url}>
+        <a
+          className="navbar-item"
+          target="_blank"
+          rel="noopener noreferrer"
+          href={document.url}
+        >
           {document.name}
         </a>
       ))}
@@ -119,7 +123,7 @@ const DocumentLinks: React.FC<{ documents: DocumentLink[] }> = ({
 );
 
 const HomeLogo: React.FC = () => (
-  <a href="/" className="navbar-item">
+  <a href={renderRoute(routeHome)} className="navbar-item">
     <span className="icon is-small" style={{ width: "3vw" }}>
       <i className="fas fa-home"></i>
     </span>

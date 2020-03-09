@@ -43,7 +43,7 @@ export const EditMinutes: React.FC<EditMinutesProps> = ({
     if (result.successful) {
       saved(minutes);
     }
-  }, [setSaveState, minutes]);
+  }, [setSaveState, saved, minutes]);
 
   const deleteMinutes = useCallback(async () => {
     setDeleteState(sending);
@@ -104,7 +104,7 @@ const DeleteMinutesModal: React.FC<DeleteMinutesModalProps> = ({
     confirm={confirm}
     state={state}
   >
-    Are you sure you want to delete these meeting minutes?. You can't undo that.
+    Are you sure you want to delete these meeting minutes? You can't undo that.
   </DeleteModal>
 );
 

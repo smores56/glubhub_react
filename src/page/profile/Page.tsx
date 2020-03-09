@@ -152,6 +152,7 @@ const ProfilePic: React.FC<{ member: Member }> = ({ member }) => (
       style={{
         backgroundImage: `url(${member.picture || "https://picsum.photos/250"})`
       }}
+      alt=""
     />
   </div>
 );
@@ -196,7 +197,7 @@ const UserActions: React.FC<{ member: Member }> = ({ member }) => {
       updateMembers(members.filter(m => m.email !== member.email));
       goToRoute(routeRoster);
     }
-  }, [setDeleteState, updateMembers, members, goToRoute]);
+  }, [setDeleteState, member.email, updateMembers, members, goToRoute]);
 
   if (user?.email === member.email) {
     return (
@@ -267,21 +268,34 @@ interface ProfileTabsProps {
   tab: ProfileTab;
 }
 
-const ProfileTabs: React.FC<ProfileTabsProps> = ({ member, tab }) => (
-  <div className="tabs">
-    <ul>
-      {[profileDetails, profileMoney, profileAttendance, profileSemesters].map(
-        profileTab => (
-          <li className={tab.route === profileTab.route ? "is-active" : ""}>
-            <a href={renderRoute(routeProfile(member.email, profileTab))}>
+const ProfileTabs: React.FC<ProfileTabsProps> = ({ member, tab }) => {
+  const { replaceRoute } = useGlubRoute();
+
+  return (
+    <div className="tabs">
+      <ul>
+        {[
+          profileDetails,
+          profileMoney,
+          profileAttendance,
+          profileSemesters
+        ].map(profileTab => (
+          <li
+            className={tab.route === profileTab.route ? "is-active" : undefined}
+          >
+            <a
+              onClick={() =>
+                replaceRoute(routeProfile(member.email, profileTab))
+              }
+            >
               {profileTab.name}
             </a>
           </li>
-        )
-      )}
-    </ul>
-  </div>
-);
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 interface TabContentProps {
   member: Member;
@@ -294,7 +308,7 @@ const TabContent: React.FC<TabContentProps> = ({
   tab,
   updateMember
 }) => {
-  switch (tab?.route) {
+  switch (tab.route) {
     case "attendance":
       return <Attendance member={member} />;
     case "semesters":

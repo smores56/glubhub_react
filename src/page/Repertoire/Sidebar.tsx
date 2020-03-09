@@ -5,7 +5,7 @@ import { BackButton, Button } from "components/Buttons";
 import { editRepertoire } from "state/permissions";
 import { playPitch, pitchToUnicode } from "utils/helpers";
 import { Song, SongLinkSection, Pitch, SongMode } from "state/models";
-import { Sidebar, RequiresPermission, Title } from "components/Basics";
+import { Sidebar, RequiresPermission, Title, Tooltip } from "components/Basics";
 
 interface SongSidebarProps {
   song: RemoteData<Song>;
@@ -78,9 +78,11 @@ const PitchSection: React.FC<PitchSectionProps> = ({ title, pitch, mode }) => (
   <p>
     {title}:{" "}
     {pitch ? (
-      <b onClick={() => playPitch(pitch)} tooltip="hey kid, wanna pitch?">
-        {pitchToUnicode(pitch)}
-        {mode ? ` ${mode}` : ""}
+      <b onClick={() => playPitch(pitch)}>
+        <Tooltip content="hey kid, wanna pitch?">
+          {pitchToUnicode(pitch)}
+          {mode ? ` ${mode}` : ""}
+        </Tooltip>
       </b>
     ) : (
       <b>?</b>

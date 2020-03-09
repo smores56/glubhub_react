@@ -22,7 +22,7 @@ interface GlubHubContextUpdate {
   updateUser: (member: Member | null) => void;
   updateMembers: (members: Member[]) => void;
   updateInfo: (info: Info) => void;
-  updateSemester: (semester: Semester) => void;
+  updateCurrentSemester: (semester: Semester) => void;
   refreshAll: () => Promise<void>;
 }
 
@@ -36,7 +36,7 @@ const initialContext: GlubHubContextType = {
   updateUser: () => {},
   updateMembers: () => {},
   updateInfo: () => {},
-  updateSemester: () => {},
+  updateCurrentSemester: () => {},
   refreshAll: async () => {}
 };
 
@@ -48,7 +48,7 @@ export const GlubHubContextProvider: React.FC = ({ children }) => {
   const [user, updateUser] = useState<Member | null>(initialContext.user);
   const [members, updateMembers] = useState<Member[]>(initialContext.members);
   const [info, updateInfo] = useState<Info | null>(initialContext.info);
-  const [currentSemester, updateSemester] = useState<Semester | null>(
+  const [currentSemester, updateCurrentSemester] = useState<Semester | null>(
     initialContext.currentSemester
   );
 
@@ -64,12 +64,12 @@ export const GlubHubContextProvider: React.FC = ({ children }) => {
     updateUser(user.successful ? user.data : null);
     updateMembers(members.successful ? members.data : []);
     updateInfo(info.successful ? info.data : null);
-    updateSemester(semester.successful ? semester.data : null);
-  }, [updateUser, updateMembers, updateInfo, updateSemester]);
+    updateCurrentSemester(semester.successful ? semester.data : null);
+  }, [updateUser, updateMembers, updateInfo, updateCurrentSemester]);
 
   useEffect(() => {
     refreshAll();
-  });
+  }, [refreshAll]);
 
   return (
     <GlubHubContext.Provider
@@ -81,7 +81,7 @@ export const GlubHubContextProvider: React.FC = ({ children }) => {
         info,
         updateInfo,
         currentSemester,
-        updateSemester,
+        updateCurrentSemester,
         refreshAll
       }}
     >

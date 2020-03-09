@@ -4,7 +4,17 @@ import { SelectableList } from "components/List";
 import { visibleAdminTabs } from "utils/helpers";
 import { AdminRoute, routeAdmin } from "state/route";
 import { GlubHubContext, useGlubRoute } from "utils/context";
-import { Section, Container, Columns, Box } from "components/Basics";
+import { Section, Container, Columns, Box, Column } from "components/Basics";
+import { AbsenceRequests } from "./AbsenceRequests";
+import { CreateEvent } from "./create-event/Page";
+import { DocumentLinks } from "./DocumentLinks";
+import { GigRequests } from "./GigRequests";
+import { Money } from "./Money";
+import { OfficerPositions } from "./OfficerPositions";
+import { Semesters } from "./Semesters";
+import { SitePermissions } from "./SitePermissions";
+import { Uniforms } from "./Uniforms";
+import { WebmasterTools } from "./WebmasterTools";
 
 export const Admin: React.FC<{ tab: AdminRoute | null }> = ({ tab }) => {
   const { goToRoute } = useGlubRoute();
@@ -21,46 +31,49 @@ export const Admin: React.FC<{ tab: AdminRoute | null }> = ({ tab }) => {
             onSelect={t => goToRoute(routeAdmin(t))}
             render={t => <td>{t.name}</td>}
           />
-          {tab ? (
-            <TabContent tab={tab} />
-          ) : (
-            <Box>Please select a menu item</Box>
-          )}
+          <div>
+            {tab ? (
+              <TabContent tab={tab} />
+            ) : (
+              <Box>Please select a menu item</Box>
+            )}
+          </div>
         </Columns>
       </Container>
     </Section>
   );
 };
 
-// tabContent : FullAdminTab -> Html Msg
-// tabContent tab =
-//     case tab of
-//         FullAdminCreateEvent tabModel ->
-//             CreateEvent.view tabModel |> Html.map CreateEventMsg
+const TabContent: React.FC<{ tab: AdminRoute }> = ({ tab }) => {
+  switch (tab.route) {
+    case "absence-requests":
+      return <AbsenceRequests />;
 
-//         FullAdminGigRequests tabModel ->
-//             GigRequests.view tabModel |> Html.map GigRequestsMsg
+    case "create-event":
+      return <CreateEvent gigRequestId={tab.gigRequestId} />;
 
-//         FullAdminAbsenceRequests tabModel ->
-//             AbsenceRequests.view tabModel |> Html.map AbsenceRequestsMsg
+    case "document-links":
+      return <DocumentLinks />;
 
-//         FullAdminEditSemester tabModel ->
-//             EditSemester.view tabModel |> Html.map EditSemesterMsg
+    case "gig-requests":
+      return <GigRequests />;
 
-//         FullAdminOfficerPositions tabModel ->
-//             OfficerPositions.view tabModel |> Html.map OfficerPositionsMsg
+    case "money":
+      return <Money tab={tab.tab} />;
 
-//         FullAdminSitePermissions tabModel ->
-//             SitePermissions.view tabModel |> Html.map SitePermissionsMsg
+    case "officer-positions":
+      return <OfficerPositions />;
 
-//         FullAdminUniforms tabModel ->
-//             Uniforms.view tabModel |> Html.map UniformsMsg
+    case "semesters":
+      return <Semesters tab={tab.tab} />;
 
-//         FullAdminDues tabModel ->
-//             Dues.view tabModel |> Html.map DuesMsg
+    case "site-permissions":
+      return <SitePermissions />;
 
-//         FullAdminDocumentLinks tabModel ->
-//             DocumentLinks.view tabModel |> Html.map DocumentLinksMsg
+    case "uniforms":
+      return <Uniforms />;
 
-//         FullAdminWebmasterTools tabModel ->
-//             WebmasterTools.view tabModel |> Html.map WebmasterToolsMsg
+    case "webmaster-tools":
+      return <WebmasterTools />;
+  }
+};

@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
 import {
-  RouteEvents,
   routeEvents,
   EventTab,
   eventDetails,
@@ -16,7 +15,8 @@ import {
   loaded,
   errorLoading,
   resultToRemote,
-  mapLoaded
+  mapLoaded,
+  isLoaded
 } from "state/types";
 import {
   Section,
@@ -42,8 +42,14 @@ import { EditEvent } from "./edit/Page";
 import { Attendees } from "./Attendees";
 import { Attendance } from "./Attendance";
 import { RequestAbsence } from "./RequestAbsence";
+import { simpleDateFormatter } from "utils/datetime";
 
-export const Events: React.FC<{ route: RouteEvents }> = ({ route }) => {
+interface EventsProps {
+  eventId: number | null;
+  tab: EventTab | null;
+}
+
+export const Events: React.FC<EventsProps> = ({ eventId, tab }) => {
   const { replaceRoute } = useGlubRoute();
 
   const [events, setEvents] = useState<RemoteData<GlubEvent[]>>(loading);
@@ -64,7 +70,7 @@ export const Events: React.FC<{ route: RouteEvents }> = ({ route }) => {
 
   const changeTab = useCallback(
     (tab: EventTab) => {
-      if (selected.status === "loaded") {
+      if (isLoaded(selected)) {
         replaceRoute(routeEvents(selected.data.id, tab));
       }
     },
@@ -73,15 +79,11 @@ export const Events: React.FC<{ route: RouteEvents }> = ({ route }) => {
 
   const loadEvent = useCallback(
     async (eventId: number) => {
+      setSelected(loading);
       const result = await get<GlubEvent>(`events/${eventId}`);
-
-      if (result.successful) {
-        selectEvent(result.data);
-      } else {
-        setSelected(errorLoading(result.error));
-      }
+      setSelected(resultToRemote(result));
     },
-    [setSelected, selectEvent]
+    [setSelected]
   );
 
   const propagateEventUpdate = useCallback(
@@ -94,19 +96,25 @@ export const Events: React.FC<{ route: RouteEvents }> = ({ route }) => {
     [events, setEvents, setSelected]
   );
 
+  const deletedEvent = useCallback(
+    (event: GlubEvent) => {
+      setSelected(notAsked);
+      setEvents(mapLoaded(events, x => x.filter(e => e.id !== event.id)));
+    },
+    [setSelected, setEvents, events]
+  );
+
   useEffect(() => {
     const loadEvents = async () => {
       const result = await get<GlubEvent[]>("events?attendance=true");
-      setEvents(
-        mapLoaded(resultToRemote<GlubEvent[]>(result), e => e.reverse())
-      );
+      setEvents(resultToRemote(result));
     };
 
     loadEvents();
-    if (route.eventId !== null) {
-      loadEvent(route.eventId);
+    if (eventId !== null) {
+      loadEvent(eventId);
     }
-  }, [setEvents, route, loadEvent]);
+  }, []);
 
   const selectedId = selected.status === "loaded" ? selected.data.id : null;
   const upcomingEvents = mapLoaded(events, x =>
@@ -134,42 +142,18 @@ export const Events: React.FC<{ route: RouteEvents }> = ({ route }) => {
         close={unselectEvent}
         render={event => (
           <TabContent
-            tab={route.tab}
+            tab={tab}
             event={event}
             changeTab={changeTab}
             unselectEvent={unselectEvent}
             updateEvent={propagateEventUpdate}
+            deletedEvent={deletedEvent}
           />
         )}
       />
     </>
   );
 };
-
-//         ( OnDeleteEvent eventId, _ ) ->
-//             ( { model
-//                 | selected = NotAsked
-//                 , events = model.events |> mapLoaded (List.filter (\e -> e.id /= eventId))
-//               }
-//             , Cmd.none
-//             )
-
-//         ( OnEditEvent event, _ ) ->
-//             let
-//                 eventMapper e =
-//                     if e.id == event.id then
-//                         event
-
-//                     else
-//                         e
-
-//                 updatedModel =
-//                     { model
-//                         | selected = model.selected |> mapLoaded (Tuple.mapFirst (\_ -> event))
-//                         , events = model.events |> mapLoaded (List.map eventMapper)
-//                     }
-//             in
-//             changeTab event EventDetails updatedModel
 
 interface EventColumnsProps {
   events: RemoteData<GlubEvent[]>;
@@ -183,16 +167,18 @@ const EventColumns: React.FC<EventColumnsProps> = ({
   onSelect
 }) => {
   const column = (title: string, allowedEventTypes: GlubEventType[]) => (
-    <SelectableList
-      title={title}
-      listItems={mapLoaded(events, all => [
-        all.filter(event => allowedEventTypes.includes(event.type))
-      ])}
-      isSelected={event => event.id === selectedId}
-      onSelect={onSelect}
-      render={event => <EventRow event={event} />}
-      messageIfEmpty="No events here, misster."
-    />
+    <div className="column is-one-quarter is-centered">
+      <SelectableList
+        title={title}
+        listItems={mapLoaded(events, all => [
+          all.filter(event => allowedEventTypes.includes(event.type))
+        ])}
+        isSelected={event => event.id === selectedId}
+        onSelect={onSelect}
+        render={event => <EventRow event={event} />}
+        messageIfEmpty="No events here, misster."
+      />
+    </div>
   );
 
   return (
@@ -253,6 +239,7 @@ interface TabContentProps {
   unselectEvent: () => void;
   changeTab: (tab: EventTab) => void;
   updateEvent: (event: GlubEvent) => void;
+  deletedEvent: (event: GlubEvent) => void;
 }
 
 const TabContent: React.FC<TabContentProps> = props => {
@@ -327,7 +314,11 @@ const TabContent: React.FC<TabContentProps> = props => {
       return (
         <>
           {header}
-          <Details event={props.event} />
+          <Details
+            event={props.event}
+            updateEvent={props.updateEvent}
+            deletedEvent={() => props.deletedEvent(props.event)}
+          />
         </>
       );
   }

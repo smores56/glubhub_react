@@ -1,0 +1,171 @@
+.oldgold-text {
+  color: #b4a46a;
+}
+
+.oldgold {
+  background-color: #b4a46a;
+}
+
+.tooltip.is-tooltip-primary::before {
+  background: rgba(0, 209, 178, 0.1);
+}
+
+.is-tooltip[data-tooltip]::before {
+  z-index: 200;
+}
+
+.is-tooltip:hover::before {
+  z-index: 200;
+}
+
+table.is-fullwidth.is-hoverable:hover {
+  cursor: pointer;
+}
+
+.select:not(.is-multiple):not(.is-loading)::after {
+  border-color: #b4a46a;
+}
+
+.placeholder {
+  width: 250px;
+  height: 250px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url('../public/placeholder.png');
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+html {
+  background-color: #fafafa;
+}
+
+div.container.fullheight {
+  height: 80%;
+}
+
+div.container.fullheight div.columns {
+  height: 100%;
+}
+
+a.button.is-primary:not(.is-outlined) {
+  color: white;
+}
+
+button.button.is-primary:not(.is-outlined) {
+  color: white;
+}
+
+div.spinner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+div.spinner-inner {
+  display: block;
+}
+
+div.spinner i {
+  animation-duration: 1s;
+}
+
+.sidenav {
+  height: 100%;
+  position: fixed;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  background-color: white;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  padding: 20px;
+  padding-top: 100px;
+}
+
+@media screen and (max-width: 768px) {
+  .sidenav:not(.hidden) {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .sidenav:not(.hidden) {
+    width: 40%;
+  }
+}
+
+.transparent-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transition: 0s;
+  background-color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.sidenav .is-divider[data-content]::after {
+  background-color: #fff;
+}
+
+.box .is-divider[data-content]::after {
+  background-color: #fff;
+}
+
+.is-divider[data-content]::after {
+  background-color: #fafafa;
+}
+
+.vertheader {
+  writing-mode: sideways-lr;
+  width: 20px;
+  margin-left: -35px;
+}
+
+tr.no-bottom-border td {
+  border-bottom: 0px;
+}
+
+table.no-bottom-border td {
+  border-bottom: 0px;
+}
+
+table.is-hoverable tr.not-hoverable:hover {
+  background-color: #fff;
+}
+
+.timeline body {
+  background-color: #fafafa;
+}
+
+.timeline .dot {
+  fill: #b4a46a;
+  stroke: white;
+}
+.timeline .now {
+  stroke: none;
+  fill: black;
+}
+.timeline .box-topper {
+  margin-bottom: 0;
+}
+.timeline path {
+  stroke: #b4a46a;
+}
+
+.timeline .domain {
+  stroke-linecap: round;
+  stroke-width: 5; /* Can this be bound somehow? */
+}
+.timeline .tick line {
+  stroke: none;
+}

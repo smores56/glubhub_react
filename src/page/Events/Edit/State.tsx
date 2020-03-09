@@ -1,4 +1,9 @@
 import { Uniform, GlubEvent } from "state/models";
+import {
+  twentyFourHourTimeFormatter,
+  hyphenDateFormatter,
+  parseFormDateAndTimeString
+} from "utils/datetime";
 
 export interface EventForm {
   name: string;
@@ -82,8 +87,8 @@ export const buildUpdateBody = (event: EventForm, gig: GigForm) => ({
   name: event.name,
   semester: event.semester,
   type: event.type,
-  callTime: encodeDatetime(event.callDate, event.callTime),
-  releaseTime: encodeDatetime(event.releaseDate, event.releaseTime),
+  callTime: parseFormDateAndTimeString(event.callDate, event.callTime),
+  releaseTime: parseFormDateAndTimeString(event.releaseDate, event.releaseTime),
   points: event.points || 5,
   comments: event.comments,
   location: event.location,
@@ -91,7 +96,10 @@ export const buildUpdateBody = (event: EventForm, gig: GigForm) => ({
   defaultAttend: event.defaultAttend,
 
   // -- gig fields
-  performanceTime: encodeDatetime(event.callDate, gig.performanceTime),
+  performanceTime: parseFormDateAndTimeString(
+    event.callDate,
+    gig.performanceTime
+  ),
   uniform: gig.uniform?.id || null,
   contactName: gig.contactName,
   contactEmail: gig.contactEmail,

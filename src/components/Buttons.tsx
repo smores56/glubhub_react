@@ -1,5 +1,5 @@
 import React, { CSSProperties } from "react";
-import { GlubRoute, renderRoute } from "state/route";
+import { GlubRoute } from "state/route";
 import { useGlubRoute } from "utils/context";
 
 interface BackButtonProps {
@@ -17,8 +17,8 @@ export const BackButton: React.FC<BackButtonProps> = ({ content, click }) => (
     <i
       className="fas fa-arrow-left"
       style={{ fontSize: "16px", ...middleInlineStyle }}
-    />
-    <span style={middleInlineStyle}> {content}</span>
+    />{" "}
+    <span style={middleInlineStyle}>{content}</span>
   </span>
 );
 

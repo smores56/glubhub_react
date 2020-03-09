@@ -5,12 +5,7 @@ import { useGlubRoute } from "utils/context";
 import { routeLogin } from "state/route";
 import { Column, Title4, Box } from "components/Basics";
 import { TextInput, emailType } from "components/Forms";
-import {
-  ButtonGroup,
-  LinkButton,
-  Button,
-  SubmitButton
-} from "components/Buttons";
+import { ButtonGroup, LinkButton, SubmitButton } from "components/Buttons";
 import ErrorBox from "components/ErrorBox";
 
 export const ForgotPassword: React.FC = () => {

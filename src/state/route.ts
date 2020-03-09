@@ -214,7 +214,7 @@ export type AdminRoute =
   | { name: "Create Event"; route: "create-event"; gigRequestId: number | null }
   | { name: "Gig Requests"; route: "gig-requests" }
   | { name: "Absence Requests"; route: "absence-requests" }
-  | { name: "Edit the Semester"; route: "edit-semester" }
+  | { name: "Edit the Semester"; route: "semesters"; tab: SemesterTab | null }
   | { name: "Edit Officers"; route: "officer-positions" }
   | { name: "Edit Permissions"; route: "site-permissions" }
   | { name: "Edit Documents"; route: "document-links" }
@@ -237,10 +237,11 @@ export const adminAbsenceRequests: AdminRoute = {
   name: "Absence Requests",
   route: "absence-requests"
 };
-export const adminEditSemester: AdminRoute = {
+export const adminSemesters = (tab: SemesterTab | null): AdminRoute => ({
   name: "Edit the Semester",
-  route: "edit-semester"
-};
+  route: "semesters",
+  tab
+});
 export const adminOfficerPositions: AdminRoute = {
   name: "Edit Officers",
   route: "officer-positions"
@@ -290,6 +291,31 @@ export const moneyAssignLateDues: MoneyTab = {
 export const moneyBatchTransactions: MoneyTab = {
   route: "batch-transactions",
   name: "Bake a batch of chocolate chip transactions"
+};
+
+// Edit Semester Tabs //////////////////////////
+
+export type SemesterTab =
+  | { route: "change"; name: "Switch semesters" }
+  | { route: "create"; name: "Birth a semester" }
+  | {
+      route: "edit";
+      name: "Edit this semester";
+    };
+
+// Edit Semester Tab Constructors
+
+export const semesterChange: SemesterTab = {
+  route: "change",
+  name: "Switch semesters"
+};
+export const semesterCreate: SemesterTab = {
+  route: "create",
+  name: "Birth a semester"
+};
+export const semesterEdit: SemesterTab = {
+  route: "edit",
+  name: "Edit this semester"
 };
 
 // Parsing Routes //////////////////////////
@@ -345,22 +371,22 @@ const parseProfileRoute = (segments: string[]): GlubRoute | null => {
     return null;
   }
 
-  if (segments.length === 1) {
-    return routeProfile(segments[0], null);
-  }
+  const email = segments[0];
+  switch (segments[1]) {
+    case undefined:
+      return routeProfile(email, null);
 
-  switch (segments[2]) {
     case profileAttendance.route:
-      return routeProfile(segments[0], profileAttendance);
+      return routeProfile(email, profileAttendance);
 
     case profileDetails.route:
-      return routeProfile(segments[0], profileDetails);
+      return routeProfile(email, profileDetails);
 
     case profileMoney.route:
-      return routeProfile(segments[0], profileMoney);
+      return routeProfile(email, profileMoney);
 
     case profileSemesters.route:
-      return routeProfile(segments[0], profileSemesters);
+      return routeProfile(email, profileSemesters);
 
     default:
       return null;
@@ -372,52 +398,46 @@ const parseEventsRoute = (segments: string[]): GlubRoute | null => {
     return routeEvents(null, null);
   }
 
-  if (segments.length === 1) {
-    try {
-      const eventId = parseInt(segments[0]);
-      return routeEvents(eventId, null);
-    } catch {
-      return null;
-    }
+  const eventId = parseInt(segments[0]);
+  if (isNaN(eventId)) {
+    return null;
   }
 
-  try {
-    const eventId = parseInt(segments[0]);
-    switch (segments[2]) {
-      case eventDetails.route:
-        return routeEvents(eventId, eventDetails);
+  switch (segments[1]) {
+    case undefined:
+      return routeEvents(eventId, null);
 
-      case eventAttendees.route:
-        return routeEvents(eventId, eventAttendees);
+    case eventDetails.route:
+      return routeEvents(eventId, eventDetails);
 
-      case eventAttendance.route:
-        return routeEvents(eventId, eventAttendance);
+    case eventAttendees.route:
+      return routeEvents(eventId, eventAttendees);
 
-      case eventSetlist.route:
-        return routeEvents(eventId, eventSetlist);
+    case eventAttendance.route:
+      return routeEvents(eventId, eventAttendance);
 
-      case eventCarpools.route:
-        return routeEvents(eventId, eventCarpools);
+    case eventSetlist.route:
+      return routeEvents(eventId, eventSetlist);
 
-      case eventRequestAbsence.route:
-        return routeEvents(eventId, eventRequestAbsence);
+    case eventCarpools.route:
+      return routeEvents(eventId, eventCarpools);
 
-      case eventEdit.route:
-        return routeEvents(eventId, eventEdit);
+    case eventRequestAbsence.route:
+      return routeEvents(eventId, eventRequestAbsence);
 
-      default:
-        return null;
-    }
-  } catch {
-    return null;
+    case eventEdit.route:
+      return routeEvents(eventId, eventEdit);
+
+    default:
+      return null;
   }
 };
 
 const parseEditCarpoolsRoute = (segments: string[]): GlubRoute | null => {
-  try {
-    const eventId = parseInt(segments[0]);
+  const eventId = parseInt(segments[0]);
+  if (!isNaN(eventId)) {
     return routeEditCarpools(eventId);
-  } catch {
+  } else {
     return null;
   }
 };
@@ -427,10 +447,10 @@ const parseRepertoireRoute = (segments: string[]): GlubRoute | null => {
     return routeRepertoire(null);
   }
 
-  try {
-    const songId = parseInt(segments[0]);
+  const songId = parseInt(segments[0]);
+  if (!isNaN(songId)) {
     return routeRepertoire(songId);
-  } catch {
+  } else {
     return null;
   }
 };
@@ -440,32 +460,26 @@ const parseMinutesRoute = (segments: string[]): GlubRoute | null => {
     return routeMinutes(null, null);
   }
 
-  if (segments.length === 1) {
-    try {
-      const minutesId = parseInt(segments[0]);
-      return routeMinutes(minutesId, null);
-    } catch {
-      return null;
-    }
+  const minutesId = parseInt(segments[0]);
+  if (isNaN(minutesId)) {
+    return null;
   }
 
-  try {
-    const minutesId = parseInt(segments[0]);
-    switch (segments[2]) {
-      case minutesPublic.route:
-        return routeMinutes(minutesId, minutesPublic);
+  switch (segments[1]) {
+    case undefined:
+      return routeMinutes(minutesId, null);
 
-      case minutesPrivate.route:
-        return routeMinutes(minutesId, minutesPrivate);
+    case minutesPublic.route:
+      return routeMinutes(minutesId, minutesPublic);
 
-      case minutesEdit.route:
-        return routeMinutes(minutesId, minutesEdit);
+    case minutesPrivate.route:
+      return routeMinutes(minutesId, minutesPrivate);
 
-      default:
-        return null;
-    }
-  } catch {
-    return null;
+    case minutesEdit.route:
+      return routeMinutes(minutesId, minutesEdit);
+
+    default:
+      return null;
   }
 };
 
@@ -485,9 +499,6 @@ const parseAdminRoute = (segments: string[]): GlubRoute | null => {
     case adminAbsenceRequests.route:
       return routeAdmin(adminAbsenceRequests);
 
-    case adminEditSemester.route:
-      return routeAdmin(adminEditSemester);
-
     case adminOfficerPositions.route:
       return routeAdmin(adminOfficerPositions);
 
@@ -503,12 +514,30 @@ const parseAdminRoute = (segments: string[]): GlubRoute | null => {
     case adminUniforms.route:
       return routeAdmin(adminUniforms);
 
+    case adminSemesters(null).route:
+      if (segments.length === 1) {
+        return routeAdmin(adminSemesters(null));
+      }
+
+      switch (segments[1]) {
+        case semesterChange.route:
+          return routeAdmin(adminSemesters(semesterChange));
+
+        case semesterCreate.route:
+          return routeAdmin(adminSemesters(semesterCreate));
+
+        case semesterEdit.route:
+          return routeAdmin(adminSemesters(semesterEdit));
+
+        default:
+          return null;
+      }
+
     case adminMoney(null).route:
       if (segments.length === 1) {
         return routeAdmin(adminMoney(null));
       }
 
-      const tab = segments[1];
       switch (segments[1]) {
         case moneyAssignDues.route:
           return routeAdmin(adminMoney(moneyAssignDues));
@@ -528,10 +557,10 @@ const parseAdminRoute = (segments: string[]): GlubRoute | null => {
         return routeAdmin(adminCreateEvent(null));
       }
 
-      try {
-        const gigRequestId = parseInt(segments[1]);
+      const gigRequestId = parseInt(segments[1]);
+      if (!isNaN(gigRequestId)) {
         return routeAdmin(adminCreateEvent(gigRequestId));
-      } catch {
+      } else {
         return null;
       }
 
@@ -553,7 +582,9 @@ const buildAdminRoute = (base: string, tab: AdminRoute | null): string[] => {
   } else if (tab.route === "create-event" && tab.gigRequestId !== null) {
     return [base, tab.route, `${tab.gigRequestId}`];
   } else if (tab.route === "money" && tab.tab !== null) {
-    return [base, tab.route, `${tab.tab.route}`];
+    return [base, tab.route, tab.tab.route];
+  } else if (tab.route === "semesters" && tab.tab !== null) {
+    return [base, tab.route, tab.tab.route];
   } else {
     return [base, tab.route];
   }
@@ -572,7 +603,7 @@ const buildMinutesRoute = (
 ): string[] => [base, ...(id ? [`${id}`] : []), ...(tab ? [tab.route] : [])];
 
 const buildRoute = (route: GlubRoute): string[] => {
-  if (route.route === "") {
+  if (!route.route) {
     return [];
   } else if (route.route === "events") {
     return buildEventsRoute(route.route, route.eventId, route.tab);

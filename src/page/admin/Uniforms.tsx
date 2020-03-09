@@ -111,7 +111,6 @@ export const Uniforms: React.FC = () => {
                   tryToDelete={setUniformToDelete}
                 />
               ))}
-              ))}
               <tr>
                 <td>New</td>
               </tr>

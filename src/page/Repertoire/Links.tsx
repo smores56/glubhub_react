@@ -50,7 +50,12 @@ export const SongLinkButton: React.FC<SongLinkProps> = ({ link, onDelete }) => {
 };
 
 const SheetMusicLink: React.FC<LinkButtonProps> = ({ url, name }) => (
-  <a className="button is-outlined is-primary" href={url} target="_blank">
+  <a
+    className="button is-outlined is-primary"
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
     <span className="icon">
       <i className="fas fa-scroll" />
     </span>
@@ -59,7 +64,12 @@ const SheetMusicLink: React.FC<LinkButtonProps> = ({ url, name }) => (
 );
 
 const MidiLink: React.FC<LinkButtonProps> = ({ url, name }) => (
-  <a className="button is-outlined is-primary" href={url} target="_blank">
+  <a
+    className="button is-outlined is-primary"
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
     <span className="icon">
       <i className="fas fa-volume-up" />
     </span>
@@ -75,7 +85,7 @@ const VideoLink: React.FC<LinkButtonProps> = ({ url, name }) => (
     >
       <i className="fas fa-external-link-alt" />
     </span>
-    <a className="button" href={url} target="_blank">
+    <a className="button" href={url} target="_blank" rel="noopener noreferrer">
       <span className="icon has-text-danger">
         <i className="fab fa-youtube" />
       </span>
@@ -85,7 +95,7 @@ const VideoLink: React.FC<LinkButtonProps> = ({ url, name }) => (
 );
 
 const DefaultLink: React.FC<LinkButtonProps> = ({ url, name }) => (
-  <a className="button" target="_blank" href={url}>
+  <a className="button" target="_blank" href={url} rel="noopener noreferrer">
     {name}
   </a>
 );

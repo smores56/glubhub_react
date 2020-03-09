@@ -9,7 +9,8 @@ import {
   resultToRemote,
   sending,
   errorSending,
-  mapLoaded
+  mapLoaded,
+  isLoaded
 } from "state/types";
 import {
   Container,
@@ -26,24 +27,25 @@ import { SelectableList } from "components/List";
 import DeleteModal from "components/DeleteModal";
 import { editRepertoire } from "state/permissions";
 import { BackButton, ButtonGroup, Button } from "components/Buttons";
-import { RouteRepertoire, routeRepertoire } from "state/route";
+import { routeRepertoire } from "state/route";
 import { get, postReturning, NewId, deleteRequest } from "utils/request";
 
-export const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
+interface RepertoireProps {
+  songId: number | null;
+}
+
+export const Repertoire: React.FC<RepertoireProps> = ({ songId }) => {
   const { replaceRoute } = useGlubRoute();
 
   const [songs, setSongs] = useState<RemoteData<Song[]>>(loading);
   const [selected, setSelected] = useState<RemoteData<Song>>(notAsked);
   const [createState, setCreateState] = useState(notSentYet);
   const [deleteState, setDeleteState] = useState<SubmissionState | null>(null);
-
-  const loadSongs = useCallback(async () => {
-    const resp = await get<Song[]>(`repertoire`);
-    setSongs(resultToRemote(resp));
-  }, [setSongs]);
+  const [editing, setEditing] = useState(false);
 
   const loadSong = useCallback(
     async (songId: number) => {
+      setSelected(loading);
       const resp = await get<Song>(`repertoire/${songId}?details=true`);
       setSelected(resultToRemote(resp));
       replaceRoute(routeRepertoire(songId));
@@ -71,7 +73,7 @@ export const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
 
     if (resp.successful) {
       setCreateState(notSentYet);
-      await loadSong(resp.data.id);
+      loadSong(resp.data.id);
     } else {
       setCreateState(errorSending(resp.error));
     }
@@ -98,13 +100,18 @@ export const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
   // Load Songs on Initialize
 
   useEffect(() => {
-    loadSongs();
-    if (route.songId !== null) {
-      loadSong(route.songId);
-    }
-  }, [route, loadSong, loadSongs]);
+    const loadSongs = async () => {
+      const resp = await get<Song[]>(`repertoire`);
+      setSongs(resultToRemote(resp));
+    };
 
-  const selectedId = selected.status === "loaded" ? selected.data.id : null;
+    loadSongs();
+    if (songId !== null) {
+      loadSong(songId);
+    }
+  }, []);
+
+  const selectedId = isLoaded(selected) ? selected.data.id : null;
   const columns: [
     string,
     (songs: Song[]) => Song[],
@@ -141,7 +148,7 @@ export const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
           </Columns>
         </Container>
       </Section>
-      {selected.status === "loaded" ? (
+      {isLoaded(selected) && editing ? (
         <Sidebar
           data={loaded(null)}
           close={unselectSong}
@@ -149,7 +156,7 @@ export const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
             <div>
               <BackButton
                 content="finish editing"
-                click={() => setSelected(loaded(selected.data))}
+                click={() => setEditing(false)}
               />
               {/* {Html.map editSongTranslator (EditSong.view editSongModel)} */}
             </div>
@@ -159,7 +166,7 @@ export const Repertoire: React.FC<{ route: RouteRepertoire }> = ({ route }) => {
         <SongSidebar
           song={selected}
           close={unselectSong}
-          edit={() => setSelected(loading)}
+          edit={() => setEditing(true)}
           tryToDelete={() => setDeleteState(notSentYet)}
         />
       )}

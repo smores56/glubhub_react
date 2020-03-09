@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Member, ActiveSemester } from "state/models";
-import { RemoteData, loading, resultToRemote } from "state/types";
+import { RemoteData, loading, resultToRemote, mapLoaded } from "state/types";
 import { get } from "utils/request";
 import { RemoteContent } from "components/Basics";
+import { roundToTwoDigits } from "utils/helpers";
 
 export const Semesters: React.FC<{ member: Member }> = ({ member }) => {
   const [semesters, setSemesters] = useState<RemoteData<ActiveSemester[]>>(
@@ -12,8 +13,8 @@ export const Semesters: React.FC<{ member: Member }> = ({ member }) => {
   useEffect(() => {
     const loadSemesters = async () => {
       const url = `members/${member.email}?details=true`;
-      const result = await get<ActiveSemester[]>(url);
-      setSemesters(resultToRemote(result));
+      const result = await get<{ semesters: ActiveSemester[] }>(url);
+      setSemesters(mapLoaded(resultToRemote(result), x => x.semesters));
     };
 
     loadSemesters();

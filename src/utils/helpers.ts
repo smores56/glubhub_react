@@ -1,10 +1,10 @@
-import { Pitch, Member, GlubEvent } from "state/models";
+import { Pitch, Member, GlubEvent, RolePermission } from "state/models";
 import {
   AdminRoute,
   adminCreateEvent,
   adminGigRequests,
   adminAbsenceRequests,
-  adminEditSemester,
+  adminSemesters,
   adminDocumentLinks,
   adminOfficerPositions,
   adminUniforms,
@@ -49,6 +49,17 @@ export const playPitch = (pitch: Pitch): void => {
   synth.triggerAttackRelease(Tone.Midi(`${pitchToUnicode(pitch)}4`), "1n");
 };
 
+export const rolePermissionsAreEqual = (
+  permission1: RolePermission,
+  permission2: RolePermission
+): boolean =>
+  permission1.role === permission2.role &&
+  permission1.permission === permission2.permission &&
+  permission1.eventType === permission2.eventType;
+
+export const roundToTwoDigits = (x: number): number =>
+  Math.round(x * 100) / 100.0;
+
 export const visibleAdminTabs = (user: Member): AdminRoute[][] => {
   const eventTabs: [AdminRoute, boolean][] = [
     [adminCreateEvent(null), permittedTo(user, Permissions.createEvent)],
@@ -59,7 +70,7 @@ export const visibleAdminTabs = (user: Member): AdminRoute[][] => {
     ]
   ];
   const dataTabs: [AdminRoute, boolean][] = [
-    [adminEditSemester, permittedTo(user, Permissions.editSemester)],
+    [adminSemesters(null), permittedTo(user, Permissions.editSemester)],
     [adminDocumentLinks, permittedTo(user, Permissions.editLinks)],
     [adminMoney(null), permittedTo(user, Permissions.editTransaction)],
     [adminOfficerPositions, permittedTo(user, Permissions.editOfficers)],
@@ -221,5 +232,39 @@ export const halfStepsAboveA = (pitch: Pitch): number => {
       return 10;
     case Pitch.GSharp:
       return 11;
+  }
+};
+
+export const romanNumeral = (n: number): string => {
+  const wordNumeralPairs: [string, string][] = [
+    ["zero", "0"],
+    ["one", "I"],
+    ["two", "II"],
+    ["three", "III"],
+    ["four", "IV"],
+    ["five", "V"],
+    ["six", "VI"],
+    ["seven", "VII"],
+    ["eight", "VIII"],
+    ["nine", "IX"],
+    ["ten", "X"],
+    ["eleven", "XI"],
+    ["twelve", "XII"],
+    ["thirteen", "XIII"],
+    ["fourteen", "XIV"],
+    ["fifteen", "XV"],
+    ["sixteen", "XVI"],
+    ["seventeen", "XVII"],
+    ["eighteen", "XVIII"],
+    ["nineteen", "XIX"],
+    ["twenty", "XX"]
+  ];
+
+  const pair = wordNumeralPairs[n];
+  if (pair) {
+    const [word, numeral] = pair;
+    return `${word} (${numeral})`;
+  } else {
+    return `${n}`;
   }
 };
