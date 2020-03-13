@@ -10,7 +10,6 @@ import {
   Title,
   Column,
   Box,
-  Spinner,
   Tooltip
 } from "components/Basics";
 import { GlubHubContext } from "utils/context";
@@ -46,33 +45,28 @@ export const Home: React.FC = () => {
   return (
     <RemoteContent
       data={events}
-      render={events => {
-        const [pastEvents, futureEvents] = organizeEvents(events);
-        const finalGrade = events[events.length - 1].change?.partialScore;
-
-        return (
-          <>
-            <GradesBlock
-              finalGrade={finalGrade !== undefined ? finalGrade : 100}
-              pastEvents={pastEvents}
-            />
-            {hovered && <EventHoverBox hovered={hovered} />}
-            <Section>
-              <Container>
-                <Columns>
-                  <UpcomingEvents allEvents={events} />
-                  <Volunteerism pastEvents={pastEvents} />
-                </Columns>
-              </Container>
-            </Section>
-          </>
-        );
-      }}
+      render={events => (
+        <>
+          <GradesBlock
+            finalGrade={events[events.length - 1]?.change?.partialScore}
+            events={events}
+          />
+          {hovered && <EventHoverBox hovered={hovered} />}
+          <Section>
+            <Container>
+              <Columns>
+                <UpcomingEvents allEvents={events} />
+                <Volunteerism pastEvents={events} />
+              </Columns>
+            </Container>
+          </Section>
+        </>
+      )}
     />
   );
 };
 
-interface HoveredEvent {
+export interface HoveredEvent {
   event: GlubEvent;
   x: number;
   y: number;
@@ -107,14 +101,11 @@ const attendanceMessage = (
 };
 
 interface GradesBlockProps {
-  pastEvents: GlubEvent[];
-  finalGrade: number;
+  events: GlubEvent[];
+  finalGrade?: number;
 }
 
-const GradesBlock: React.FC<GradesBlockProps> = ({
-  pastEvents,
-  finalGrade
-}) => {
+const GradesBlock: React.FC<GradesBlockProps> = ({ events, finalGrade }) => {
   const { user } = useContext(GlubHubContext);
 
   return (
@@ -125,12 +116,18 @@ const GradesBlock: React.FC<GradesBlockProps> = ({
           Right now you have a <strong>{finalGrade}</strong>.
           <br />
           <span className="has-text-grey-light is-italic">
-            {attendanceMessage(user?.enrollment || null, finalGrade)}
+            {attendanceMessage(
+              user?.enrollment || null,
+              finalGrade ? finalGrade : 100
+            )}
           </span>
         </p>
-        {pastEvents.length ? (
+        {events.length ? (
           <>
-            <AttendanceGraph events={pastEvents} />
+            <div style={{ width: "100%", margin: "auto" }}>
+              <AttendanceGraph events={events} />
+            </div>
+            <div id="tooltip" className="box hidden"></div>
             <p>
               <br />
               Do you have an issue? Do you need a daddy tissue?{" "}

@@ -1,9 +1,10 @@
 import React, { useRef, useEffect } from "react";
 import { GlubEvent } from "state/models";
+import { renderRoute, routeEvents } from "state/route";
 import * as d3 from "d3";
 
 export const ThisWeek: React.FC<{ events: GlubEvent[] }> = ({ events }) => {
-  const d3Container = useRef<React.RefObject<SVGSVGElement> | null>(null);
+  const d3Container = useRef<SVGSVGElement | null>(null);
 
   const height = 500;
   const circleX = 100;
@@ -17,16 +18,14 @@ export const ThisWeek: React.FC<{ events: GlubEvent[] }> = ({ events }) => {
   const sunday = new Date(monday.getTime() + 7 * 86400000 - 1);
 
   useEffect(() => {
-    console.log("d3 container", d3Container);
-
-    const timeline = d3.select(d3Container.current?.current || null);
+    const timeline = d3.select(d3Container.current);
 
     const y = d3.scaleTime().range([height - 20, 10]);
     y.domain([sunday, monday]);
 
     timeline
       .append("g")
-      .attr("transform", "translate(" + (circleX - 1) + ",0)")
+      .attr("transform", `translate(${circleX - 1}, 0)`)
       .call(
         d3
           .axisLeft(y)
@@ -64,7 +63,7 @@ export const ThisWeek: React.FC<{ events: GlubEvent[] }> = ({ events }) => {
       .data(events)
       .enter()
       .append("a")
-      .attr("href", event => `/#/events/${event.id}`)
+      .attr("href", event => renderRoute(routeEvents(event.id, null)))
       .append("text")
       .text(event => event.name)
       .attr("y", (event, index) => {
@@ -77,5 +76,5 @@ export const ThisWeek: React.FC<{ events: GlubEvent[] }> = ({ events }) => {
       .attr("x", circleX + 15);
   }, [events, d3Container.current]);
 
-  return <svg height={height} ref={d3Container.current} />;
+  return <svg height={height} ref={d3Container} />;
 };
