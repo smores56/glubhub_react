@@ -82,30 +82,47 @@ export const gigFormFromEvent = (
   };
 };
 
-export const buildUpdateBody = (event: EventForm, gig: GigForm) => ({
-  // -- event fields
-  name: event.name,
-  semester: event.semester,
-  type: event.type,
-  callTime: parseFormDateAndTimeString(event.callDate, event.callTime),
-  releaseTime: parseFormDateAndTimeString(event.releaseDate, event.releaseTime),
-  points: event.points || 5,
-  comments: event.comments,
-  location: event.location,
-  gigCount: event.gigCount,
-  defaultAttend: event.defaultAttend,
+export const buildUpdateBody = (event: EventForm, gig: GigForm) => {
+  const includeGig = !!(
+    gig.performanceTime ||
+    gig.uniform ||
+    gig.contactName ||
+    gig.contactEmail ||
+    gig.contactPhone ||
+    gig.price ||
+    gig.summary ||
+    gig.description
+  );
 
-  // -- gig fields
-  performanceTime: parseFormDateAndTimeString(
-    event.callDate,
-    gig.performanceTime
-  ),
-  uniform: gig.uniform?.id || null,
-  contactName: gig.contactName,
-  contactEmail: gig.contactEmail,
-  contactPhone: gig.contactPhone,
-  price: gig.price,
-  public: gig.public,
-  summary: gig.summary,
-  description: gig.description
-});
+  return {
+    name: event.name,
+    semester: event.semester,
+    type: event.type,
+    callTime: parseFormDateAndTimeString(event.callDate, event.callTime),
+    releaseTime: parseFormDateAndTimeString(
+      event.releaseDate,
+      event.releaseTime
+    ),
+    points: event.points || 5,
+    comments: event.comments,
+    location: event.location,
+    gigCount: event.gigCount,
+    defaultAttend: event.defaultAttend,
+    gig: includeGig
+      ? {
+          performanceTime: parseFormDateAndTimeString(
+            event.callDate,
+            gig.performanceTime
+          ),
+          uniform: gig.uniform?.id || null,
+          contactName: gig.contactName,
+          contactEmail: gig.contactEmail,
+          contactPhone: gig.contactPhone,
+          price: gig.price,
+          public: gig.public,
+          summary: gig.summary,
+          description: gig.description
+        }
+      : null
+  };
+};

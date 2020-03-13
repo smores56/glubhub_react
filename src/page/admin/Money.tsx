@@ -7,7 +7,8 @@ import {
   sending,
   SubmissionState,
   errorSending,
-  isSending
+  isSending,
+  isLoaded
 } from "state/types";
 import { Transaction, Fee, emptyTransactionBatch, Member } from "state/models";
 import { useGlubRoute, GlubHubContext } from "utils/context";
@@ -55,7 +56,7 @@ export const Money: React.FC<{ tab: MoneyTab | null }> = ({ tab }) => {
 
   const resolveTransaction = useCallback(
     async (transactionId: number, resolved: boolean) => {
-      if (transactions.status !== "loaded") return;
+      if (!isLoaded(transactions)) return;
 
       setTransactionState(sending);
       updateTransactions(
@@ -186,6 +187,7 @@ interface SingleFeeProps {
 
 const SingleFee: React.FC<SingleFeeProps> = ({ fee, update }) => (
   <TextInput
+    key={fee.name}
     type={numberType}
     value={fee.amount}
     onInput={amount => update({ ...fee, amount: amount || 0 })}
@@ -220,21 +222,13 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               <td>{`${transaction.amount}`}</td>
               <td>{transaction.resolved ? "Resolved" : "Outstanding"}</td>
               <td>
-                {transaction.resolved ? (
-                  <button
-                    className="button is-small"
-                    onClick={() => resolve(transaction.id, false)}
-                  >
-                    Unresolve
-                  </button>
-                ) : (
-                  <button
-                    className="button is-small is-primary"
-                    onClick={() => resolve(transaction.id, true)}
-                  >
-                    Resolve
-                  </button>
-                )}
+                <Button
+                  size="is-small"
+                  color={!transaction.resolved ? "is-primary" : undefined}
+                  onClick={() => resolve(transaction.id, !transaction.resolved)}
+                >
+                  {transaction.resolved ? "Unresolve" : "Resolve"}
+                </Button>
               </td>
               <td>{transaction.description}</td>
             </tr>

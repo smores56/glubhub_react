@@ -10,30 +10,32 @@ export interface NewToken {
   token: string;
 }
 
-export type ResponseType<T> =
+export type GlubResponseType<T> =
   | { successful: true; data: T }
   | { successful: false; error: GlubHubError };
 
-export const success = <T>(data: T): ResponseType<T> => ({
+export const success = <T>(data: T): GlubResponseType<T> => ({
   successful: true,
   data
 });
 
-export const get = async <T = any>(url: string): Promise<ResponseType<T>> =>
+export const get = async <T = any>(url: string): Promise<GlubResponseType<T>> =>
   makeRequest<null, T>(url, "GET", null, true);
 
 export const post = async <T>(
   url: string,
   body: T
-): Promise<ResponseType<null>> =>
+): Promise<GlubResponseType<null>> =>
   makeRequest<T, null>(url, "POST", body, false);
 
 export const postReturning = async <T, U>(
   url: string,
   body: T
-): Promise<ResponseType<U>> => makeRequest<T, U>(url, "POST", body, true);
+): Promise<GlubResponseType<U>> => makeRequest<T, U>(url, "POST", body, true);
 
-export const deleteRequest = async (url: string): Promise<ResponseType<null>> =>
+export const deleteRequest = async (
+  url: string
+): Promise<GlubResponseType<null>> =>
   makeRequest<void, null>(url, "DELETE", null, false);
 
 const makeRequest = async <T extends any, R>(
@@ -41,7 +43,7 @@ const makeRequest = async <T extends any, R>(
   method: string,
   body: T | null,
   parseReturnVal: boolean
-): Promise<ResponseType<R>> => {
+): Promise<GlubResponseType<R>> => {
   try {
     const token = getToken();
     const headers = token ? { token } : undefined;
@@ -71,12 +73,12 @@ const makeRequest = async <T extends any, R>(
   }
 };
 
-export type GlubRequest<T> = Promise<ResponseType<T>>;
+export type GlubRequest<T> = Promise<GlubResponseType<T>>;
 
 export const chain = async <T, U>(
   req1: GlubRequest<T>,
   req2: (u: T) => GlubRequest<U>
-): Promise<ResponseType<U>> => {
+): Promise<GlubResponseType<U>> => {
   const result = await req1;
   if (!result.successful) {
     return result;
@@ -88,7 +90,7 @@ export const chain = async <T, U>(
 export const collect2 = async <T, U>(
   req1: GlubRequest<T>,
   req2: GlubRequest<U>
-): Promise<ResponseType<[T, U]>> => {
+): Promise<GlubResponseType<[T, U]>> => {
   const [result1, result2] = await Promise.all([req1, req2]);
   if (!result1.successful) {
     return result1;
@@ -103,7 +105,7 @@ export const collect3 = async <T, U, V>(
   req1: GlubRequest<T>,
   req2: GlubRequest<U>,
   req3: GlubRequest<V>
-): Promise<ResponseType<[T, U, V]>> => {
+): Promise<GlubResponseType<[T, U, V]>> => {
   const [result1, result2, result3] = await Promise.all([req1, req2, req3]);
   if (!result1.successful) {
     return result1;
@@ -124,7 +126,7 @@ export const collect4 = async <T, U, V, W>(
   req2: GlubRequest<U>,
   req3: GlubRequest<V>,
   req4: GlubRequest<W>
-): Promise<ResponseType<[T, U, V, W]>> => {
+): Promise<GlubResponseType<[T, U, V, W]>> => {
   const [result1, result2, result3, result4] = await Promise.all([
     req1,
     req2,

@@ -1,102 +1,14 @@
 import React, { PropsWithChildren } from "react";
-import { Info, Enrollment, Uniform, Member, Semester } from "state/models";
-import { fullName } from "utils/helpers";
-
-export interface FormInputType<T> {
-  toString: (t: T) => string;
-  fromString: (s: string) => T;
-  textType: TextInputType;
-}
-
-export type TextInputType =
-  | "text"
-  | "number"
-  | "tel"
-  | "email"
-  | "password"
-  | "date"
-  | "time";
-
-export const stringType: FormInputType<string> = {
-  toString: x => x,
-  fromString: x => x,
-  textType: "text"
-};
-
-export const dateType: FormInputType<string> = {
-  toString: x => x,
-  fromString: x => x,
-  textType: "date"
-};
-
-export const timeType: FormInputType<string> = {
-  toString: x => x,
-  fromString: x => x,
-  textType: "time"
-};
-
-export const emailType: FormInputType<string> = {
-  toString: x => x,
-  fromString: x => x,
-  textType: "email"
-};
-
-export const passwordType: FormInputType<string> = {
-  toString: x => x,
-  fromString: x => x,
-  textType: "password"
-};
-
-export const phoneType: FormInputType<string> = {
-  toString: x => x,
-  fromString: x => x,
-  textType: "tel"
-};
-
-export const numberType: FormInputType<number | null> = {
-  toString: x => (x ? `${x}` : ""),
-  fromString: x => (isNaN(parseInt(x)) ? null : parseInt(x)),
-  textType: "number"
-};
-
-export const sectionType = (
-  info: Info | null
-): FormInputType<string | null> => ({
-  toString: x => x || "No Section",
-  fromString: x => (info?.sections || []).find(s => s === x) || null,
-  textType: "text"
-});
-
-export const uniformType = (
-  info: Info | null
-): FormInputType<Uniform | null> => ({
-  toString: u => u?.name || "(no uniform)",
-  fromString: u =>
-    (info?.uniforms || []).find(uniform => uniform.name === u) || null,
-  textType: "text"
-});
-
-export const memberType = (
-  members: Member[]
-): FormInputType<Member | null> => ({
-  toString: member => (member ? fullName(member) : "(nobody)"),
-  fromString: name => members.find(m => fullName(m) === name) || null,
-  textType: "text"
-});
-
-export const enrollmentType: FormInputType<Enrollment | null> = {
-  toString: x => x || "Inactive",
-  fromString: x => (x === "Class" || x === "Club" ? x : null),
-  textType: "text"
-};
-
-export const semesterType = (
-  semesters: Semester[]
-): FormInputType<Semester | null> => ({
-  toString: x => x?.name || "(no semester)",
-  fromString: x => semesters.find(s => s.name === x) || null,
-  textType: "text"
-});
+import {
+  Info,
+  Enrollment,
+  Uniform,
+  Member,
+  Semester,
+  Pitch,
+  SongMode
+} from "state/models";
+import { fullName, pitchToUnicode, pitchFromUnicode } from "utils/helpers";
 
 export const Control: React.FC<{ expanded?: boolean }> = ({
   expanded,
@@ -119,7 +31,7 @@ export interface InputAttributes {
 }
 
 export const InputWrapper: React.FC<InputAttributes> = props => (
-  <div className={"field" + props.horizontal ? " is-horizontal" : ""}>
+  <div className={"field" + (props.horizontal ? " is-horizontal" : "")}>
     {props.title &&
       (props.horizontal ? (
         <div className="field-label is-normal">
@@ -128,7 +40,7 @@ export const InputWrapper: React.FC<InputAttributes> = props => (
       ) : (
         <label className="label">{props.title}</label>
       ))}
-    {props.children}
+    <div className="field-body">{props.children}</div>
     {props.helpText && <p className="help">{props.helpText}</p>}
   </div>
 );
@@ -230,6 +142,7 @@ export const SelectInput = <T extends any>(
             .map(val => props.type.toString(val))
             .map(value => (
               <option
+                key={value}
                 value={value}
                 selected={value === props.type.toString(props.selected)}
               >
@@ -256,7 +169,7 @@ export const RadioInput = <T extends any>(
     <FieldWrapper {...props}>
       {props.values.map((val, index) => (
         <>
-          <label className="radio">
+          <label key={props.render(val)} className="radio">
             <input
               type="radio"
               checked={`${val}` === `${props.selected}`}
@@ -321,3 +234,111 @@ export const FileInput: React.FC<FileInputProps> = props => (
     </div>
   </InputWrapper>
 );
+
+export interface FormInputType<T> {
+  toString: (t: T) => string;
+  fromString: (s: string) => T;
+  textType: TextInputType;
+}
+
+export type TextInputType =
+  | "text"
+  | "number"
+  | "tel"
+  | "email"
+  | "password"
+  | "date"
+  | "time";
+
+export const stringType: FormInputType<string> = {
+  toString: x => x,
+  fromString: x => x,
+  textType: "text"
+};
+
+export const dateType: FormInputType<string> = {
+  toString: x => x,
+  fromString: x => x,
+  textType: "date"
+};
+
+export const timeType: FormInputType<string> = {
+  toString: x => x,
+  fromString: x => x,
+  textType: "time"
+};
+
+export const emailType: FormInputType<string> = {
+  toString: x => x,
+  fromString: x => x,
+  textType: "email"
+};
+
+export const passwordType: FormInputType<string> = {
+  toString: x => x,
+  fromString: x => x,
+  textType: "password"
+};
+
+export const phoneType: FormInputType<string> = {
+  toString: x => x,
+  fromString: x => x,
+  textType: "tel"
+};
+
+export const numberType: FormInputType<number | null> = {
+  toString: x => (x ? `${x}` : ""),
+  fromString: x => (isNaN(parseInt(x)) ? null : parseInt(x)),
+  textType: "number"
+};
+
+export const sectionType = (
+  info: Info | null
+): FormInputType<string | null> => ({
+  toString: x => x || "No Section",
+  fromString: x => (info?.sections || []).find(s => s === x) || null,
+  textType: "text"
+});
+
+export const uniformType = (
+  info: Info | null
+): FormInputType<Uniform | null> => ({
+  toString: u => u?.name || "(no uniform)",
+  fromString: u =>
+    (info?.uniforms || []).find(uniform => uniform.name === u) || null,
+  textType: "text"
+});
+
+export const memberType = (
+  members: Member[]
+): FormInputType<Member | null> => ({
+  toString: member => (member ? fullName(member) : "(nobody)"),
+  fromString: name => members.find(m => fullName(m) === name) || null,
+  textType: "text"
+});
+
+export const enrollmentType: FormInputType<Enrollment | null> = {
+  toString: x => x || "Inactive",
+  fromString: x => (x === "Class" || x === "Club" ? x : null),
+  textType: "text"
+};
+
+export const semesterType = (
+  semesters: Semester[]
+): FormInputType<Semester | null> => ({
+  toString: x => x?.name || "(no semester)",
+  fromString: x => semesters.find(s => s.name === x) || null,
+  textType: "text"
+});
+
+export const pitchType: FormInputType<Pitch | null> = {
+  toString: p => (p ? pitchToUnicode(p) : "?"),
+  fromString: pitchFromUnicode,
+  textType: "text"
+};
+
+export const songModeType: FormInputType<SongMode | null> = {
+  toString: sm => sm || "(no mode)",
+  fromString: sm => (["Major", "Minor"].includes(sm) ? (sm as SongMode) : null),
+  textType: "text"
+};

@@ -47,7 +47,7 @@ const SongRow: React.FC<SongRowProps> = ({ song, index }) => (
   <tr key={index}>
     <td>{index}</td>
     <td>
-      <a href={renderRoute(routeRepertoire(song.id))}>{song.title}</a>
+      <a href={renderRoute(routeRepertoire(song.id, null))}>{song.title}</a>
     </td>
     <td>{song.key ? pitchToUnicode(song.key) : "No key"}</td>
     <td>

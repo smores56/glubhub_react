@@ -23,8 +23,14 @@ import {
   resultToSubmissionState
 } from "state/types";
 import { Member } from "state/models";
-import { get, NewToken, deleteRequest } from "utils/request";
-import { getToken, setOldToken, setToken, fullName } from "utils/helpers";
+import { get, NewToken, deleteRequest, post, chain } from "utils/request";
+import {
+  getToken,
+  setOldToken,
+  setToken,
+  fullName,
+  getOldToken
+} from "utils/helpers";
 import {
   EmailLink,
   PhoneLink,
@@ -173,17 +179,39 @@ const UserActions: React.FC<{ member: Member }> = ({ member }) => {
     goToRoute(routeLogin);
   }, [updateUser, goToRoute]);
 
-  const loginAsMember = useCallback(async () => {
+  const logBackIn = useCallback(async () => {
+    const oldToken = getOldToken();
+    if (!oldToken) return;
+
     setLoginAsState(sending);
-    const result = await get<NewToken>(`members/${member.email}/login_as`);
+    const result = await chain(get("logout"), () => {
+      setOldToken(null);
+      setToken(oldToken);
+      return get<Member | null>("user");
+    });
 
     setLoginAsState(resultToSubmissionState(result));
     if (result.successful) {
-      const token = getToken();
-      setOldToken(token);
-      setToken(result.data.token);
+      updateUser(result.data);
+    }
+  }, [setLoginAsState, refreshAll]);
 
-      refreshAll();
+  const loginAsMember = useCallback(async () => {
+    setLoginAsState(sending);
+
+    const result = await chain(
+      get<NewToken>(`members/${member.email}/login_as`),
+      newToken => {
+        const token = getToken();
+        setOldToken(token);
+        setToken(newToken.token);
+        return get<Member | null>("user");
+      }
+    );
+
+    setLoginAsState(resultToSubmissionState(result));
+    if (result.successful) {
+      updateUser(result.data);
     }
   }, [setLoginAsState, refreshAll, member]);
 
@@ -202,7 +230,11 @@ const UserActions: React.FC<{ member: Member }> = ({ member }) => {
   if (user?.email === member.email) {
     return (
       <ButtonGroup>
-        <Button onClick={logout}>Log out</Button>
+        {getOldToken() ? (
+          <Button onClick={logBackIn}>Log back in as yourself</Button>
+        ) : (
+          <Button onClick={logout}>Log out</Button>
+        )}
         <LinkButton route={routeEditProfile}>Edit your profile</LinkButton>
       </ButtonGroup>
     );

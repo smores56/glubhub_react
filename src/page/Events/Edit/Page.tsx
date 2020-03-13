@@ -10,7 +10,7 @@ import {
   SubmissionState
 } from "state/types";
 import { get, post } from "utils/request";
-import { GlubHubContext } from "utils/context";
+import { GlubHubContext, useGlubRoute } from "utils/context";
 import { Title, Column } from "components/Basics";
 import {
   TextInput,
@@ -33,6 +33,7 @@ import {
   EventForm
 } from "./state";
 import { SubmitButton } from "components/Buttons";
+import { eventDetails, routeEvents } from "state/route";
 
 interface EditEventProps {
   event: GlubEvent;
@@ -41,6 +42,7 @@ interface EditEventProps {
 
 export const EditEvent: React.FC<EditEventProps> = ({ event, updateEvent }) => {
   const { info, currentSemester } = useContext(GlubHubContext);
+  const { replaceRoute } = useGlubRoute();
 
   const [eventForm, updateEventForm] = useState(eventFormFromEvent(event));
   const [gigForm, updateGigForm] = useState(
@@ -60,6 +62,7 @@ export const EditEvent: React.FC<EditEventProps> = ({ event, updateEvent }) => {
       const updatedEvent = await get<GlubEvent>(url);
       if (updatedEvent.successful) {
         updateEvent(updatedEvent.data);
+        replaceRoute(routeEvents(event.id, eventDetails));
       } else {
         setState(errorSending(updatedEvent.error));
       }

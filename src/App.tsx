@@ -1,13 +1,13 @@
 import "./App.css";
-import React from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
-import { useGlubRoute, GlubHubContextProvider } from "utils/context";
+import { useGlubRoute, GlubHubContext } from "utils/context";
 import { Admin } from "page/admin/Page";
 import { EditCarpools } from "page/events/EditCarpools";
 import { EditProfile } from "page/EditProfile";
 import { Events } from "page/events/Page";
 import { ForgotPassword } from "page/ForgotPassword";
-import Login from "page/Login";
+import { Login } from "page/Login";
 import { Minutes } from "page/minutes/Page";
 import { Profile } from "page/profile/Page";
 import { Repertoire } from "page/repertoire/Page";
@@ -17,29 +17,114 @@ import { Navbar } from "components/Navbar";
 import { ConfirmAccountHeader } from "components/ConfirmAccount";
 import { Router } from "react-router-dom";
 import { createBrowserHistory } from "history";
-import { Home } from "page/Home";
+import { Home } from "page/home/Page";
+import {
+  RemoteData,
+  loading,
+  errorLoading,
+  loaded,
+  isLoaded
+} from "state/types";
+import { Member, Info, Semester } from "state/models";
+import { getToken, setToken } from "utils/helpers";
+import { collect4, get, success } from "utils/request";
+import { RemoteContent } from "components/Basics";
+import { renderRoute, routeLogin } from "state/route";
 
 const history = createBrowserHistory();
 
-const App: React.FC = () => (
-  <GlubHubContextProvider>
+const App: React.FC = () => {
+  const [appData, setAppData] = useState<
+    RemoteData<{
+      user: Member | null;
+      members: Member[];
+      info: Info;
+      currentSemester: Semester;
+    }>
+  >(loading);
+
+  const refreshAll = useCallback(async () => {
+    const hasToken = !!getToken();
+    const result = await collect4(
+      get<Member | null>("user"),
+      get<Info>("static"),
+      get<Semester>("semesters/current"),
+      hasToken
+        ? get<Member[]>("members")
+        : Promise.resolve(success([] as Member[]))
+    );
+
+    if (result.successful) {
+      const [user, info, currentSemester, members] = result.data;
+      setAppData(loaded({ user, members, info, currentSemester }));
+    } else if (result.error.message === "login required") {
+      setToken(null);
+    } else {
+      setAppData(errorLoading(result.error));
+    }
+  }, [setAppData]);
+
+  useEffect(() => {
+    refreshAll();
+  }, [refreshAll]);
+
+  return (
     <Router history={history}>
       <div id="app">
-        <Navbar />
+        <Navbar
+          {...(isLoaded(appData) ? appData.data : { user: null, info: null })}
+        />
         <ConfirmAccountHeader />
         <div style={{ paddingBottom: "50px" }} />
         <div className="center" style={{ height: "100%" }}>
-          <CurrentPage />
+          <RemoteContent
+            data={appData}
+            render={appData => (
+              <GlubHubContext.Provider
+                value={{
+                  ...appData,
+                  refreshAll,
+                  updateUser: user => setAppData(loaded({ ...appData, user })),
+                  updateMembers: members =>
+                    setAppData(loaded({ ...appData, members })),
+                  updateInfo: info => setAppData(loaded({ ...appData, info })),
+                  updateCurrentSemester: currentSemester =>
+                    setAppData(loaded({ ...appData, currentSemester }))
+                }}
+              >
+                <CurrentPage loggedIn={!!appData.user} />
+              </GlubHubContext.Provider>
+            )}
+          />
         </div>
       </div>
     </Router>
-  </GlubHubContextProvider>
-);
+  );
+};
 
 export default App;
 
-const CurrentPage: React.FC = () => {
-  const { location } = useGlubRoute();
+const CurrentPage: React.FC<{ loggedIn: boolean }> = ({ loggedIn }) => {
+  const { location, goToRoute } = useGlubRoute();
+
+  if (!loggedIn) {
+    switch (location?.route) {
+      case "edit-profile":
+        return <EditProfile />;
+
+      case "forgot-password":
+        return <ForgotPassword />;
+
+      case "reset-password":
+        return <ResetPassword token={location.token} />;
+
+      default:
+        if (location?.route !== "login") {
+          goToRoute(routeLogin);
+        }
+        return <Login />;
+    }
+  }
 
   switch (location?.route) {
     case "admin":
@@ -67,7 +152,7 @@ const CurrentPage: React.FC = () => {
       return <Profile email={location.email} tab={location.tab} />;
 
     case "repertoire":
-      return <Repertoire songId={location.songId} />;
+      return <Repertoire songId={location.songId} tab={location.tab} />;
 
     case "reset-password":
       return <ResetPassword token={location.token} />;

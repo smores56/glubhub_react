@@ -1,6 +1,6 @@
-import React, { useContext, useState, useCallback } from "react";
-import { GlubHubContext, useGlubRoute } from "utils/context";
-import { DocumentLink, Member } from "state/models";
+import React, { useState, useCallback } from "react";
+import { useGlubRoute } from "utils/context";
+import { DocumentLink, Member, Info } from "state/models";
 import { visibleAdminTabs, fullName } from "utils/helpers";
 import {
   AdminRoute,
@@ -15,9 +15,13 @@ import {
   routeHome
 } from "state/route";
 
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  user: Member | null;
+  info: Info | null;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ user, info }) => {
   const { location } = useGlubRoute();
-  const { user, info } = useContext(GlubHubContext);
   const [expanded, setExpanded] = useState(false);
   const toggleExpanded = useCallback(() => {
     setExpanded(!expanded);
@@ -50,7 +54,7 @@ export const Navbar: React.FC = () => {
         {user && (
           <div className="navbar-start">
             {singleLink(routeEvents(null, null))}
-            {singleLink(routeRepertoire(null))}
+            {singleLink(routeRepertoire(null, null))}
             {singleLink(routeRoster)}
             {singleLink(routeMinutes(null, null))}
             <DocumentLinks documents={info?.documents || []} />
@@ -84,14 +88,20 @@ const AdminLinks: React.FC<{ user: Member | null }> = ({ user }) => {
 
   const divider = <hr className="navbar-divider" />;
   const adminTab = (tab: AdminRoute) => (
-    <a className="navbar-item" href={renderRoute(routeAdmin(tab))}>
+    <a
+      key={tab.route}
+      className="navbar-item"
+      href={renderRoute(routeAdmin(tab))}
+    >
       {tab.name}
     </a>
   );
 
   return (
     <div className="navbar-item has-dropdown is-hoverable">
-      <a className="navbar-link">Admin</a>
+      <a className="navbar-link" href={renderRoute(routeAdmin(null))}>
+        Admin
+      </a>
       <div className="navbar-dropdown">
         {adminTabs.map((tabGroup, index) => [
           ...tabGroup.map(adminTab),
@@ -110,6 +120,7 @@ const DocumentLinks: React.FC<{ documents: DocumentLink[] }> = ({
     <div className="navbar-dropdown">
       {documents.map(document => (
         <a
+          key={document.name}
           className="navbar-item"
           target="_blank"
           rel="noopener noreferrer"

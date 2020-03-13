@@ -303,7 +303,7 @@ export interface Song {
   key: Pitch | null;
   startingPitch: Pitch | null;
   mode: SongMode | null;
-  links: SongLinkSection[];
+  links?: SongLinkSection[];
 }
 
 export interface SongLinkSection {

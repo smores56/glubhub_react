@@ -223,19 +223,19 @@ const ChangeSemesterModal: React.FC<ChangeSemesterModalProps> = ({
         </p>
         <br />
         <div className="field is-grouped is-grouped-centered">
-          <SelectInput
+          <SelectInput<Semester | null>
             type={semesterType(semesters)}
             values={semesters}
             selected={selected}
-            onInput={setSelected}
+            onInput={selected => selected && setSelected(selected)}
           />
         </div>
         <br />
         <Button
-          color="is-primary"
-          loading={isSending(state)}
-          className="is-pulled-left"
           element="a"
+          color="is-primary"
+          className="is-pulled-left"
+          loading={isSending(state)}
           onClick={changeSemester}
         >
           The ol' Glub Hub switcharoo

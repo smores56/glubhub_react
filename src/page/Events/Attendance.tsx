@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   notSentYet,
   loading,
@@ -11,13 +11,11 @@ import {
 import { fullName } from "utils/helpers";
 import { get, post } from "utils/request";
 import { EventAttendee } from "state/models";
-import { GlubHubContext } from "utils/context";
 import { RemoteContent, SubmissionStateBox } from "components/Basics";
 import { CheckboxInput, TextInput, numberType } from "components/Forms";
+import { NO_SECTION, SECTION_ORDER } from "state/constants";
 
 export const Attendance: React.FC<{ eventId: number }> = ({ eventId }) => {
-  const { info } = useContext(GlubHubContext);
-
   const [state, setState] = useState(notSentYet);
   const [attendees, setAttendees] = useState<RemoteData<EventAttendee[]>>(
     loading
@@ -56,7 +54,7 @@ export const Attendance: React.FC<{ eventId: number }> = ({ eventId }) => {
         data={attendees}
         render={attendees => (
           <table className="table is-fullwidth">
-            {groupAttendees(attendees, info?.sections || []).map(group => (
+            {groupAttendees(attendees).map(group => (
               <>
                 <thead>
                   <tr>
@@ -155,20 +153,8 @@ interface AttendeeGroup {
   attendees: EventAttendee[];
 }
 
-const groupAttendees = (
-  attendees: EventAttendee[],
-  sections: string[]
-): AttendeeGroup[] => {
-  const noSection = "Homeless";
-
-  const groups = new Map<string, EventAttendee[]>();
-  attendees.forEach(attendee => {
-    const section = attendee.member.section || noSection;
-    const existingGroup = groups.get(section) || [];
-    groups.set(section, [...existingGroup, attendee]);
-  });
-
-  return [...sections, noSection]
-    .sort()
-    .map(section => ({ section, attendees: groups.get(section)! }));
-};
+const groupAttendees = (attendees: EventAttendee[]): AttendeeGroup[] =>
+  SECTION_ORDER.map(section => ({
+    section: section || NO_SECTION,
+    attendees: attendees.filter(a => a.member.section === section)
+  })).filter(group => group.attendees.length);

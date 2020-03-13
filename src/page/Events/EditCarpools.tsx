@@ -13,7 +13,8 @@ import {
   errorLoading,
   notSentYet,
   sending,
-  errorSending
+  errorSending,
+  isLoaded
 } from "state/types";
 import {
   Section,
@@ -52,7 +53,7 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
   const getSelectedIfAllUnassigned = useCallback(():
     | [CarpoolData, Member[]]
     | null => {
-    if (data.status !== "loaded" || !selected.length) {
+    if (!isLoaded(data) || !selected.length) {
       return null;
     }
 
@@ -72,6 +73,8 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
     (email: string) => {
       if (selected.includes(email)) {
         setSelected(selected.filter(s => s !== email));
+      } else {
+        setSelected([...selected, email]);
       }
     },
     [selected, setSelected]

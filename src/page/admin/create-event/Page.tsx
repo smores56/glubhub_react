@@ -11,7 +11,8 @@ import {
   failedToSend,
   SubmissionState,
   sending,
-  resultToSubmissionState
+  resultToSubmissionState,
+  isLoading
 } from "state/types";
 import { Semester, GigRequest, GlubEventType } from "state/models";
 import { get, postReturning, NewId } from "utils/request";
@@ -238,7 +239,7 @@ const MiddleColumn: React.FC<MiddleColumnProps> = ({
           update({ ...form, event: { ...form.event, semester } })
         }
         title="Semester"
-        loading={isLoaded(semesters)}
+        loading={isLoading(semesters)}
       />
       <SelectInput
         type={uniformType(info)}

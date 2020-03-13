@@ -1,5 +1,5 @@
 import { GlubHubError } from "./error";
-import { ResponseType } from "utils/request";
+import { GlubResponseType } from "utils/request";
 import { SUBMISSION_STATE_BOX_ID } from "./constants";
 
 export type RemoteData<T> =
@@ -39,16 +39,16 @@ export const mapLoaded = <T, U>(
 ): RemoteData<U> =>
   data.status === "loaded" ? loaded(mapper(data.data)) : data;
 
-export const resultToRemote = <T>(result: ResponseType<T>): RemoteData<T> =>
+export const resultToRemote = <T>(result: GlubResponseType<T>): RemoteData<T> =>
   result.successful ? loaded(result.data) : errorLoading(result.error);
 
 export const resultToSubmissionState = <T>(
-  result: ResponseType<T>
+  result: GlubResponseType<T>
 ): SubmissionState =>
   result.successful ? notSentYet : errorSending(result.error);
 
 export const checkSubmissionResult = <T>(
-  result: ResponseType<T>,
+  result: GlubResponseType<T>,
   setState: (state: SubmissionState) => void
 ): void => {
   if (result.successful) {

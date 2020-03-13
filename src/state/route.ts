@@ -74,11 +74,16 @@ export interface RouteRepertoire {
   name: "Repertoire";
   route: "repertoire";
   songId: number | null;
+  tab: RepertoireTab | null;
 }
-export const routeRepertoire = (songId: number | null): RouteRepertoire => ({
+export const routeRepertoire = (
+  songId: number | null,
+  tab: RepertoireTab | null
+): RouteRepertoire => ({
   name: "Repertoire",
   route: "repertoire",
-  songId
+  songId,
+  tab
 });
 
 export interface RouteMinutes {
@@ -318,6 +323,23 @@ export const semesterEdit: SemesterTab = {
   name: "Edit this semester"
 };
 
+// Edit Semester Tabs //////////////////////////
+
+export type RepertoireTab =
+  | { route: "details"; name: "Details" }
+  | { route: "edit"; name: "Edit" };
+
+// Edit Semester Tab Constructors
+
+export const repertoireDetails: RepertoireTab = {
+  route: "details",
+  name: "Details"
+};
+export const repertoireEdit: RepertoireTab = {
+  route: "edit",
+  name: "Edit"
+};
+
 // Parsing Routes //////////////////////////
 
 export const parseRoute = (segments: string[]): GlubRoute | null => {
@@ -344,7 +366,7 @@ export const parseRoute = (segments: string[]): GlubRoute | null => {
     case routeEditCarpools(0).route:
       return parseEditCarpoolsRoute(segments.slice(1));
 
-    case routeRepertoire(null).route:
+    case routeRepertoire(null, null).route:
       return parseRepertoireRoute(segments.slice(1));
 
     case routeMinutes(null, null).route:
@@ -444,14 +466,26 @@ const parseEditCarpoolsRoute = (segments: string[]): GlubRoute | null => {
 
 const parseRepertoireRoute = (segments: string[]): GlubRoute | null => {
   if (segments.length === 0) {
-    return routeRepertoire(null);
+    return routeRepertoire(null, null);
   }
 
   const songId = parseInt(segments[0]);
-  if (!isNaN(songId)) {
-    return routeRepertoire(songId);
-  } else {
+  if (isNaN(songId)) {
     return null;
+  }
+
+  switch (segments[1]) {
+    case undefined:
+      return routeRepertoire(songId, null);
+
+    case repertoireDetails.route:
+      return routeRepertoire(songId, repertoireDetails);
+
+    case repertoireEdit.route:
+      return routeRepertoire(songId, repertoireEdit);
+
+    default:
+      return null;
   }
 };
 
@@ -596,6 +630,16 @@ const buildEventsRoute = (
   tab: EventTab | null
 ): string[] => [base, ...(id ? [`${id}`] : []), ...(tab ? [tab.route] : [])];
 
+const buildRepertoireRoute = (
+  base: string,
+  songId: number | null,
+  tab: RepertoireTab | null
+): string[] => [
+  base,
+  ...(songId ? [`${songId}`] : []),
+  ...(tab ? [tab.route] : [])
+];
+
 const buildMinutesRoute = (
   base: string,
   id: number | null,
@@ -611,10 +655,10 @@ const buildRoute = (route: GlubRoute): string[] => {
     return buildMinutesRoute(route.route, route.minutesId, route.tab);
   } else if (route.route === "admin") {
     return buildAdminRoute(route.route, route.tab);
+  } else if (route.route === "repertoire") {
+    return buildRepertoireRoute(route.route, route.songId, route.tab);
   } else if (route.route === "profile") {
     return [route.route, route.email, ...(route.tab ? [route.tab.route] : [])];
-  } else if (route.route === "repertoire") {
-    return [route.route, ...(route.songId ? [`${route.songId}`] : [])];
   } else if (route.route === "reset-password") {
     return [route.route, ...(route.token ? [route.token] : [])];
   } else if (route.route === "edit-carpools") {

@@ -199,6 +199,7 @@ const RsvpActions: React.FC<RsvpActionsProps> = ({
       color="is-primary"
       loading={isSending(rsvpState)}
       outlined={!attending}
+      onClick={() => rsvp(attending)}
     >
       {content}
     </Button>
@@ -354,21 +355,22 @@ const OfficerInfoSection: React.FC<OfficerInfoSectionProps> = ({
         </>
       )}
       <br />
-      <button
-        className="button"
+      <Button
         onClick={() => replaceRoute(routeEvents(event.id, eventEdit))}
         style={{ marginBottom: "5px" }}
       >
         Edit this bitch
-      </button>
+      </Button>
       <br />
-      <button
-        className="button is-danger is-outlined"
+      <Button
+        color="is-danger"
+        outlined
         onClick={() => setDeleteState(notSentYet)}
         style={{ marginBottom: "5px" }}
       >
-        Edit this bitch
-      </button>
+        Yeet this bitch into the void
+      </Button>
+
       {deleteState && (
         <DeleteModal
           title={`Delete ${event.name}?`}

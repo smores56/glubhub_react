@@ -170,7 +170,7 @@ const GigRequestTable: React.FC<GigRequestTableProps> = ({
 );
 
 const SingleGigRequest: React.FC<{ request: GigRequest }> = ({ request }) => (
-  <tr className="no-bottom-border">
+  <tr key={request.id} className="no-bottom-border">
     <td>
       {dateFormatter(request.time)}
       <br />

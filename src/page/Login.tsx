@@ -9,7 +9,7 @@ import { notSentYet, sending, errorSending } from "state/types";
 import { TextInput, emailType, passwordType, Control } from "components/Forms";
 import { routeHome, routeForgotPassword, routeEditProfile } from "state/route";
 
-const Login: React.FC = () => {
+export const Login: React.FC = () => {
   const { refreshAll } = useContext(GlubHubContext);
   const { goToRoute } = useGlubRoute();
 
@@ -99,5 +99,3 @@ const Login: React.FC = () => {
     </div>
   );
 };
-
-export default Login;

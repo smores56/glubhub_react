@@ -143,7 +143,7 @@ const AbsenceRequestRow: React.FC<AbsenceRequestRowProps> = ({
   request,
   event
 }) => (
-  <tr className="no-bottom-border">
+  <tr key={request.time} className="no-bottom-border">
     <td>
       {dateFormatter(request.time)}
       <br />

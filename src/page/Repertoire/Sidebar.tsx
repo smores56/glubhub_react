@@ -6,15 +6,20 @@ import { editRepertoire } from "state/permissions";
 import { playPitch, pitchToUnicode } from "utils/helpers";
 import { Song, SongLinkSection, Pitch, SongMode } from "state/models";
 import { Sidebar, RequiresPermission, Title, Tooltip } from "components/Basics";
+import { useGlubRoute } from "utils/context";
+import { routeRepertoire, repertoireEdit } from "state/route";
 
 interface SongSidebarProps {
   song: RemoteData<Song>;
-  close: () => void;
-  edit: () => void;
   tryToDelete: () => void;
 }
 
-export const SongSidebar: React.FC<SongSidebarProps> = props => {
+export const SongSidebar: React.FC<SongSidebarProps> = ({
+  song,
+  tryToDelete
+}) => {
+  const { replaceRoute } = useGlubRoute();
+
   const linkSection = (section: SongLinkSection) => (
     <tr style={{ border: "none" }}>
       <td style={{ border: "none" }}>{section.name}</td>
@@ -30,11 +35,14 @@ export const SongSidebar: React.FC<SongSidebarProps> = props => {
 
   return (
     <Sidebar
-      data={props.song}
-      close={props.close}
+      data={song}
+      close={() => replaceRoute(routeRepertoire(null, null))}
       render={song => (
         <div>
-          <BackButton content="all songs" click={props.close} />
+          <BackButton
+            content="all songs"
+            click={() => replaceRoute(routeRepertoire(null, null))}
+          />
           <Title centered>{song.title}</Title>
           {song.info && (
             <p>
@@ -50,14 +58,20 @@ export const SongSidebar: React.FC<SongSidebarProps> = props => {
           />
           <br />
           <table className="table is-fullwidth">
-            {song.links.filter(links => links.links.length).map(linkSection)}
+            {song.links?.filter(links => links.links.length).map(linkSection)}
           </table>
           <RequiresPermission permission={editRepertoire}>
             <div>
-              <Button onClick={props.edit}>Edit Song</Button>
+              <Button
+                onClick={() =>
+                  replaceRoute(routeRepertoire(song.id, repertoireEdit))
+                }
+              >
+                Edit Song
+              </Button>
               <br />
               <br />
-              <Button color="is-danger" onClick={props.tryToDelete}>
+              <Button color="is-danger" onClick={tryToDelete}>
                 Delete Song
               </Button>
             </div>
@@ -81,7 +95,7 @@ const PitchSection: React.FC<PitchSectionProps> = ({ title, pitch, mode }) => (
       <b onClick={() => playPitch(pitch)}>
         <Tooltip content="hey kid, wanna pitch?">
           {pitchToUnicode(pitch)}
-          {mode ? ` ${mode}` : ""}
+          {mode && ` ${mode}`}
         </Tooltip>
       </b>
     ) : (
@@ -89,5 +103,3 @@ const PitchSection: React.FC<PitchSectionProps> = ({ title, pitch, mode }) => (
     )}
   </p>
 );
-
-export default SongSidebar;

@@ -16,6 +16,8 @@ import {
 import { GlubHubContext } from "utils/context";
 import { eventIsOver, romanNumeral } from "utils/helpers";
 import { fullDateTimeFormatter, dateFormatter } from "utils/datetime";
+import { AttendanceGraph } from "./AttendanceGraph";
+import { ThisWeek } from "./ThisWeek";
 
 export const Home: React.FC = () => {
   const [events, setEvents] = useState<RemoteData<GlubEvent[]>>(loading);
@@ -58,7 +60,7 @@ export const Home: React.FC = () => {
             <Section>
               <Container>
                 <Columns>
-                  <UpcomingEvents futureEvents={futureEvents} />
+                  <UpcomingEvents allEvents={events} />
                   <Volunteerism pastEvents={pastEvents} />
                 </Columns>
               </Container>
@@ -128,7 +130,7 @@ const GradesBlock: React.FC<GradesBlockProps> = ({
         </p>
         {pastEvents.length ? (
           <>
-            {/* {graphGrades} TODO: this */}
+            <AttendanceGraph events={pastEvents} />
             <p>
               <br />
               Do you have an issue? Do you need a daddy tissue?{" "}
@@ -175,16 +177,14 @@ const EventHoverBox: React.FC<{ hovered: HoveredEvent }> = ({ hovered }) => (
   </div>
 );
 
-const UpcomingEvents: React.FC<{ futureEvents: GlubEvent[] }> = ({
-  futureEvents
+const UpcomingEvents: React.FC<{ allEvents: GlubEvent[] }> = ({
+  allEvents
 }) => (
   <Column>
     <Title>This Week</Title>
     <Box>
       <div className="timeline">
-        <svg id={timelineId} width={500} height={500}>
-          <Spinner />
-        </svg>
+        <ThisWeek events={allEvents} />
       </div>
     </Box>
   </Column>

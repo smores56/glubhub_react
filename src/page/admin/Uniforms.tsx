@@ -112,7 +112,9 @@ export const Uniforms: React.FC = () => {
                 />
               ))}
               <tr>
-                <td>New</td>
+                <td>
+                  <b>New</b>
+                </td>
               </tr>
               <NewUniformRow
                 uniform={newUniform}

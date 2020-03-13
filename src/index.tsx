@@ -1,3 +1,5 @@
+/// <reference types="react-vis-types" />
+
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";

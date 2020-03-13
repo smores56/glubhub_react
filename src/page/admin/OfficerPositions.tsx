@@ -7,7 +7,7 @@ import {
   Box,
   SubmissionStateBox
 } from "components/Basics";
-import { get, post, ResponseType, collect2 } from "utils/request";
+import { get, post, collect2, success } from "utils/request";
 import {
   RemoteData,
   loading,
@@ -31,14 +31,13 @@ export const OfficerPositions: React.FC = () => {
       if (roles.status !== "loaded") return;
 
       setState(sending);
-      const emptySuccess: ResponseType<null> = { successful: true, data: null };
 
       const removeRole = from
         ? post(`roles/remove`, { role: role.name, member: from.email })
-        : Promise.resolve(emptySuccess);
+        : Promise.resolve(success(null));
       const addRole = to
         ? post(`roles/add`, { role: role.name, member: to.email })
-        : Promise.resolve(emptySuccess);
+        : Promise.resolve(success(null));
       const result = await collect2(removeRole, addRole);
 
       setState(resultToSubmissionState(result));

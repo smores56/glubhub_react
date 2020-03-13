@@ -13,7 +13,6 @@ import {
   loading,
   notAsked,
   loaded,
-  errorLoading,
   resultToRemote,
   mapLoaded,
   isLoaded
@@ -56,11 +55,18 @@ export const Events: React.FC<EventsProps> = ({ eventId, tab }) => {
   const [selected, setSelected] = useState<RemoteData<GlubEvent>>(notAsked);
 
   const selectEvent = useCallback(
-    (event: GlubEvent) => {
-      setSelected(loaded(event));
-      replaceRoute(routeEvents(event.id, null));
+    (eventId: number) => {
+      if (isLoaded(events)) {
+        const event = events.data.find(e => e.id === eventId);
+        if (event) {
+          setSelected(loaded(event));
+          return;
+        }
+      }
+
+      loadEvent(eventId);
     },
-    [setSelected, replaceRoute]
+    [setSelected, events, replaceRoute]
   );
 
   const unselectEvent = useCallback(() => {
@@ -111,10 +117,15 @@ export const Events: React.FC<EventsProps> = ({ eventId, tab }) => {
     };
 
     loadEvents();
-    if (eventId !== null) {
-      loadEvent(eventId);
-    }
   }, []);
+
+  useEffect(() => {
+    if (eventId !== null) {
+      selectEvent(eventId);
+    } else {
+      setSelected(notAsked);
+    }
+  }, [eventId]);
 
   const selectedId = selected.status === "loaded" ? selected.data.id : null;
   const upcomingEvents = mapLoaded(events, x =>
@@ -125,17 +136,9 @@ export const Events: React.FC<EventsProps> = ({ eventId, tab }) => {
   return (
     <>
       <Section>
-        <EventColumns
-          events={upcomingEvents}
-          selectedId={selectedId}
-          onSelect={selectEvent}
-        />
+        <EventColumns events={upcomingEvents} selectedId={selectedId} />
         <Divider content="Past" />
-        <EventColumns
-          events={pastEvents}
-          selectedId={selectedId}
-          onSelect={selectEvent}
-        />
+        <EventColumns events={pastEvents} selectedId={selectedId} />
       </Section>
       <Sidebar
         data={selected}
@@ -158,14 +161,11 @@ export const Events: React.FC<EventsProps> = ({ eventId, tab }) => {
 interface EventColumnsProps {
   events: RemoteData<GlubEvent[]>;
   selectedId: number | null;
-  onSelect: (event: GlubEvent) => void;
 }
 
-const EventColumns: React.FC<EventColumnsProps> = ({
-  events,
-  selectedId,
-  onSelect
-}) => {
+const EventColumns: React.FC<EventColumnsProps> = ({ events, selectedId }) => {
+  const { replaceRoute } = useGlubRoute();
+
   const column = (title: string, allowedEventTypes: GlubEventType[]) => (
     <div className="column is-one-quarter is-centered">
       <SelectableList
@@ -174,7 +174,7 @@ const EventColumns: React.FC<EventColumnsProps> = ({
           all.filter(event => allowedEventTypes.includes(event.type))
         ])}
         isSelected={event => event.id === selectedId}
-        onSelect={onSelect}
+        onSelect={event => replaceRoute(routeEvents(event.id, null))}
         render={event => <EventRow event={event} />}
         messageIfEmpty="No events here, misster."
       />

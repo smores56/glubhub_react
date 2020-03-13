@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { MeetingMinutes } from "state/models";
 import {
   notSentYet,
@@ -35,6 +35,18 @@ export const EditMinutes: React.FC<EditMinutesProps> = ({
   const [deleteState, setDeleteState] = useState<SubmissionState | null>(null);
   const [visibility, setVisibility] = useState<Visibility>("private");
 
+  const setContent = useRef((_content: string) => {});
+
+  const updateVisibility = useCallback(
+    (newVisibility: Visibility) => {
+      setVisibility(newVisibility);
+      setContent.current(
+        (newVisibility === "public" ? minutes.public : minutes.private) || ""
+      );
+    },
+    [setVisibility, setContent, minutes]
+  );
+
   const updateMinutes = useCallback(async () => {
     setSaveState(sending);
     const result = await post(`meeting_minutes/${minutes.id}`, minutes);
@@ -61,7 +73,7 @@ export const EditMinutes: React.FC<EditMinutesProps> = ({
         <EditHeader
           minutes={minutes}
           visibility={visibility}
-          setVisibility={setVisibility}
+          updateVisibility={updateVisibility}
           saveState={saveState}
           save={updateMinutes}
           tryToDelete={() => setDeleteState(notSentYet)}
@@ -74,6 +86,7 @@ export const EditMinutes: React.FC<EditMinutesProps> = ({
           minutes={minutes}
           visibility={visibility}
           update={update}
+          setContent={setContent}
         />
       </p>
       {deleteState && (
@@ -112,18 +125,27 @@ interface MinutesEditorProps {
   minutes: MeetingMinutes;
   visibility: Visibility;
   update: (minutes: MeetingMinutes) => void;
+  setContent: React.MutableRefObject<(content: string) => void>;
 }
 
 const MinutesEditor: React.FC<MinutesEditorProps> = ({
   minutes,
   visibility,
-  update
+  update,
+  setContent
 }) => (
   <Editor
     initialValue={
       (visibility === "private" ? minutes.private : minutes.public) || ""
     }
-    init={{ height: 500 }}
+    init={{
+      height: 500,
+      setupEditor: (editor: any) => {
+        setContent.current = (content: string) => {
+          editor.setContent(content);
+        };
+      }
+    }}
     onEditorChange={content =>
       update(
         visibility === "private"
@@ -141,13 +163,13 @@ interface EditHeaderProps {
   save: () => void;
   tryToDelete: () => void;
   update: (minutes: MeetingMinutes) => void;
-  setVisibility: (visibility: Visibility) => void;
+  updateVisibility: (visibility: Visibility) => void;
 }
 
 const EditHeader: React.FC<EditHeaderProps> = ({
   minutes,
   visibility,
-  setVisibility,
+  updateVisibility,
   update,
   save,
   tryToDelete,
@@ -157,13 +179,13 @@ const EditHeader: React.FC<EditHeaderProps> = ({
     <Control>
       <ButtonGroup connected>
         <Button
-          onClick={() => setVisibility("public")}
+          onClick={() => updateVisibility("public")}
           color={visibility === "public" ? "is-primary" : undefined}
         >
           Public
         </Button>
         <Button
-          onClick={() => setVisibility("private")}
+          onClick={() => updateVisibility("private")}
           color={visibility === "private" ? "is-primary" : undefined}
         >
           Private

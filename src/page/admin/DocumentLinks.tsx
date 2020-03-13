@@ -88,7 +88,7 @@ export const DocumentLinks: React.FC = () => {
           render={links => (
             <table style={{ borderSpacing: "5px", borderCollapse: "separate" }}>
               {links.map((link, index) => (
-                <tr>
+                <tr key={link.name}>
                   <td style={{ paddingRight: "10px" }}>
                     <span
                       style={{

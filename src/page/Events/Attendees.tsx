@@ -4,6 +4,7 @@ import { fullName } from "utils/helpers";
 import { EventAttendee } from "state/models";
 import { RemoteContent, Column, Title } from "components/Basics";
 import { RemoteData, loading, resultToRemote } from "state/types";
+import { SECTION_ORDER } from "state/constants";
 
 export const Attendees: React.FC<{ eventId: number }> = ({ eventId }) => {
   const [attendees, setAttendees] = useState<RemoteData<EventAttendee[]>>(
@@ -36,26 +37,43 @@ const AttendeeTables: React.FC<{ attendees: EventAttendee[] }> = ({
   return (
     <Column>
       <Title centered>Attending</Title>
-      <AttendeeTable {...attending} />
+      {SECTION_ORDER.map(
+        section =>
+          attending.get(section) && (
+            <AttendeeTable section={section} {...attending.get(section)!} />
+          )
+      )}
       <Title centered>Not Attending</Title>
-      <AttendeeTable {...notAttending} />
+      {SECTION_ORDER.map(
+        section =>
+          notAttending.get(section) && (
+            <AttendeeTable section={section} {...notAttending.get(section)!} />
+          )
+      )}
     </Column>
   );
 };
 
-const AttendeeTable: React.FC<SeparateByConfirmed> = ({
+interface AttendeeTableProps extends SeparateByConfirmed {
+  section: string | null;
+}
+
+const AttendeeTable: React.FC<AttendeeTableProps> = ({
+  section,
   confirmed,
   notConfirmed
 }) => (
   <table className="table is-fullwidth">
     <thead>
       <tr>
+        <th>{section}</th>
         <th>Confirmed</th>
         <th>Not Confirmed</th>
       </tr>
     </thead>
     <tbody>
       <tr>
+        <td style={{ width: "20%" }}></td>
         <AttendeeNameList attendees={confirmed} />
         <AttendeeNameList attendees={notConfirmed} />
       </tr>
@@ -66,7 +84,7 @@ const AttendeeTable: React.FC<SeparateByConfirmed> = ({
 const AttendeeNameList: React.FC<{ attendees: EventAttendee[] }> = ({
   attendees
 }) => (
-  <td style={{ width: "50%" }}>
+  <td style={{ width: "40%" }}>
     {attendees.map((attendee, index) => (
       <>
         {fullName(attendee.member)}
@@ -77,8 +95,8 @@ const AttendeeNameList: React.FC<{ attendees: EventAttendee[] }> = ({
 );
 
 interface SeparateByAttending {
-  attending: SeparateByConfirmed;
-  notAttending: SeparateByConfirmed;
+  attending: Map<string | null, SeparateByConfirmed | null>;
+  notAttending: Map<string | null, SeparateByConfirmed | null>;
 }
 
 interface SeparateByConfirmed {
@@ -90,14 +108,29 @@ const separateAttendees = (attendees: EventAttendee[]): SeparateByAttending => {
   const attending = attendees.filter(a => a.attendance.shouldAttend);
   const notAttending = attendees.filter(a => !a.attendance.shouldAttend);
 
+  const separateByConfirmed = (
+    givenAttendees: EventAttendee[]
+  ): Map<string | null, SeparateByConfirmed | null> =>
+    new Map(
+      SECTION_ORDER.map(section => {
+        const inSection = givenAttendees.filter(
+          a => a.member.section === section
+        );
+
+        return [
+          section,
+          inSection.length
+            ? {
+                confirmed: inSection.filter(a => a.attendance.confirmed),
+                notConfirmed: inSection.filter(a => !a.attendance.confirmed)
+              }
+            : null
+        ];
+      })
+    );
+
   return {
-    attending: {
-      confirmed: attending.filter(a => a.attendance.confirmed),
-      notConfirmed: attending.filter(a => !a.attendance.confirmed)
-    },
-    notAttending: {
-      confirmed: notAttending.filter(a => a.attendance.confirmed),
-      notConfirmed: notAttending.filter(a => !a.attendance.confirmed)
-    }
+    attending: separateByConfirmed(attending),
+    notAttending: separateByConfirmed(notAttending)
   };
 };

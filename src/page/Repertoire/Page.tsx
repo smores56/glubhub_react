@@ -20,35 +20,35 @@ import {
   RequiresPermission
 } from "components/Basics";
 import { Song } from "state/models";
-import SongSidebar from "./Sidebar";
+import { SongSidebar } from "./Sidebar";
 import ErrorBox from "components/ErrorBox";
 import { useGlubRoute } from "utils/context";
 import { SelectableList } from "components/List";
 import DeleteModal from "components/DeleteModal";
 import { editRepertoire } from "state/permissions";
 import { BackButton, ButtonGroup, Button } from "components/Buttons";
-import { routeRepertoire } from "state/route";
 import { get, postReturning, NewId, deleteRequest } from "utils/request";
+import { routeRepertoire, RepertoireTab, repertoireDetails } from "state/route";
+import { Edit } from "./Edit";
 
 interface RepertoireProps {
   songId: number | null;
+  tab: RepertoireTab | null;
 }
 
-export const Repertoire: React.FC<RepertoireProps> = ({ songId }) => {
+export const Repertoire: React.FC<RepertoireProps> = ({ songId, tab }) => {
   const { replaceRoute } = useGlubRoute();
 
   const [songs, setSongs] = useState<RemoteData<Song[]>>(loading);
   const [selected, setSelected] = useState<RemoteData<Song>>(notAsked);
   const [createState, setCreateState] = useState(notSentYet);
   const [deleteState, setDeleteState] = useState<SubmissionState | null>(null);
-  const [editing, setEditing] = useState(false);
 
   const loadSong = useCallback(
     async (songId: number) => {
       setSelected(loading);
       const resp = await get<Song>(`repertoire/${songId}?details=true`);
       setSelected(resultToRemote(resp));
-      replaceRoute(routeRepertoire(songId));
 
       if (
         resp.successful &&
@@ -63,7 +63,7 @@ export const Repertoire: React.FC<RepertoireProps> = ({ songId }) => {
 
   const unselectSong = useCallback(() => {
     setSelected(notAsked);
-    replaceRoute(routeRepertoire(null));
+    replaceRoute(routeRepertoire(null, null));
   }, [setSelected, replaceRoute]);
 
   const createSong = useCallback(async () => {
@@ -97,6 +97,16 @@ export const Repertoire: React.FC<RepertoireProps> = ({ songId }) => {
     [setDeleteState, setSelected, setSongs]
   );
 
+  const propagateUpdate = useCallback(
+    (song: Song) => {
+      setSelected(loaded(song));
+      setSongs(
+        mapLoaded(songs, all => all.map(s => (s.id === song.id ? song : s)))
+      );
+    },
+    [songs, setSelected]
+  );
+
   // Load Songs on Initialize
 
   useEffect(() => {
@@ -108,13 +118,15 @@ export const Repertoire: React.FC<RepertoireProps> = ({ songId }) => {
     loadSongs();
     if (songId !== null) {
       loadSong(songId);
+    } else {
+      setSelected(notAsked);
     }
-  }, []);
+  }, [songId, setSelected]);
 
   const selectedId = isLoaded(selected) ? selected.data.id : null;
   const columns: [
     string,
-    (songs: Song[]) => Song[],
+    (songs: Song) => boolean,
     JSX.Element | undefined
   ][] = [
     [
@@ -133,12 +145,14 @@ export const Repertoire: React.FC<RepertoireProps> = ({ songId }) => {
         <Container>
           <Columns>
             {columns.map(([title, filter, maybeCreateButton]) => (
-              <div className="column is-one-quarter is-centered">
+              <div key={title} className="column is-one-quarter is-centered">
                 <SelectableList
                   title={title}
-                  listItems={mapLoaded(songs, x => [filter(x)])}
+                  listItems={mapLoaded(songs, x => [x.filter(filter)])}
                   isSelected={song => song.id === selectedId}
-                  onSelect={(song: Song) => loadSong(song.id)}
+                  onSelect={song =>
+                    replaceRoute(routeRepertoire(song.id, null))
+                  }
                   messageIfEmpty="Nothin' to see here, buddy."
                   render={song => <td>{song.title}</td>}
                   contentAtBottom={maybeCreateButton}
@@ -148,7 +162,7 @@ export const Repertoire: React.FC<RepertoireProps> = ({ songId }) => {
           </Columns>
         </Container>
       </Section>
-      {isLoaded(selected) && editing ? (
+      {isLoaded(selected) && tab?.route === "edit" ? (
         <Sidebar
           data={loaded(null)}
           close={unselectSong}
@@ -156,17 +170,19 @@ export const Repertoire: React.FC<RepertoireProps> = ({ songId }) => {
             <div>
               <BackButton
                 content="finish editing"
-                click={() => setEditing(false)}
+                click={() =>
+                  replaceRoute(
+                    routeRepertoire(selected.data.id, repertoireDetails)
+                  )
+                }
               />
-              {/* {Html.map editSongTranslator (EditSong.view editSongModel)} */}
+              <Edit song={selected.data} propagateUpdate={propagateUpdate} />
             </div>
           )}
         />
       ) : (
         <SongSidebar
           song={selected}
-          close={unselectSong}
-          edit={() => setEditing(true)}
           tryToDelete={() => setDeleteState(notSentYet)}
         />
       )}
@@ -191,22 +207,18 @@ export const Repertoire: React.FC<RepertoireProps> = ({ songId }) => {
 
 // Song Filters
 
-const currentSongsFilter = (songs: Song[]) =>
-  songs.filter(song => song.current);
+const currentSongsFilter = (song: Song): boolean => song.current;
 
-const otherAToGFilter = (songs: Song[]) =>
-  songs.filter(song => !song.current && song.title.toLowerCase()[0] < "h");
+const otherAToGFilter = (song: Song) =>
+  !song.current && song.title.toLowerCase()[0] < "h";
 
-const otherHToPFilter = (songs: Song[]) =>
-  songs.filter(
-    song =>
-      !song.current &&
-      song.title.toLowerCase()[0] >= "h" &&
-      song.title.toLowerCase()[0] < "q"
-  );
+const otherHToPFilter = (song: Song) =>
+  !song.current &&
+  song.title.toLowerCase()[0] >= "h" &&
+  song.title.toLowerCase()[0] < "q";
 
-const otherQToZFilter = (songs: Song[]) =>
-  songs.filter(song => !song.current && song.title.toLowerCase()[0] >= "q");
+const otherQToZFilter = (song: Song) =>
+  !song.current && song.title.toLowerCase()[0] >= "q";
 
 // Create Song Button
 
