@@ -20,6 +20,7 @@ import {
   SubmissionStateBox,
   MemberName
 } from "components/Complex";
+import { Table } from "components/Table";
 
 export const AbsenceRequests: React.FC = () => {
   const [requestsAndEvents, updateRequestsAndEvents] = useState<
@@ -112,7 +113,7 @@ const AbsenceRequestTable: React.FC<AbsenceRequestTableProps> = ({
   requestsAndEvents,
   respond
 }) => (
-  <table className="table" style={{ width: "100%" }}>
+  <Table scrollable style={{ width: "100%" }}>
     <thead>
       <tr style={{ width: "100%" }}>
         <th>When Submitted</th>
@@ -130,7 +131,7 @@ const AbsenceRequestTable: React.FC<AbsenceRequestTableProps> = ({
         </>
       ))}
     </tbody>
-  </table>
+  </Table>
 );
 
 interface AbsenceRequestRowProps {

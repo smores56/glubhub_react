@@ -8,6 +8,7 @@ import { Title, Tooltip } from "components/Basics";
 import { useGlubRoute } from "utils/context";
 import { routeRepertoire, repertoireEdit } from "state/route";
 import { RequiresPermission } from "components/Complex";
+import { Table } from "components/Table";
 
 interface SongSidebarProps {
   song: Song;
@@ -53,9 +54,11 @@ export const SongSidebar: React.FC<SongSidebarProps> = ({
         mode={null}
       />
       <br />
-      <table className="table is-fullwidth">
-        {song.links?.filter(links => links.links.length).map(linkSection)}
-      </table>
+      <Table fullwidth>
+        <tbody>
+          {song.links?.filter(links => links.links.length).map(linkSection)}
+        </tbody>
+      </Table>
       <RequiresPermission permission={editRepertoire}>
         <div>
           <Button

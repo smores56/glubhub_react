@@ -3,6 +3,7 @@ import { RemoteData } from "state/types";
 import { Box, Title, Column } from "./Basics";
 import { GOLD_COLOR } from "../state/constants";
 import { RemoteContent } from "./Complex";
+import { Table } from "./Table";
 
 interface SelectableListProps<T> {
   listItems: RemoteData<T[][]>;
@@ -27,28 +28,22 @@ export const SelectableList = <T extends any>(
         render={groups => {
           const nonEmptyGroups = groups.filter(group => group.length);
 
-          if (nonEmptyGroups.length === 0) {
+          if (!nonEmptyGroups.length) {
             return <p>{props.messageIfEmpty}</p>;
           }
 
           return (
-            <div>
-              <table className="table is-fullwidth is-hoverable no-bottom-border">
-                <thead />
-                <tbody>
-                  {nonEmptyGroups
-                    .map((group, index) => [
-                      ...group.map(item => singleRow(item, props)),
-                      index === nonEmptyGroups.length - 1 ? (
-                        <></>
-                      ) : (
-                        <DividerRow />
-                      )
-                    ])
-                    .flatMap(group => group)}
-                </tbody>
-              </table>
-            </div>
+            <Table fullwidth hoverable className="no-bottom-border">
+              <thead />
+              <tbody>
+                {nonEmptyGroups
+                  .map((group, index) => [
+                    ...group.map(item => singleRow(item, props)),
+                    index === nonEmptyGroups.length - 1 ? <></> : <DividerRow />
+                  ])
+                  .flatMap(group => group)}
+              </tbody>
+            </Table>
           );
         }}
       />

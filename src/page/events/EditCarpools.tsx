@@ -35,6 +35,7 @@ import { GlubHubContext, useGlubRoute } from "utils/context";
 import { routeEvents, eventCarpools } from "state/route";
 import { LinkButton, Button } from "components/Buttons";
 import { RemoteContent } from "components/Complex";
+import { Table } from "components/Table";
 
 interface CarpoolData {
   event: GlubEvent;
@@ -202,7 +203,7 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
                         <ErrorBox error={updateState.error} />
                       )}
                     </div>
-                    <table className="table" style={{ width: "100%" }}>
+                    <Table style={{ width: "100%" }}>
                       {data.carpools.map(carpool => (
                         <CarpoolPartialTable
                           carpool={carpool}
@@ -211,7 +212,7 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
                           selection={selection}
                         />
                       ))}
-                    </table>
+                    </Table>
                     <Button fullwidth onClick={addNewCarpool}>
                       Pick a driver and then click here to add new carpool
                     </Button>
@@ -249,15 +250,17 @@ const RemainingMemberTable: React.FC<RemainingMemberTableProps> = ({
   }
 
   return (
-    <table className="table">
-      {membersLeft.map(member => (
-        <CarpoolRow
-          member={member}
-          event={{ ...data.event, attendance: null }}
-          selection={selection}
-        />
-      ))}
-    </table>
+    <Table>
+      <tbody>
+        {membersLeft.map(member => (
+          <CarpoolRow
+            member={member}
+            event={{ ...data.event, attendance: null }}
+            selection={selection}
+          />
+        ))}
+      </tbody>
+    </Table>
   );
 };
 

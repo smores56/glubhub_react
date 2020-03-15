@@ -10,6 +10,7 @@ import { Member } from "state/models";
 import { fullName } from "utils/helpers";
 import { GlubHubContext } from "utils/context";
 import { routeProfile, renderRoute } from "state/route";
+import { Table } from "components/Table";
 
 export const Roster: React.FC = () => {
   const { members } = useContext(GlubHubContext);
@@ -36,20 +37,18 @@ export const Roster: React.FC = () => {
     <Section>
       <Container>
         <Box>
-          <div className="table-container">
-            <table className="table is-fullwidth">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Section</th>
-                  <th>E-mail</th>
-                  <th>Phone</th>
-                  <th>Location</th>
-                </tr>
-              </thead>
-              <tbody>{members.map(memberRow)}</tbody>
-            </table>
-          </div>
+          <Table fullwidth scrollable>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Section</th>
+                <th>E-mail</th>
+                <th>Phone</th>
+                <th>Location</th>
+              </tr>
+            </thead>
+            <tbody>{members.map(memberRow)}</tbody>
+          </Table>
         </Box>
       </Container>
     </Section>

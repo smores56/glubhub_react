@@ -5,6 +5,7 @@ import { pitchToUnicode } from "utils/helpers";
 import { RemoteContent } from "components/Complex";
 import { renderRoute, routeRepertoire } from "state/route";
 import { RemoteData, loading, resultToRemote } from "state/types";
+import { Table } from "components/Table";
 
 export const Setlist: React.FC<{ eventId: number }> = ({ eventId }) => {
   const [songs, setSongs] = useState<RemoteData<Song[]>>(loading);
@@ -25,13 +26,13 @@ export const Setlist: React.FC<{ eventId: number }> = ({ eventId }) => {
         songs.length === 0 ? (
           <div>No set list for this event.</div>
         ) : (
-          <table className="table is-striped">
+          <Table striped>
             <tbody>
               {songs.map((song, index) => (
                 <SongRow song={song} index={index + 1} />
               ))}
             </tbody>
-          </table>
+          </Table>
         )
       }
     />

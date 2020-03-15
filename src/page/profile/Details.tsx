@@ -22,6 +22,7 @@ import {
 } from "components/Forms";
 import { ButtonGroup, Button, SubmitButton } from "components/Buttons";
 import ErrorBox from "components/ErrorBox";
+import { Table } from "components/Table";
 
 interface DetailsProps {
   member: Member;
@@ -97,7 +98,7 @@ const ReadOnlyDetails: React.FC<ReadOnlyDetailsProps> = ({
 
   return (
     <Column>
-      <table className="table">
+      <Table>
         <tbody>
           {rows.map(([name, value]) => (
             <tr className="no-bottom-border">
@@ -108,7 +109,7 @@ const ReadOnlyDetails: React.FC<ReadOnlyDetailsProps> = ({
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
       <ButtonGroup alignment="is-right">
         <Button onClick={startEditing}>Edit</Button>
       </ButtonGroup>

@@ -18,6 +18,7 @@ import { routeEditCarpools, routeProfile } from "state/route";
 import { RemoteData, loading, resultToRemote } from "state/types";
 import { LinkButton } from "components/Buttons";
 import { useGlubRoute } from "utils/context";
+import { Table } from "components/Table";
 
 export const Carpools: React.FC<{ event: GlubEvent }> = ({ event }) => {
   const { goToRoute } = useGlubRoute();
@@ -41,7 +42,7 @@ export const Carpools: React.FC<{ event: GlubEvent }> = ({ event }) => {
           {carpools.length === 0 ? (
             <div>No carpools set for this event.</div>
           ) : (
-            <table className="table">
+            <Table scrollable>
               {carpools.map(carpool => (
                 <CarpoolPartialTable
                   includeIcon
@@ -54,7 +55,7 @@ export const Carpools: React.FC<{ event: GlubEvent }> = ({ event }) => {
                   }}
                 />
               ))}
-            </table>
+            </Table>
           )}
           <RequiresPermission permission={editCarpool}>
             <div style={{ padding: "10px" }}>
@@ -86,11 +87,11 @@ interface CarpoolTablesProps extends CarpoolTableBaseProps {
 }
 
 export const CarpoolTables: React.FC<CarpoolTablesProps> = props => (
-  <table>
+  <Table>
     {props.carpools.map(carpool => (
       <CarpoolTable carpool={carpool} {...props} />
     ))}
-  </table>
+  </Table>
 );
 
 interface CarpoolTableProps extends CarpoolTableBaseProps {
@@ -98,9 +99,9 @@ interface CarpoolTableProps extends CarpoolTableBaseProps {
 }
 
 export const CarpoolTable: React.FC<CarpoolTableProps> = props => (
-  <table>
+  <Table>
     <CarpoolPartialTable {...props} />
-  </table>
+  </Table>
 );
 
 export const CarpoolPartialTable: React.FC<CarpoolTableProps> = ({

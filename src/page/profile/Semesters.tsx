@@ -4,6 +4,7 @@ import { RemoteData, loading, resultToRemote, mapLoaded } from "state/types";
 import { get } from "utils/request";
 import { RemoteContent } from "components/Complex";
 import { roundToTwoDigits } from "utils/helpers";
+import { Table } from "components/Table";
 
 export const Semesters: React.FC<{ member: Member }> = ({ member }) => {
   const [semesters, setSemesters] = useState<RemoteData<ActiveSemester[]>>(
@@ -24,7 +25,7 @@ export const Semesters: React.FC<{ member: Member }> = ({ member }) => {
     <RemoteContent
       data={semesters}
       render={semesters => (
-        <table className="table">
+        <Table>
           <thead>
             <tr>
               <th>Semester</th>
@@ -43,7 +44,7 @@ export const Semesters: React.FC<{ member: Member }> = ({ member }) => {
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
       )}
     />
   );

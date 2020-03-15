@@ -6,6 +6,7 @@ import { Column, Title } from "components/Basics";
 import { RemoteData, loading, resultToRemote } from "state/types";
 import { SECTION_ORDER } from "state/constants";
 import { RemoteContent } from "components/Complex";
+import { Table } from "components/Table";
 
 export const Attendees: React.FC<{ eventId: number }> = ({ eventId }) => {
   const [attendees, setAttendees] = useState<RemoteData<EventAttendee[]>>(
@@ -64,7 +65,7 @@ const AttendeeTable: React.FC<AttendeeTableProps> = ({
   confirmed,
   notConfirmed
 }) => (
-  <table className="table is-fullwidth">
+  <Table fullwidth scrollable>
     <thead>
       <tr>
         <th>{section}</th>
@@ -79,7 +80,7 @@ const AttendeeTable: React.FC<AttendeeTableProps> = ({
         <AttendeeNameList attendees={notConfirmed} />
       </tr>
     </tbody>
-  </table>
+  </Table>
 );
 
 const AttendeeNameList: React.FC<{ attendees: EventAttendee[] }> = ({

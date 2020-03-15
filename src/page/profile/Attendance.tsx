@@ -16,6 +16,7 @@ import { RemoteContent, SubmissionStateBox } from "components/Complex";
 import { routeEvents, renderRoute } from "state/route";
 import { CheckboxInput, TextInput, numberType } from "components/Forms";
 import { dateFormatter } from "utils/datetime";
+import { Table } from "components/Table";
 
 export const Attendance: React.FC<{ member: Member }> = ({ member }) => {
   const [grades, updateGrades] = useState<RemoteData<Grades>>(loading);
@@ -62,7 +63,7 @@ export const Attendance: React.FC<{ member: Member }> = ({ member }) => {
       <RemoteContent
         data={grades}
         render={grades => (
-          <table className="table">
+          <Table>
             <thead>
               <tr>
                 <th>Date</th>
@@ -81,7 +82,7 @@ export const Attendance: React.FC<{ member: Member }> = ({ member }) => {
                 <AttendanceRow event={event} update={updateAttendance} />
               ))}
             </tbody>
-          </table>
+          </Table>
         )}
       />
       <SubmissionStateBox state={state} />

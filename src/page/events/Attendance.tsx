@@ -14,6 +14,7 @@ import { EventAttendee } from "state/models";
 import { RemoteContent, SubmissionStateBox } from "components/Complex";
 import { CheckboxInput, TextInput, numberType } from "components/Forms";
 import { NO_SECTION, SECTION_ORDER } from "state/constants";
+import { Table } from "components/Table";
 
 export const Attendance: React.FC<{ eventId: number }> = ({ eventId }) => {
   const [state, setState] = useState(notSentYet);
@@ -53,7 +54,7 @@ export const Attendance: React.FC<{ eventId: number }> = ({ eventId }) => {
       <RemoteContent
         data={attendees}
         render={attendees => (
-          <table className="table is-fullwidth">
+          <Table fullwidth scrollable>
             {groupAttendees(attendees).map(group => (
               <>
                 <thead>
@@ -75,7 +76,7 @@ export const Attendance: React.FC<{ eventId: number }> = ({ eventId }) => {
                 </tbody>
               </>
             ))}
-          </table>
+          </Table>
         )}
       />
       <SubmissionStateBox state={state} />

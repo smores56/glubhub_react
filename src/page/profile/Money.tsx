@@ -14,6 +14,7 @@ import { RemoteContent, SubmissionStateBox } from "components/Complex";
 import { Button } from "components/Buttons";
 import { simpleDateWithYearFormatter } from "utils/datetime";
 import { Column } from "components/Basics";
+import { Table } from "components/Table";
 
 export const Money: React.FC<{ member: Member }> = ({ member }) => {
   const [transactions, updateTransactions] = useState<
@@ -55,7 +56,7 @@ export const Money: React.FC<{ member: Member }> = ({ member }) => {
       <RemoteContent
         data={transactions}
         render={transactions => (
-          <table className="table is-striped">
+          <Table striped>
             <tbody>
               {transactions
                 .sort((t1, t2) => t2.time - t1.time)
@@ -66,7 +67,7 @@ export const Money: React.FC<{ member: Member }> = ({ member }) => {
                   />
                 ))}
             </tbody>
-          </table>
+          </Table>
         )}
       />
       <SubmissionStateBox state={state} />
