@@ -19,7 +19,8 @@ import {
   loaded,
   mapLoaded,
   SubmissionState,
-  isSending
+  isSending,
+  failedToSend
 } from "state/types";
 import { MeetingMinutes } from "state/models";
 import { useGlubRoute } from "utils/context";
@@ -213,7 +214,7 @@ const MinutesList: React.FC<MinutesListProps> = ({
               >
                 + Add New Minutes
               </Button>
-              {createState.status === "errorSending" && (
+              {failedToSend(createState) && (
                 <ErrorBox error={createState.error} />
               )}
             </ButtonGroup>

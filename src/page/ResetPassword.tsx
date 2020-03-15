@@ -7,7 +7,13 @@ import { useGlubRoute } from "utils/context";
 import { Column, Title4, Box } from "components/Basics";
 import { TextInput, passwordType } from "components/Forms";
 import { ButtonGroup, SubmitButton } from "components/Buttons";
-import { notSentYet, sending, errorSending } from "state/types";
+import {
+  notSentYet,
+  sending,
+  errorSending,
+  isSending,
+  failedToSend
+} from "state/types";
 
 export const ResetPassword: React.FC<{ token: string | null }> = ({
   token
@@ -66,16 +72,11 @@ export const ResetPassword: React.FC<{ token: string | null }> = ({
               />
 
               <ButtonGroup alignment="is-right">
-                <SubmitButton
-                  color="is-primary"
-                  loading={state.status === "sending"}
-                >
+                <SubmitButton color="is-primary" loading={isSending(state)}>
                   call me Jake Sully
                 </SubmitButton>
               </ButtonGroup>
-              {state.status === "errorSending" && (
-                <ErrorBox error={state.error} />
-              )}
+              {failedToSend(state) && <ErrorBox error={state.error} />}
             </Box>
           </form>
         </Column>

@@ -14,7 +14,9 @@ import {
   notSentYet,
   sending,
   errorSending,
-  isLoaded
+  isLoaded,
+  isSending,
+  failedToSend
 } from "state/types";
 import {
   Section,
@@ -84,7 +86,7 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
   // const selectEmptyCarpool;
 
   const moveBackToUnassigned = useCallback(() => {
-    if (data.status !== "loaded" || !selected.length) return;
+    if (!isLoaded(data) || !selected.length) return;
 
     setData(
       loaded({
@@ -120,7 +122,7 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
   }, [setData, setSelected, getSelectedIfAllUnassigned]);
 
   const updateCarpools = useCallback(async () => {
-    if (data.status !== "loaded") return;
+    if (!isLoaded(data)) return;
 
     setUpdateState(sending);
     const body = data.data.carpools.map(c => ({
@@ -194,12 +196,12 @@ export const EditCarpools: React.FC<{ eventId: number }> = ({ eventId }) => {
                       <Button
                         color="is-primary"
                         className="is-pulled-right"
-                        loading={updateState.status === "sending"}
+                        loading={isSending(updateState)}
                         onClick={updateCarpools}
                       >
                         Update Carpools
                       </Button>
-                      {updateState.status === "errorSending" && (
+                      {failedToSend(updateState) && (
                         <ErrorBox error={updateState.error} />
                       )}
                     </div>

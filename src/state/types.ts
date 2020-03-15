@@ -36,8 +36,7 @@ export const errorSending = (error: GlubHubError): SubmissionState => ({
 export const mapLoaded = <T, U>(
   data: RemoteData<T>,
   mapper: (t: T) => U
-): RemoteData<U> =>
-  data.status === "loaded" ? loaded(mapper(data.data)) : data;
+): RemoteData<U> => (isLoaded(data) ? loaded(mapper(data.data)) : data);
 
 export const resultToRemote = <T>(result: GlubResponseType<T>): RemoteData<T> =>
   result.successful ? loaded(result.data) : errorLoading(result.error);

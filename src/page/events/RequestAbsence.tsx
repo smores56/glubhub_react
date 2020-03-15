@@ -6,7 +6,13 @@ import { TextareaInput } from "components/Forms";
 import { Subtitle, Title } from "components/Basics";
 import { GlubEvent, AbsenceRequest } from "state/models";
 import { BackButton, ButtonGroup, SubmitButton } from "components/Buttons";
-import { notSentYet, errorSending, sending } from "state/types";
+import {
+  notSentYet,
+  errorSending,
+  sending,
+  isSending,
+  failedToSend
+} from "state/types";
 
 interface RequestAbsenceProps {
   event: GlubEvent;
@@ -56,12 +62,12 @@ export const RequestAbsence: React.FC<RequestAbsenceProps> = props => {
           required
         />
         <ButtonGroup alignment="is-right">
-          <SubmitButton color="is-primary" loading={state.status === "sending"}>
+          <SubmitButton color="is-primary" loading={isSending(state)}>
             Beg for Mercy
           </SubmitButton>
         </ButtonGroup>
       </form>
-      {state.status === "errorSending" && <ErrorBox error={state.error} />}
+      {failedToSend(state) && <ErrorBox error={state.error} />}
     </div>
   );
 };

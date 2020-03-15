@@ -1,5 +1,11 @@
 import React, { useState, useCallback } from "react";
-import { notSentYet, errorSending, sending } from "state/types";
+import {
+  notSentYet,
+  errorSending,
+  sending,
+  isSending,
+  failedToSend
+} from "state/types";
 import { post } from "utils/request";
 import { useGlubRoute } from "utils/context";
 import { routeLogin } from "state/route";
@@ -66,16 +72,11 @@ export const ForgotPassword: React.FC = () => {
 
               <ButtonGroup alignment="is-right">
                 <LinkButton route={routeLogin}>uh, nvm</LinkButton>
-                <SubmitButton
-                  color="is-primary"
-                  loading={state.status === "sending"}
-                >
+                <SubmitButton color="is-primary" loading={isSending(state)}>
                   halp
                 </SubmitButton>
               </ButtonGroup>
-              {state.status === "errorSending" && (
-                <ErrorBox error={state.error} />
-              )}
+              {failedToSend(state) && <ErrorBox error={state.error} />}
             </Box>
           </form>
         </Column>

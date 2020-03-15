@@ -20,7 +20,8 @@ import {
   loaded,
   resultToRemote,
   sending,
-  resultToSubmissionState
+  resultToSubmissionState,
+  failedToSend
 } from "state/types";
 import { Member } from "state/models";
 import { get, NewToken, deleteRequest, chain } from "utils/request";
@@ -249,9 +250,7 @@ const UserActions: React.FC<{ member: Member }> = ({ member }) => {
           </Button>
         </RequiresPermission>
 
-        {loginAsState.status === "errorSending" && (
-          <ErrorBox error={loginAsState.error} />
-        )}
+        {failedToSend(loginAsState) && <ErrorBox error={loginAsState.error} />}
         {deleteState && (
           <DeleteMemberModal
             member={member}

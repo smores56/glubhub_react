@@ -125,7 +125,7 @@ export const Events: React.FC<EventsProps> = ({ eventId, tab }) => {
     }
   }, [eventId, selectEvent, setSelected]);
 
-  const selectedId = selected.status === "loaded" ? selected.data.id : null;
+  const selectedId = isLoaded(selected) ? selected.data.id : null;
   const upcomingEvents = mapLoaded(events, x =>
     x.filter(event => !eventIsOver(event))
   );

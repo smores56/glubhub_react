@@ -10,7 +10,8 @@ import {
   resultToRemote,
   resultToSubmissionState,
   sending,
-  loaded
+  loaded,
+  isLoaded
 } from "state/types";
 import { inlineMiddleStyle } from "utils/style";
 import { SelectInput, memberType } from "components/Forms";
@@ -24,7 +25,7 @@ export const OfficerPositions: React.FC = () => {
 
   const toggleOfficer = useCallback(
     async (role: Role, from: Member | null, to: Member | null) => {
-      if (roles.status !== "loaded") return;
+      if (!isLoaded(roles)) return;
 
       setState(sending);
 

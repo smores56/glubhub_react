@@ -8,7 +8,10 @@ import {
   sending,
   errorSending,
   SubmissionState,
-  isLoaded
+  isLoaded,
+  isLoading,
+  isSending,
+  failedToSend
 } from "state/types";
 import { get, post } from "utils/request";
 import { GlubHubContext, useGlubRoute } from "utils/context";
@@ -204,7 +207,7 @@ const MiddleColumn: React.FC<FormData> = props => (
       type={stringType}
       onInput={semester => props.updateEvent({ ...props.event, semester })}
       title="Semester"
-      loading={props.semesters.status === "loading"}
+      loading={isLoading(props.semesters)}
     />
     <SelectInput
       values={[null, ...(props.info?.uniforms || [])]}
@@ -267,9 +270,9 @@ const RightColumn: React.FC<FormData> = ({
     />
     <br />
     <br />
-    <SubmitButton color="is-primary" loading={state.status === "sending"}>
+    <SubmitButton color="is-primary" loading={isSending(state)}>
       Update
     </SubmitButton>
-    {state.status === "errorSending" && <ErrorBox error={state.error} />}
+    {failedToSend(state) && <ErrorBox error={state.error} />}
   </Column>
 );

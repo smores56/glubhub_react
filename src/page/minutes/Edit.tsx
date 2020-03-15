@@ -5,7 +5,8 @@ import {
   SubmissionState,
   sending,
   resultToSubmissionState,
-  isSending
+  isSending,
+  failedToSend
 } from "state/types";
 import { post, deleteRequest } from "utils/request";
 import { RequiresPermission } from "components/Complex";
@@ -221,8 +222,6 @@ const EditHeader: React.FC<EditHeaderProps> = ({
       </ButtonGroup>
     </Control>
 
-    {saveState.status === "errorSending" && (
-      <ErrorBox error={saveState.error} />
-    )}
+    {failedToSend(saveState) && <ErrorBox error={saveState.error} />}
   </div>
 );

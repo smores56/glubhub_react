@@ -11,7 +11,9 @@ import {
   errorSending,
   mapLoaded,
   isLoaded,
-  resultToSubmissionState
+  resultToSubmissionState,
+  isSending,
+  failedToSend
 } from "state/types";
 import { Container, Section, Columns } from "components/Basics";
 import { Song } from "state/models";
@@ -160,7 +162,7 @@ export const Repertoire: React.FC<RepertoireProps> = ({ songId, tab }) => {
           )
         }
       />
-      {selected.status === "loaded" && deleteState ? (
+      {isLoaded(selected) && deleteState ? (
         <DeleteModal
           title={`Are you sure you want to delete ${selected.data.title}?`}
           cancel={() => setDeleteState(null)}
@@ -210,13 +212,13 @@ const CreateSongButton: React.FC<CreateSongButtonProps> = ({
       <ButtonGroup alignment="is-centered">
         <Button
           color="is-primary"
-          loading={state.status === "sending"}
+          loading={isSending(state)}
           onClick={createSong}
         >
           + Add New Song
         </Button>
       </ButtonGroup>
-      {state.status === "errorSending" && <ErrorBox error={state.error} />}
+      {failedToSend(state) && <ErrorBox error={state.error} />}
     </div>
   </RequiresPermission>
 );

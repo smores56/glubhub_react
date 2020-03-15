@@ -7,7 +7,8 @@ import {
   sending,
   resultToSubmissionState,
   loaded,
-  resultToRemote
+  resultToRemote,
+  isLoaded
 } from "state/types";
 import { post, get } from "utils/request";
 import { RemoteContent, SubmissionStateBox } from "components/Complex";
@@ -24,7 +25,7 @@ export const Money: React.FC<{ member: Member }> = ({ member }) => {
 
   const resolveTransaction = useCallback(
     async (transactionId: number, resolved: boolean) => {
-      if (transactions.status !== "loaded") return;
+      if (!isLoaded(transactions)) return;
 
       setState(sending);
       updateTransactions(

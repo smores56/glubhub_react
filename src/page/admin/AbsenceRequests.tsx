@@ -7,7 +7,8 @@ import {
   sending,
   checkSubmissionResult,
   loaded,
-  mapLoaded
+  mapLoaded,
+  isLoaded
 } from "state/types";
 import { Title, Box } from "components/Basics";
 import { get, post } from "utils/request";
@@ -30,7 +31,7 @@ export const AbsenceRequests: React.FC = () => {
 
   const respondToAbsenceRequest = useCallback(
     async (request: AbsenceRequest, action: "approve" | "deny") => {
-      if (requestsAndEvents.status !== "loaded") return;
+      if (!isLoaded(requestsAndEvents)) return;
       setState(sending);
 
       const url = `absence_requests/${request.event}/${request.member}/${action}`;

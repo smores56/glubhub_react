@@ -4,7 +4,9 @@ import {
   notSentYet,
   SubmissionState,
   sending,
-  resultToSubmissionState
+  resultToSubmissionState,
+  isSending,
+  failedToSend
 } from "state/types";
 import { Member, Enrollment } from "state/models";
 import { chain, get, post } from "utils/request";
@@ -252,11 +254,11 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
       />
       <ButtonGroup alignment="is-right">
         <Button onClick={cancel}>Cancel</Button>
-        <SubmitButton color="is-primary" loading={state.status === "sending"}>
+        <SubmitButton color="is-primary" loading={isSending(state)}>
           Save
         </SubmitButton>
       </ButtonGroup>
-      {state.status === "errorSending" && <ErrorBox error={state.error} />}
+      {failedToSend(state) && <ErrorBox error={state.error} />}
     </form>
   );
 };

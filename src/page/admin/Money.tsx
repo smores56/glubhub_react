@@ -8,7 +8,8 @@ import {
   SubmissionState,
   errorSending,
   isSending,
-  isLoaded
+  isLoaded,
+  failedToSend
 } from "state/types";
 import { Transaction, Fee, emptyTransactionBatch, Member } from "state/models";
 import { useGlubRoute, GlubHubContext } from "utils/context";
@@ -75,7 +76,7 @@ export const Money: React.FC<{ tab: MoneyTab | null }> = ({ tab }) => {
 
   const updateFeeAmount = useCallback(
     async (fee: Fee) => {
-      if (fees.status !== "loaded") return;
+      if (!isLoaded(fees)) return;
 
       setFeeState(sending);
       updateFees(loaded(fees.data.map(f => (f.name === fee.name ? fee : f))));
@@ -274,7 +275,7 @@ const AssignDuesModal: React.FC = () => {
         <BeholdThe text="power" />
         <BeholdThe text="corruption" />
         <BeholdThe text="folksy phrasing" />
-        {state.status === "errorSending" && <ErrorBox error={state.error} />}
+        {failedToSend(state) && <ErrorBox error={state.error} />}
         <br />
         <Button
           element="a"
@@ -317,7 +318,7 @@ const AssignLateDuesModal: React.FC = () => {
         <BeholdThe text="power" />
         <BeholdThe text="corruption" />
         <BeholdThe text="folksy phrasing" />
-        {state.status === "errorSending" && <ErrorBox error={state.error} />}
+        {failedToSend(state) && <ErrorBox error={state.error} />}
         <br />
         <Button
           element="a"
@@ -418,16 +419,14 @@ const BatchTransactions: React.FC = () => {
             </Box>
           </InputWrapper>
           <br />
-          <button
-            className={
-              "button is-primary" +
-              (state.status === "sending" ? " is-loading" : "")
-            }
+          <Button
+            color="is-primary"
+            loading={isSending(state)}
             onClick={sendBatch}
           >
             My mind on my money and my money on my mind
-          </button>
-          {state.status === "errorSending" && <ErrorBox error={state.error} />}
+          </Button>
+          {failedToSend(state) && <ErrorBox error={state.error} />}
         </form>
       )}
     />

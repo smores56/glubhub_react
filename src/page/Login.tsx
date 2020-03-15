@@ -5,7 +5,7 @@ import { Column, Box } from "components/Basics";
 import { postReturning, NewToken } from "utils/request";
 import { GlubHubContext, useGlubRoute } from "utils/context";
 import { SubmitButton, LinkButton } from "components/Buttons";
-import { notSentYet, sending, errorSending } from "state/types";
+import { notSentYet, sending, errorSending, isSending } from "state/types";
 import { TextInput, emailType, passwordType, Control } from "components/Forms";
 import { routeHome, routeForgotPassword, routeEditProfile } from "state/route";
 
@@ -70,7 +70,7 @@ export const Login: React.FC = () => {
                 <SubmitButton
                   color="is-primary"
                   fullwidth
-                  loading={state.status === "sending"}
+                  loading={isSending(state)}
                 >
                   I posit that I am worthy
                 </SubmitButton>

@@ -6,7 +6,8 @@ import {
   resultToRemote,
   sending,
   loaded,
-  resultToSubmissionState
+  resultToSubmissionState,
+  isLoaded
 } from "state/types";
 import { DocumentLink, emptyDocumentLink } from "state/models";
 import { get, post, deleteRequest } from "utils/request";
@@ -22,7 +23,7 @@ export const DocumentLinks: React.FC = () => {
 
   const updateLink = useCallback(
     async (index: number, link: DocumentLink) => {
-      if (links.status !== "loaded") return;
+      if (!isLoaded(links)) return;
 
       setState(sending);
       const update = await post(`google_docs/${links.data[index].name}`, link);
@@ -37,7 +38,7 @@ export const DocumentLinks: React.FC = () => {
 
   const deleteLink = useCallback(
     async (index: number) => {
-      if (links.status !== "loaded") return;
+      if (!isLoaded(links)) return;
 
       const link = links.data[index];
       if (!link) return;
@@ -54,7 +55,7 @@ export const DocumentLinks: React.FC = () => {
   );
 
   const createLink = useCallback(async () => {
-    if (links.status !== "loaded" || !newLink.name || !newLink.url) return;
+    if (!isLoaded(links) || !newLink.name || !newLink.url) return;
 
     setState(sending);
     const result = await post(`google_docs`, newLink);

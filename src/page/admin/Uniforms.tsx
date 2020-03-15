@@ -7,7 +7,8 @@ import {
   sending,
   resultToSubmissionState,
   loaded,
-  SubmissionState
+  SubmissionState,
+  isLoaded
 } from "state/types";
 import { Uniform, emptyUniform } from "state/models";
 import { get, post, deleteRequest, postReturning, NewId } from "utils/request";
@@ -31,7 +32,7 @@ export const Uniforms: React.FC = () => {
       const update = await post(`uniforms/${uniform.id}`, body);
 
       setState(resultToSubmissionState(update));
-      if (update.successful && uniforms.status === "loaded") {
+      if (update.successful && isLoaded(uniforms)) {
         setUniforms(
           loaded(uniforms.data.map(u => (u.id === uniform.id ? uniform : u)))
         );
@@ -47,7 +48,7 @@ export const Uniforms: React.FC = () => {
       const result = await deleteRequest(`uniforms/${uniform.id}`);
 
       setState(resultToSubmissionState(result));
-      if (result.successful && uniforms.status === "loaded") {
+      if (result.successful && isLoaded(uniforms)) {
         setUniforms(loaded(uniforms.data.filter(u => u.id !== uniform.id)));
       }
     },
@@ -61,7 +62,7 @@ export const Uniforms: React.FC = () => {
     const result = await postReturning<typeof body, NewId>(`uniforms`, body);
 
     setState(resultToSubmissionState(result));
-    if (result.successful && uniforms.status === "loaded") {
+    if (result.successful && isLoaded(uniforms)) {
       setUniforms(
         loaded([...uniforms.data, { ...newUniform, id: result.data.id }])
       );
