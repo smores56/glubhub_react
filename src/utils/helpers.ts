@@ -60,6 +60,13 @@ export const rolePermissionsAreEqual = (
 export const roundToTwoDigits = (x: number): number =>
   Math.round(x * 100) / 100.0;
 
+export const fileToBase64 = async (file: File): Promise<string> =>
+  new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onloadend = event => resolve(event.target!.result as string);
+    reader.readAsDataURL(file);
+  });
+
 export const visibleAdminTabs = (user: Member): AdminRoute[][] => {
   const eventTabs: [AdminRoute, boolean][] = [
     [adminCreateEvent(null), permittedTo(user, Permissions.createEvent)],

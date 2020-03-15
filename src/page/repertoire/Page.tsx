@@ -10,7 +10,8 @@ import {
   sending,
   errorSending,
   mapLoaded,
-  isLoaded
+  isLoaded,
+  resultToSubmissionState
 } from "state/types";
 import {
   Container,
@@ -26,9 +27,9 @@ import { useGlubRoute } from "utils/context";
 import { SelectableList } from "components/List";
 import DeleteModal from "components/DeleteModal";
 import { editRepertoire } from "state/permissions";
-import { BackButton, ButtonGroup, Button } from "components/Buttons";
+import { ButtonGroup, Button } from "components/Buttons";
 import { get, postReturning, NewId, deleteRequest } from "utils/request";
-import { routeRepertoire, RepertoireTab, repertoireDetails } from "state/route";
+import { routeRepertoire, RepertoireTab, repertoireEdit } from "state/route";
 import { Edit } from "./Edit";
 
 interface RepertoireProps {
@@ -49,35 +50,20 @@ export const Repertoire: React.FC<RepertoireProps> = ({ songId, tab }) => {
       setSelected(loading);
       const resp = await get<Song>(`repertoire/${songId}?details=true`);
       setSelected(resultToRemote(resp));
-
-      if (
-        resp.successful &&
-        songs.status === "loaded" &&
-        !songs.data.some(song => song.id === songId)
-      ) {
-        setSongs(loaded([...songs.data, resp.data]));
-      }
     },
-    [setSelected, replaceRoute, songs, setSongs]
+    [setSelected]
   );
-
-  const unselectSong = useCallback(() => {
-    setSelected(notAsked);
-    replaceRoute(routeRepertoire(null, null));
-  }, [setSelected, replaceRoute]);
 
   const createSong = useCallback(async () => {
     setCreateState(sending);
     const body = { title: "New Song" };
     const resp = await postReturning<typeof body, NewId>("repertoire", body);
 
+    setCreateState(resultToSubmissionState(resp));
     if (resp.successful) {
-      setCreateState(notSentYet);
-      loadSong(resp.data.id);
-    } else {
-      setCreateState(errorSending(resp.error));
+      replaceRoute(routeRepertoire(resp.data.id, repertoireEdit));
     }
-  }, [setCreateState, loadSong]);
+  }, [setCreateState, replaceRoute]);
 
   const deleteSong = useCallback(
     async (songId: number) => {
@@ -116,12 +102,15 @@ export const Repertoire: React.FC<RepertoireProps> = ({ songId, tab }) => {
     };
 
     loadSongs();
+  }, [setSongs]);
+
+  useEffect(() => {
     if (songId !== null) {
       loadSong(songId);
     } else {
       setSelected(notAsked);
     }
-  }, [songId, setSelected]);
+  }, [songId, loadSong, setSelected]);
 
   const selectedId = isLoaded(selected) ? selected.data.id : null;
   const columns: [
@@ -162,30 +151,20 @@ export const Repertoire: React.FC<RepertoireProps> = ({ songId, tab }) => {
           </Columns>
         </Container>
       </Section>
-      {isLoaded(selected) && tab?.route === "edit" ? (
-        <Sidebar
-          data={loaded(null)}
-          close={unselectSong}
-          render={() => (
-            <div>
-              <BackButton
-                content="finish editing"
-                click={() =>
-                  replaceRoute(
-                    routeRepertoire(selected.data.id, repertoireDetails)
-                  )
-                }
-              />
-              <Edit song={selected.data} propagateUpdate={propagateUpdate} />
-            </div>
-          )}
-        />
-      ) : (
-        <SongSidebar
-          song={selected}
-          tryToDelete={() => setDeleteState(notSentYet)}
-        />
-      )}
+      <Sidebar
+        data={selected}
+        close={() => replaceRoute(routeRepertoire(null, null))}
+        render={song =>
+          tab?.route === "edit" ? (
+            <Edit song={song} propagateUpdate={propagateUpdate} />
+          ) : (
+            <SongSidebar
+              song={song}
+              tryToDelete={() => setDeleteState(notSentYet)}
+            />
+          )
+        }
+      />
       {selected.status === "loaded" && deleteState ? (
         <DeleteModal
           title={`Are you sure you want to delete ${selected.data.title}?`}

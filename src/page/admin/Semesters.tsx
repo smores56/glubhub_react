@@ -37,7 +37,6 @@ import {
   SubmitButton
 } from "components/Buttons";
 import {
-  Control,
   SelectInput,
   semesterType,
   TextInput,

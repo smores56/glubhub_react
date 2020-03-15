@@ -17,11 +17,14 @@ export const ThisWeek: React.FC<{ events: GlubEvent[] }> = ({ events }) => {
   const monday = d3.timeMonday(now);
   const sunday = new Date(monday.getTime() + 7 * 86400000 - 1);
 
+  const y = d3.scaleTime().range([height - 20, 10]);
+  y.domain([sunday, monday]);
+
+  const tooCloseToPrevious = (event: GlubEvent, index: number) =>
+    index && y(event.callTime) - y(events[index - 1].callTime) <= 20;
+
   useEffect(() => {
     const timeline = d3.select(d3Container.current);
-
-    const y = d3.scaleTime().range([height - 20, 10]);
-    y.domain([sunday, monday]);
 
     timeline
       .append("g")
@@ -33,48 +36,57 @@ export const ThisWeek: React.FC<{ events: GlubEvent[] }> = ({ events }) => {
           .tickFormat(date => d3.timeFormat("%a")(date as Date))
           .tickSizeOuter(0)
       );
+  }, [events, y]);
 
-    const tooCloseToPrevious = (event: GlubEvent, index: number) =>
-      index && y(event.callTime) - y(events[index - 1].callTime) <= 20;
+  return (
+    <svg height={height}>
+      <g ref={d3Container} />
+      <g>
+        {events.map((event, index) => (
+          <circle
+            className="dot"
+            r={circleRadius}
+            strokeWidth={circleLineWidth}
+            cx={circleX}
+            cy={
+              tooCloseToPrevious(event, index)
+                ? -1 * circleRadius
+                : y(event.callTime)
+            }
+          />
+        ))}
+      </g>
+      <g>
+        <circle
+          className="dot now"
+          r={timelineLineWidth / 2}
+          cx={circleX - 0.5}
+          cy={y(now)}
+        />
+      </g>
+      <g>
+        {events.map((event, index) => {
+          let yPosition: number;
+          if (tooCloseToPrevious(event, index)) {
+            yPosition = y(events[index - 1].callTime) + 16 + circleRadius / 2.0;
+          } else {
+            yPosition = y(event.callTime) + circleRadius / 2.0;
+          }
 
-    // do something neat when an event is now
-    timeline
-      .selectAll("circle")
-      .data(events)
-      .enter()
-      .append("circle")
-      .attr("class", "dot")
-      .attr("cy", (event, index) =>
-        tooCloseToPrevious(event, index) ? -1 * circleRadius : y(event.callTime)
-      )
-      .attr("cx", circleX)
-      .attr("r", circleRadius)
-      .attr("stroke-width", circleLineWidth);
-
-    timeline
-      .append("circle")
-      .attr("class", "dot now")
-      .attr("cy", y(now))
-      .attr("cx", circleX - 0.5)
-      .attr("r", timelineLineWidth / 2);
-
-    timeline
-      .selectAll("p")
-      .data(events)
-      .enter()
-      .append("a")
-      .attr("href", event => renderRoute(routeEvents(event.id, null)))
-      .append("text")
-      .text(event => event.name)
-      .attr("y", (event, index) => {
-        if (tooCloseToPrevious(event, index)) {
-          return y(events[index - 1].callTime) + 16 + circleRadius / 2.0;
-        } else {
-          return y(event.callTime) + circleRadius / 2.0;
-        }
-      })
-      .attr("x", circleX + 15);
-  }, [events, d3Container.current]);
-
-  return <svg height={height} ref={d3Container} />;
+          return (
+            <foreignObject
+              x={circleX + 15}
+              y={yPosition - 16}
+              height={20}
+              width={300}
+            >
+              <a href={renderRoute(routeEvents(event.id, null))}>
+                {event.name}
+              </a>
+            </foreignObject>
+          );
+        })}
+      </g>
+    </svg>
+  );
 };

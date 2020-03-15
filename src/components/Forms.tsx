@@ -57,12 +57,14 @@ export const FieldWrapper: React.FC<InputAttributes> = props => {
     <div className={classes.filter(c => !!c).join(" ")}>
       {props.prefix && (
         <Control>
+          {/* eslint-disable-next-line */}
           <a className="button is-static">{props.prefix}</a>
         </Control>
       )}
       {props.children}
       {props.suffix && (
         <Control>
+          {/* eslint-disable-next-line */}
           <a className="button is-static">{props.suffix}</a>
         </Control>
       )}

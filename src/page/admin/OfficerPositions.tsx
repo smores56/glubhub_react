@@ -86,13 +86,15 @@ export const OfficerPositions: React.FC = () => {
           data={roles}
           render={roles => (
             <table style={{ borderSpacing: "5px", borderCollapse: "separate" }}>
-              {roleGroups(roles).map(([role, member]) => (
-                <MemberDropdown
-                  role={role}
-                  member={member}
-                  toggle={toggleOfficer}
-                />
-              ))}
+              <tbody>
+                {roleGroups(roles).map(([role, member]) => (
+                  <MemberDropdown
+                    role={role}
+                    member={member}
+                    toggle={toggleOfficer}
+                  />
+                ))}
+              </tbody>
             </table>
           )}
         />

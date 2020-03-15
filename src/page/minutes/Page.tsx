@@ -83,7 +83,6 @@ export const Minutes: React.FC<MinutesProps> = ({ minutesId, tab }) => {
 
   const loadMinutes = useCallback(
     async (id: number) => {
-      replaceRoute(routeMinutes(id, null));
       updateSelected(loading);
 
       const result = await get<MeetingMinutes>(`meeting_minutes/${id}`);
@@ -129,10 +128,15 @@ export const Minutes: React.FC<MinutesProps> = ({ minutesId, tab }) => {
     };
 
     loadAllMinutes();
+  }, [updateMinutes]);
+
+  useEffect(() => {
     if (minutesId) {
       loadMinutes(minutesId);
+    } else {
+      updateSelected(notAsked);
     }
-  }, []);
+  }, [minutesId, loadMinutes, updateSelected]);
 
   return (
     <Section>
@@ -143,7 +147,6 @@ export const Minutes: React.FC<MinutesProps> = ({ minutesId, tab }) => {
             showAllMinutes={showAllMinutes}
             createState={createState}
             selectedId={isLoaded(selected) ? selected.data.id : null}
-            select={loadMinutes}
             createNewMinutes={createNewMinutes}
             toggleShowAllMinutes={() => setShowAllMinutes(!showAllMinutes)}
           />
@@ -181,7 +184,6 @@ interface MinutesListProps {
   showAllMinutes: boolean;
   createState: SubmissionState;
   selectedId: number | null;
-  select: (id: number) => void;
   createNewMinutes: () => void;
   toggleShowAllMinutes: () => void;
 }
@@ -192,52 +194,55 @@ const MinutesList: React.FC<MinutesListProps> = ({
   createNewMinutes,
   createState,
   selectedId,
-  select,
   toggleShowAllMinutes
-}) => (
-  <SelectableList
-    listItems={
-      showAllMinutes
-        ? mapLoaded(minutes, m => [m])
-        : mapLoaded(minutes, m => [m.slice(0, 10)])
-    }
-    isSelected={m => m.id === selectedId}
-    onSelect={m => select(m.id)}
-    messageIfEmpty="No minutes"
-    render={m => <td>{m.name}</td>}
-    contentAtTop={
-      <RequiresPermission permission={editMinutes}>
-        <div style={{ paddingBottom: "5px" }}>
-          <ButtonGroup alignment="is-centered">
-            <Button
-              color="is-primary"
-              onClick={createNewMinutes}
-              loading={isSending(createState)}
-            >
-              + Add New Minutes
-            </Button>
-            {createState.status === "errorSending" && (
-              <ErrorBox error={createState.error} />
-            )}
-          </ButtonGroup>
-        </div>
-      </RequiresPermission>
-    }
-    contentAtBottom={
-      <>
-        {isLoaded(minutes) && minutes.data.length > 10 && (
+}) => {
+  const { replaceRoute } = useGlubRoute();
+
+  return (
+    <SelectableList
+      listItems={
+        showAllMinutes
+          ? mapLoaded(minutes, m => [m])
+          : mapLoaded(minutes, m => [m.slice(0, 10)])
+      }
+      isSelected={m => m.id === selectedId}
+      onSelect={m => replaceRoute(routeMinutes(m.id, null))}
+      messageIfEmpty="No minutes"
+      render={m => <td>{m.name}</td>}
+      contentAtTop={
+        <RequiresPermission permission={editMinutes}>
           <div style={{ paddingBottom: "5px" }}>
             <ButtonGroup alignment="is-centered">
-              <Button onClick={toggleShowAllMinutes}>
-                {showAllMinutes ? "Hide" : "Show"} old minutes...
+              <Button
+                color="is-primary"
+                onClick={createNewMinutes}
+                loading={isSending(createState)}
+              >
+                + Add New Minutes
               </Button>
+              {createState.status === "errorSending" && (
+                <ErrorBox error={createState.error} />
+              )}
             </ButtonGroup>
           </div>
-        )}
-      </>
-    }
-  />
-);
+        </RequiresPermission>
+      }
+      contentAtBottom={
+        <>
+          {isLoaded(minutes) && minutes.data.length > 10 && (
+            <div style={{ paddingBottom: "5px" }}>
+              <ButtonGroup alignment="is-centered">
+                <Button onClick={toggleShowAllMinutes}>
+                  {showAllMinutes ? "Hide" : "Show"} old minutes...
+                </Button>
+              </ButtonGroup>
+            </div>
+          )}
+        </>
+      }
+    />
+  );
+};
 
 interface MinutesTabListProps {
   minutes: MeetingMinutes;

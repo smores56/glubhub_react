@@ -29,8 +29,11 @@ import {
   GlubResponseType
 } from "utils/request";
 import { SongLinkButton } from "./Links";
-import { SubmitButton } from "components/Buttons";
+import { SubmitButton, BackButton } from "components/Buttons";
 import ErrorBox from "components/ErrorBox";
+import { fileToBase64 } from "utils/helpers";
+import { useGlubRoute } from "utils/context";
+import { routeRepertoire, repertoireDetails } from "state/route";
 
 interface EditProps {
   song: Song;
@@ -58,6 +61,8 @@ const emptyUrlLink: NewUrlLink = {
 };
 
 export const Edit: React.FC<EditProps> = ({ song, propagateUpdate }) => {
+  const { replaceRoute } = useGlubRoute();
+
   const [state, setState] = useState(notSentYet);
 
   const updateSong = useCallback(
@@ -90,6 +95,10 @@ export const Edit: React.FC<EditProps> = ({ song, propagateUpdate }) => {
 
   return (
     <>
+      <BackButton
+        content="finish editing"
+        click={() => replaceRoute(routeRepertoire(song.id, repertoireDetails))}
+      />
       <h2 className="title is-4" style={{ textAlign: "center" }}>
         Edit
       </h2>
@@ -182,10 +191,17 @@ const EditFileType: React.FC<EditFileTypeProps> = ({
     if (!newFile.name || !newFile.file) return;
     setState(sending);
 
+    const content = await fileToBase64(newFile.file);
+
+    console.log(newFile.file, content);
+
     const body = {
       type: typeName,
       name: newFile.name,
-      target: { path: newFile.file.name, content: newFile.file.slice(0) }
+      target: {
+        path: newFile.file.name,
+        content
+      }
     };
     const result = await createAndGetNewLink(body, song.id);
 
@@ -201,7 +217,7 @@ const EditFileType: React.FC<EditFileTypeProps> = ({
       });
       updateNewFile(emptyFileLink);
     }
-  }, []);
+  }, [newFile, propagateUpdate, song, typeName]);
 
   return (
     <>
@@ -219,14 +235,14 @@ const EditFileType: React.FC<EditFileTypeProps> = ({
           type={stringType}
           value={newFile.name}
           onInput={name => updateNewFile({ ...newFile, name })}
-          title={`${typeName} name`}
+          title={`${typeName} Name`}
           placeholder="Happy Birthday - TTBB"
           required
         />
         <FileInput
           file={newFile.file}
           selectFile={file => updateNewFile({ ...newFile, file })}
-          title={`${typeName} file`}
+          title={`${typeName} File`}
         />
         <SubmitButton loading={isSending(state)}>Add {typeName}</SubmitButton>
         {failedToSend(state) && <ErrorBox error={state.error} />}
@@ -271,7 +287,7 @@ const NewPerformanceSection: React.FC<NewPerformanceSectionProps> = ({
       });
       updateNewPerformance(emptyUrlLink);
     }
-  }, [setState, propagateUpdate, updateNewPerformance, newPerformance]);
+  }, [song, setState, propagateUpdate, updateNewPerformance, newPerformance]);
 
   return (
     <>

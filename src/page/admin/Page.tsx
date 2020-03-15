@@ -4,7 +4,7 @@ import { SelectableList } from "components/List";
 import { visibleAdminTabs } from "utils/helpers";
 import { AdminRoute, routeAdmin } from "state/route";
 import { GlubHubContext, useGlubRoute } from "utils/context";
-import { Section, Container, Columns, Box, Column } from "components/Basics";
+import { Section, Container, Columns, Box } from "components/Basics";
 import { AbsenceRequests } from "./AbsenceRequests";
 import { CreateEvent } from "./create-event/Page";
 import { DocumentLinks } from "./DocumentLinks";

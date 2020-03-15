@@ -6,7 +6,8 @@ import {
   eventSetlist,
   eventCarpools,
   eventAttendees,
-  eventAttendance
+  eventAttendance,
+  renderRoute
 } from "state/route";
 import {
   RemoteData,
@@ -54,6 +55,15 @@ export const Events: React.FC<EventsProps> = ({ eventId, tab }) => {
   const [events, setEvents] = useState<RemoteData<GlubEvent[]>>(loading);
   const [selected, setSelected] = useState<RemoteData<GlubEvent>>(notAsked);
 
+  const loadEvent = useCallback(
+    async (eventId: number) => {
+      setSelected(loading);
+      const result = await get<GlubEvent>(`events/${eventId}`);
+      setSelected(resultToRemote(result));
+    },
+    [setSelected]
+  );
+
   const selectEvent = useCallback(
     (eventId: number) => {
       if (isLoaded(events)) {
@@ -66,7 +76,7 @@ export const Events: React.FC<EventsProps> = ({ eventId, tab }) => {
 
       loadEvent(eventId);
     },
-    [setSelected, events, replaceRoute]
+    [setSelected, events, loadEvent]
   );
 
   const unselectEvent = useCallback(() => {
@@ -81,15 +91,6 @@ export const Events: React.FC<EventsProps> = ({ eventId, tab }) => {
       }
     },
     [selected, replaceRoute]
-  );
-
-  const loadEvent = useCallback(
-    async (eventId: number) => {
-      setSelected(loading);
-      const result = await get<GlubEvent>(`events/${eventId}`);
-      setSelected(resultToRemote(result));
-    },
-    [setSelected]
   );
 
   const propagateEventUpdate = useCallback(
@@ -125,7 +126,7 @@ export const Events: React.FC<EventsProps> = ({ eventId, tab }) => {
     } else {
       setSelected(notAsked);
     }
-  }, [eventId]);
+  }, [eventId, selectEvent, setSelected]);
 
   const selectedId = selected.status === "loaded" ? selected.data.id : null;
   const upcomingEvents = mapLoaded(events, x =>
@@ -204,7 +205,6 @@ const EventRow: React.FC<{ event: GlubEvent }> = ({ event }) => (
 interface EventTabsProps {
   event: GlubEvent;
   currentTab: EventTab | null;
-  changeTab: (tab: EventTab) => void;
 }
 
 const EventTabs: React.FC<EventTabsProps> = props => (
@@ -224,12 +224,12 @@ const EventTabs: React.FC<EventTabsProps> = props => (
 interface TabLinkProps {
   tab: EventTab;
   currentTab: EventTab | null;
-  changeTab: (tab: EventTab) => void;
+  event: GlubEvent;
 }
 
-const TabLink: React.FC<TabLinkProps> = ({ tab, currentTab, changeTab }) => (
+const TabLink: React.FC<TabLinkProps> = ({ tab, currentTab, event }) => (
   <li className={tab.route === currentTab?.route ? "is-active" : undefined}>
-    <a onClick={() => changeTab(tab)}>{tab.name}</a>
+    <a href={renderRoute(routeEvents(event.id, tab))}>{tab.name}</a>
   </li>
 );
 
@@ -247,11 +247,7 @@ const TabContent: React.FC<TabContentProps> = props => {
     <>
       <BackButton content="all events" click={props.unselectEvent} />
       <Title centered>{props.event.name}</Title>
-      <EventTabs
-        event={props.event}
-        changeTab={props.changeTab}
-        currentTab={props.tab}
-      />
+      <EventTabs event={props.event} currentTab={props.tab} />
     </>
   );
 

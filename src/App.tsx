@@ -29,7 +29,7 @@ import { Member, Info, Semester } from "state/models";
 import { getToken, setToken } from "utils/helpers";
 import { collect4, get, success } from "utils/request";
 import { RemoteContent } from "components/Basics";
-import { renderRoute, routeLogin } from "state/route";
+import { routeLogin } from "state/route";
 
 const history = createBrowserHistory();
 

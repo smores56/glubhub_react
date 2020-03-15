@@ -116,6 +116,7 @@ const DocumentLinks: React.FC<{ documents: DocumentLink[] }> = ({
   documents
 }) => (
   <div className="navbar-item has-dropdown is-hoverable">
+    {/* eslint-disable-next-line */}
     <a className="navbar-link">Documents</a>
     <div className="navbar-dropdown">
       {documents.map(document => (
@@ -150,6 +151,7 @@ const BurgerButton: React.FC<BurgerButtonProps> = ({
   expanded,
   toggleExpanded
 }) => (
+  // eslint-disable-next-line
   <a
     role="button"
     aria-label="menu"

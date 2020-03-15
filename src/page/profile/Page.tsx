@@ -8,8 +8,8 @@ import {
   profileMoney,
   profileAttendance,
   profileSemesters,
-  renderRoute,
-  routeProfile
+  routeProfile,
+  renderRoute
 } from "state/route";
 import { GlubHubContext, useGlubRoute } from "utils/context";
 import {
@@ -23,7 +23,7 @@ import {
   resultToSubmissionState
 } from "state/types";
 import { Member } from "state/models";
-import { get, NewToken, deleteRequest, post, chain } from "utils/request";
+import { get, NewToken, deleteRequest, chain } from "utils/request";
 import {
   getToken,
   setOldToken,
@@ -165,7 +165,7 @@ const ProfilePic: React.FC<{ member: Member }> = ({ member }) => (
 
 const UserActions: React.FC<{ member: Member }> = ({ member }) => {
   const { goToRoute } = useGlubRoute();
-  const { user, updateUser, members, updateMembers, refreshAll } = useContext(
+  const { user, updateUser, members, updateMembers } = useContext(
     GlubHubContext
   );
 
@@ -194,7 +194,7 @@ const UserActions: React.FC<{ member: Member }> = ({ member }) => {
     if (result.successful) {
       updateUser(result.data);
     }
-  }, [setLoginAsState, refreshAll]);
+  }, [setLoginAsState, updateUser]);
 
   const loginAsMember = useCallback(async () => {
     setLoginAsState(sending);
@@ -213,7 +213,7 @@ const UserActions: React.FC<{ member: Member }> = ({ member }) => {
     if (result.successful) {
       updateUser(result.data);
     }
-  }, [setLoginAsState, refreshAll, member]);
+  }, [setLoginAsState, updateUser, member]);
 
   const deleteMember = useCallback(async () => {
     setDeleteState(sending);
@@ -300,34 +300,23 @@ interface ProfileTabsProps {
   tab: ProfileTab;
 }
 
-const ProfileTabs: React.FC<ProfileTabsProps> = ({ member, tab }) => {
-  const { replaceRoute } = useGlubRoute();
-
-  return (
-    <div className="tabs">
-      <ul>
-        {[
-          profileDetails,
-          profileMoney,
-          profileAttendance,
-          profileSemesters
-        ].map(profileTab => (
+const ProfileTabs: React.FC<ProfileTabsProps> = ({ member, tab }) => (
+  <div className="tabs">
+    <ul>
+      {[profileDetails, profileMoney, profileAttendance, profileSemesters].map(
+        profileTab => (
           <li
             className={tab.route === profileTab.route ? "is-active" : undefined}
           >
-            <a
-              onClick={() =>
-                replaceRoute(routeProfile(member.email, profileTab))
-              }
-            >
+            <a href={renderRoute(routeProfile(member.email, profileTab))}>
               {profileTab.name}
             </a>
           </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
+        )
+      )}
+    </ul>
+  </div>
+);
 
 interface TabContentProps {
   member: Member;

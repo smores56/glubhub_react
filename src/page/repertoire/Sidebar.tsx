@@ -1,16 +1,15 @@
 import React from "react";
-import { RemoteData } from "state/types";
 import { SongLinkButton } from "./Links";
 import { BackButton, Button } from "components/Buttons";
 import { editRepertoire } from "state/permissions";
 import { playPitch, pitchToUnicode } from "utils/helpers";
 import { Song, SongLinkSection, Pitch, SongMode } from "state/models";
-import { Sidebar, RequiresPermission, Title, Tooltip } from "components/Basics";
+import { RequiresPermission, Title, Tooltip } from "components/Basics";
 import { useGlubRoute } from "utils/context";
 import { routeRepertoire, repertoireEdit } from "state/route";
 
 interface SongSidebarProps {
-  song: RemoteData<Song>;
+  song: Song;
   tryToDelete: () => void;
 }
 
@@ -34,51 +33,45 @@ export const SongSidebar: React.FC<SongSidebarProps> = ({
   );
 
   return (
-    <Sidebar
-      data={song}
-      close={() => replaceRoute(routeRepertoire(null, null))}
-      render={song => (
-        <div>
-          <BackButton
-            content="all songs"
-            click={() => replaceRoute(routeRepertoire(null, null))}
-          />
-          <Title centered>{song.title}</Title>
-          {song.info && (
-            <p>
-              {song.info}
-              <br />
-            </p>
-          )}
-          <PitchSection title="Key" pitch={song.key} mode={song.mode} />
-          <PitchSection
-            title="Starting Pitch"
-            pitch={song.startingPitch}
-            mode={null}
-          />
+    <div>
+      <BackButton
+        content="all songs"
+        click={() => replaceRoute(routeRepertoire(null, null))}
+      />
+      <Title centered>{song.title}</Title>
+      {song.info && (
+        <p>
+          {song.info}
           <br />
-          <table className="table is-fullwidth">
-            {song.links?.filter(links => links.links.length).map(linkSection)}
-          </table>
-          <RequiresPermission permission={editRepertoire}>
-            <div>
-              <Button
-                onClick={() =>
-                  replaceRoute(routeRepertoire(song.id, repertoireEdit))
-                }
-              >
-                Edit Song
-              </Button>
-              <br />
-              <br />
-              <Button color="is-danger" onClick={tryToDelete}>
-                Delete Song
-              </Button>
-            </div>
-          </RequiresPermission>
-        </div>
+        </p>
       )}
-    />
+      <PitchSection title="Key" pitch={song.key} mode={song.mode} />
+      <PitchSection
+        title="Starting Pitch"
+        pitch={song.startingPitch}
+        mode={null}
+      />
+      <br />
+      <table className="table is-fullwidth">
+        {song.links?.filter(links => links.links.length).map(linkSection)}
+      </table>
+      <RequiresPermission permission={editRepertoire}>
+        <div>
+          <Button
+            onClick={() =>
+              replaceRoute(routeRepertoire(song.id, repertoireEdit))
+            }
+          >
+            Edit Song
+          </Button>
+          <br />
+          <br />
+          <Button color="is-danger" onClick={tryToDelete}>
+            Delete Song
+          </Button>
+        </div>
+      </RequiresPermission>
+    </div>
   );
 };
 

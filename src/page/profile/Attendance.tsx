@@ -13,10 +13,9 @@ import {
 } from "state/types";
 import { get, post } from "utils/request";
 import { RemoteContent, SubmissionStateBox } from "components/Basics";
-import { renderRoute, routeEvents } from "state/route";
+import { routeEvents, renderRoute } from "state/route";
 import { CheckboxInput, TextInput, numberType } from "components/Forms";
 import { dateFormatter } from "utils/datetime";
-import { useGlubRoute } from "utils/context";
 
 export const Attendance: React.FC<{ member: Member }> = ({ member }) => {
   const [grades, updateGrades] = useState<RemoteData<Grades>>(loading);
@@ -56,7 +55,7 @@ export const Attendance: React.FC<{ member: Member }> = ({ member }) => {
 
   useEffect(() => {
     loadAttendance();
-  }, []);
+  }, [loadAttendance]);
 
   return (
     <>
@@ -96,8 +95,6 @@ interface AttendanceRowProps {
 }
 
 const AttendanceRow: React.FC<AttendanceRowProps> = ({ event, update }) => {
-  const { goToRoute } = useGlubRoute();
-
   const attendance = event.attendance || {
     shouldAttend: false,
     didAttend: false,
@@ -109,9 +106,7 @@ const AttendanceRow: React.FC<AttendanceRowProps> = ({ event, update }) => {
     <tr className="no-bottom-border">
       <td>{dateFormatter(event.callTime)}</td>
       <td>
-        <a onClick={() => goToRoute(routeEvents(event.id, null))}>
-          {event.name}
-        </a>
+        <a href={renderRoute(routeEvents(event.id, null))}>{event.name}</a>
       </td>
       <td>{event.type}</td>
       <td>

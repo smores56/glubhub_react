@@ -7,7 +7,8 @@ import {
   resultToRemote,
   sending,
   errorSending,
-  SubmissionState
+  SubmissionState,
+  isLoaded
 } from "state/types";
 import { get, post } from "utils/request";
 import { GlubHubContext, useGlubRoute } from "utils/context";
@@ -69,7 +70,7 @@ export const EditEvent: React.FC<EditEventProps> = ({ event, updateEvent }) => {
     } else {
       setState(errorSending(update.error));
     }
-  }, [setState, eventForm, gigForm, event, updateEvent]);
+  }, [setState, eventForm, gigForm, event, updateEvent, replaceRoute]);
 
   useEffect(() => {
     const loadSemesters = async () => {
@@ -184,7 +185,7 @@ const LeftColumn: React.FC<FormData> = ({
 );
 
 const allSemesters = (data: FormData): string[] =>
-  data.semesters.status === "loaded"
+  isLoaded(data.semesters)
     ? data.semesters.data.map(s => s.name)
     : [data.currentSemester?.name || ""];
 

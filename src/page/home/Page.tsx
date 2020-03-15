@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { RemoteData, loading, resultToRemote } from "state/types";
 import { GlubEvent, Enrollment } from "state/models";
 import { get } from "utils/request";
@@ -22,17 +22,6 @@ export const Home: React.FC = () => {
   const [events, setEvents] = useState<RemoteData<GlubEvent[]>>(loading);
   const [hovered, setHovered] = useState<HoveredEvent | null>(null);
 
-  const hoverOverEvent = useCallback(
-    (newHovered: HoveredEvent | null) => {
-      if (hovered?.event.id === newHovered?.event.id) {
-        setHovered(null);
-      } else {
-        setHovered(newHovered);
-      }
-    },
-    [setHovered, hovered]
-  );
-
   useEffect(() => {
     const loadEvents = async () => {
       const result = await get<GlubEvent[]>(`events?full=true`);
@@ -42,6 +31,8 @@ export const Home: React.FC = () => {
     loadEvents();
   }, [setEvents]);
 
+  console.log("hovered", hovered);
+
   return (
     <RemoteContent
       data={events}
@@ -50,6 +41,7 @@ export const Home: React.FC = () => {
           <GradesBlock
             finalGrade={events[events.length - 1]?.change?.partialScore}
             events={events}
+            hoverEvent={setHovered}
           />
           {hovered && <EventHoverBox hovered={hovered} />}
           <Section>
@@ -72,16 +64,8 @@ export interface HoveredEvent {
   y: number;
 }
 
-const timelineId = "timeline-box";
-
 const attendanceIssueEmail =
   "mailto:gleeclub_officers@lists.gatech.edu?subject=Attendance%20Issue";
-
-const organizeEvents = (events: GlubEvent[]): [GlubEvent[], GlubEvent[]] => {
-  const sorted = events.sort((e1, e2) => e1.callTime - e2.callTime);
-
-  return [sorted.filter(eventIsOver), sorted.filter(e => !eventIsOver(e))];
-};
 
 const attendanceMessage = (
   enrollment: Enrollment | null,
@@ -103,9 +87,14 @@ const attendanceMessage = (
 interface GradesBlockProps {
   events: GlubEvent[];
   finalGrade?: number;
+  hoverEvent: (event: HoveredEvent | null) => void;
 }
 
-const GradesBlock: React.FC<GradesBlockProps> = ({ events, finalGrade }) => {
+const GradesBlock: React.FC<GradesBlockProps> = ({
+  events,
+  finalGrade,
+  hoverEvent
+}) => {
   const { user } = useContext(GlubHubContext);
 
   return (
@@ -125,9 +114,11 @@ const GradesBlock: React.FC<GradesBlockProps> = ({ events, finalGrade }) => {
         {events.length ? (
           <>
             <div style={{ width: "100%", margin: "auto" }}>
-              <AttendanceGraph events={events} />
+              <AttendanceGraph
+                events={events.filter(eventIsOver)}
+                hover={hoverEvent}
+              />
             </div>
-            <div id="tooltip" className="box hidden"></div>
             <p>
               <br />
               Do you have an issue? Do you need a daddy tissue?{" "}
@@ -152,7 +143,7 @@ const EventHoverBox: React.FC<{ hovered: HoveredEvent }> = ({ hovered }) => (
     className="box shown"
     style={{
       position: "absolute",
-      top: `${hovered.y}px`,
+      top: `${hovered.y + 20}px`,
       left: `${hovered.x}px`,
       transform: "translateX(-50%)"
     }}
@@ -191,17 +182,20 @@ const Volunteerism: React.FC<{ pastEvents: GlubEvent[] }> = ({
   pastEvents
 }) => {
   const { currentSemester } = useContext(GlubHubContext);
+
   const volunteerGigsAttended = pastEvents.filter(
     event => event.gigCount && !!event.attendance?.didAttend
   );
-  const gigRequirement = currentSemester?.gigRequirement || 0;
-  const metGigRequirement = volunteerGigsAttended.length >= gigRequirement;
+  const metGigRequirement =
+    volunteerGigsAttended.length >= currentSemester.gigRequirement;
   const gigList = metGigRequirement
     ? volunteerGigsAttended
     : [
         ...volunteerGigsAttended,
-        ...new Array<GlubEvent | null>(gigRequirement).fill(null)
-      ].slice(gigRequirement);
+        ...new Array<GlubEvent | null>(currentSemester.gigRequirement).fill(
+          null
+        )
+      ].slice(0, currentSemester.gigRequirement);
 
   return (
     <Column>
@@ -217,8 +211,9 @@ const Volunteerism: React.FC<{ pastEvents: GlubEvent[] }> = ({
           <p>
             OK so you've only been to{" "}
             {romanNumeral(volunteerGigsAttended.length)} volunteer gigs this
-            semester and you need to go to {romanNumeral(gigRequirement)}. So.
-            Uh, you know, do that.
+            semester and you need to go to{" "}
+            {romanNumeral(currentSemester.gigRequirement)}. So. Uh, you know, do
+            that.
           </p>
         )}
         <p style={{ textAlign: "center" }}>

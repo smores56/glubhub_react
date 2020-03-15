@@ -606,7 +606,7 @@ const parseAdminRoute = (segments: string[]): GlubRoute | null => {
 // Routes to String //////////////////////////
 
 export const renderRoute = (route: GlubRoute): string =>
-  `/#/${buildRoute(route).join("/")}`;
+  `#/${buildRoute(route).join("/")}`;
 
 // Route Building Helpers
 

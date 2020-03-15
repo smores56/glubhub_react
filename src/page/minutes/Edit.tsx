@@ -135,6 +135,7 @@ const MinutesEditor: React.FC<MinutesEditorProps> = ({
   setContent
 }) => (
   <Editor
+    apiKey="4tzzx51fsqy1vtwhpvkhb3t9t4jwyotr28qjbogls2yclw26"
     initialValue={
       (visibility === "private" ? minutes.private : minutes.public) || ""
     }

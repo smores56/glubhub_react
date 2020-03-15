@@ -31,7 +31,7 @@ table.is-fullwidth.is-hoverable:hover {
   height: 250px;
   background-repeat: no-repeat;
   background-size: contain;
-  background-image: url('../public/placeholder.png');
+  background-image: url("../public/placeholder.png");
 }
 
 html,
@@ -168,4 +168,14 @@ table.is-hoverable tr.not-hoverable:hover {
 }
 .timeline .tick line {
   stroke: none;
+}
+
+.line {
+  stroke: #b4a46a;
+  fill: url("#attendanceGradient");
+  stroke-width: 2;
+}
+
+.attendanceDot {
+  fill: #b4a46a;
 }
