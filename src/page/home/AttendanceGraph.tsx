@@ -17,7 +17,7 @@ export const AttendanceGraph: React.FC<AttendanceGraphProps> = ({
   const d3Container = useRef<SVGGElement | null>(null);
 
   const margin = { top: 20, right: 20, bottom: 20, left: 30 };
-  const width = 1200;
+  const width = 1350;
   const height = 400;
   const pastEvents = events.filter(eventIsOver);
 
@@ -27,9 +27,9 @@ export const AttendanceGraph: React.FC<AttendanceGraphProps> = ({
   y.domain([0, 100]);
 
   useEffect(() => {
-    if (!d3Container.current || !events.length) return;
+    if (!d3Container.current || !pastEvents.length) return;
 
-    const svg = d3.select(d3Container.current);
+    const svg = d3.select(d3Container.current).html("");
 
     // create axes
     svg
@@ -51,7 +51,7 @@ export const AttendanceGraph: React.FC<AttendanceGraphProps> = ({
       .append("path")
       .datum([
         {
-          callTime: events[0].callTime,
+          callTime: pastEvents[0].callTime,
           partialScore: 0
         },
         ...pastEvents.map(event => ({
@@ -59,13 +59,13 @@ export const AttendanceGraph: React.FC<AttendanceGraphProps> = ({
           partialScore: event.change!.partialScore
         })),
         {
-          callTime: events[events.length - 1].callTime,
+          callTime: pastEvents[pastEvents.length - 1].callTime,
           partialScore: 0
         }
       ])
       .attr("class", "line")
       .attr("d", valueline);
-  }, [pastEvents, events, margin, x, y]);
+  }, [pastEvents, margin, x, y]);
 
   return (
     <svg width={width} height={height}>

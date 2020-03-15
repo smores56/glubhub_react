@@ -13,7 +13,7 @@ import {
   Tooltip
 } from "components/Basics";
 import { GlubHubContext } from "utils/context";
-import { eventIsOver, romanNumeral } from "utils/helpers";
+import { romanNumeral } from "utils/helpers";
 import { fullDateTimeFormatter, dateFormatter } from "utils/datetime";
 import { AttendanceGraph } from "./AttendanceGraph";
 import { ThisWeek } from "./ThisWeek";
@@ -30,8 +30,6 @@ export const Home: React.FC = () => {
 
     loadEvents();
   }, [setEvents]);
-
-  console.log("hovered", hovered);
 
   return (
     <RemoteContent
@@ -114,10 +112,7 @@ const GradesBlock: React.FC<GradesBlockProps> = ({
         {events.length ? (
           <>
             <div style={{ width: "100%", margin: "auto" }}>
-              <AttendanceGraph
-                events={events.filter(eventIsOver)}
-                hover={hoverEvent}
-              />
+              <AttendanceGraph events={events} hover={hoverEvent} />
             </div>
             <p>
               <br />

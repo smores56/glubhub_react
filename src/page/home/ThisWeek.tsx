@@ -77,7 +77,7 @@ export const ThisWeek: React.FC<{ events: GlubEvent[] }> = ({ events }) => {
             <foreignObject
               x={circleX + 15}
               y={yPosition - 16}
-              height={20}
+              height={22}
               width={300}
             >
               <a href={renderRoute(routeEvents(event.id, null))}>

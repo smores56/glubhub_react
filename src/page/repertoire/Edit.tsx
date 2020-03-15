@@ -192,9 +192,6 @@ const EditFileType: React.FC<EditFileTypeProps> = ({
     setState(sending);
 
     const content = await fileToBase64(newFile.file);
-
-    console.log(newFile.file, content);
-
     const body = {
       type: typeName,
       name: newFile.name,
