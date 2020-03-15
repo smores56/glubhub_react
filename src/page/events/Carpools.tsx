@@ -14,11 +14,14 @@ import {
 import { get } from "utils/request";
 import { fullName } from "utils/helpers";
 import { editCarpool } from "state/permissions";
-import { routeEditCarpools } from "state/route";
+import { routeEditCarpools, routeProfile } from "state/route";
 import { RemoteData, loading, resultToRemote } from "state/types";
 import { LinkButton } from "components/Buttons";
+import { useGlubRoute } from "utils/context";
 
 export const Carpools: React.FC<{ event: GlubEvent }> = ({ event }) => {
+  const { goToRoute } = useGlubRoute();
+
   const [carpools, setCarpools] = useState<RemoteData<EventCarpool[]>>(loading);
 
   useEffect(() => {
@@ -38,13 +41,20 @@ export const Carpools: React.FC<{ event: GlubEvent }> = ({ event }) => {
           {carpools.length === 0 ? (
             <div>No carpools set for this event.</div>
           ) : (
-            <ul>
+            <table className="table">
               {carpools.map(carpool => (
-                <table>
-                  <CarpoolPartialTable carpool={carpool} event={event} />
-                </table>
+                <CarpoolPartialTable
+                  includeIcon
+                  carpool={carpool}
+                  event={event}
+                  selection={{
+                    selected: [],
+                    selectEmptyCarpool: () => {},
+                    select: member => goToRoute(routeProfile(member, null))
+                  }}
+                />
               ))}
-            </ul>
+            </table>
           )}
           <RequiresPermission permission={editCarpool}>
             <div style={{ padding: "10px" }}>
@@ -165,7 +175,7 @@ export const CarpoolRow: React.FC<CarpoolRowProps> = props => {
       <ColumnElement>
         {props.includeIcon && (
           <span className="icon">
-            <i className={"fas fa-" + props.isDriver ? "user" : "users"} />
+            <i className={"fas fa-" + (props.isDriver ? "user" : "users")} />
           </span>
         )}
       </ColumnElement>

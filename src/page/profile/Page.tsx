@@ -105,7 +105,7 @@ export const Profile: React.FC<ProfileProps> = ({ email, tab }) => {
           />
         </Container>
       </Section>
-      {user?.positions?.length && (
+      {!!user?.positions?.length && (
         <Section>
           <Container>
             <Box>
@@ -153,14 +153,12 @@ const ProfileTextContent: React.FC<{ member: Member }> = ({ member }) => (
 );
 
 const ProfilePic: React.FC<{ member: Member }> = ({ member }) => (
-  <div className="placeholder">
-    <img
-      style={{
-        backgroundImage: `url(${member.picture || "https://picsum.photos/250"})`
-      }}
-      alt=""
-    />
-  </div>
+  <img
+    width={250}
+    height={250}
+    src={member.picture || "https://picsum.photos/250"}
+    alt=""
+  />
 );
 
 const UserActions: React.FC<{ member: Member }> = ({ member }) => {
