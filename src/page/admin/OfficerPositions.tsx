@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import { GlubHubContext } from "utils/context";
 import { MemberRole, Role, Member } from "state/models";
-import {
-  Title,
-  RemoteContent,
-  Box,
-  SubmissionStateBox
-} from "components/Basics";
+import { Title, Box } from "components/Basics";
 import { get, post, collect2, success } from "utils/request";
 import {
   RemoteData,
@@ -19,6 +14,7 @@ import {
 } from "state/types";
 import { inlineMiddleStyle } from "utils/style";
 import { SelectInput, memberType } from "components/Forms";
+import { RemoteContent, SubmissionStateBox } from "components/Complex";
 
 export const OfficerPositions: React.FC = () => {
   const { info } = useContext(GlubHubContext);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Song } from "state/models";
 import { get } from "utils/request";
 import { pitchToUnicode } from "utils/helpers";
-import { RemoteContent } from "components/Basics";
+import { RemoteContent } from "components/Complex";
 import { renderRoute, routeRepertoire } from "state/route";
 import { RemoteData, loading, resultToRemote } from "state/types";
 

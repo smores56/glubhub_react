@@ -36,11 +36,9 @@ import {
   PhoneLink,
   Section,
   Container,
-  RemoteContent,
   Column,
   Columns,
-  Box,
-  RequiresPermission
+  Box
 } from "components/Basics";
 import { ButtonGroup, Button, LinkButton } from "components/Buttons";
 import { switchUser, deleteUser } from "state/permissions";
@@ -50,6 +48,7 @@ import { Details } from "./Details";
 import { Attendance } from "./Attendance";
 import { Semesters } from "./Semesters";
 import { Money } from "./Money";
+import { RemoteContent, RequiresPermission } from "components/Complex";
 
 interface ProfileProps {
   email: string;

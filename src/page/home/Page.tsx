@@ -3,7 +3,6 @@ import { RemoteData, loading, resultToRemote } from "state/types";
 import { GlubEvent, Enrollment } from "state/models";
 import { get } from "utils/request";
 import {
-  RemoteContent,
   Container,
   Columns,
   Section,
@@ -17,6 +16,7 @@ import { romanNumeral } from "utils/helpers";
 import { fullDateTimeFormatter, dateFormatter } from "utils/datetime";
 import { AttendanceGraph } from "./AttendanceGraph";
 import { ThisWeek } from "./ThisWeek";
+import { RemoteContent } from "components/Complex";
 
 export const Home: React.FC = () => {
   const [events, setEvents] = useState<RemoteData<GlubEvent[]>>(loading);
@@ -111,7 +111,7 @@ const GradesBlock: React.FC<GradesBlockProps> = ({
         </p>
         {events.length ? (
           <>
-            <div style={{ width: "100%", margin: "auto" }}>
+            <div style={{ width: "100%", margin: "auto", overflowX: "scroll" }}>
               <AttendanceGraph events={events} hover={hoverEvent} />
             </div>
             <p>
@@ -135,7 +135,7 @@ const GradesBlock: React.FC<GradesBlockProps> = ({
 
 const EventHoverBox: React.FC<{ hovered: HoveredEvent }> = ({ hovered }) => (
   <div
-    className="box shown"
+    className="box"
     style={{
       position: "absolute",
       top: `${hovered.y + 20}px`,

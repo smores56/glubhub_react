@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { get } from "utils/request";
 import { fullName } from "utils/helpers";
 import { EventAttendee } from "state/models";
-import { RemoteContent, Column, Title } from "components/Basics";
+import { Column, Title } from "components/Basics";
 import { RemoteData, loading, resultToRemote } from "state/types";
 import { SECTION_ORDER } from "state/constants";
+import { RemoteContent } from "components/Complex";
 
 export const Attendees: React.FC<{ eventId: number }> = ({ eventId }) => {
   const [attendees, setAttendees] = useState<RemoteData<EventAttendee[]>>(

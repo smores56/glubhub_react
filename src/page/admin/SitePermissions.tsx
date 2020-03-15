@@ -11,16 +11,11 @@ import {
 } from "state/types";
 import { RolePermission, Permission, Info, GlubEventType } from "state/models";
 import { post, get } from "utils/request";
-import {
-  Title,
-  RemoteContent,
-  SubmissionStateBox,
-  Box,
-  Tooltip
-} from "components/Basics";
+import { Title, Box, Tooltip } from "components/Basics";
 import { GlubHubContext } from "utils/context";
 import { rolePermissionsAreEqual } from "utils/helpers";
 import { CheckboxInput } from "components/Forms";
+import { RemoteContent, SubmissionStateBox } from "components/Complex";
 
 export const SitePermissions: React.FC = () => {
   const { info } = useContext(GlubHubContext);

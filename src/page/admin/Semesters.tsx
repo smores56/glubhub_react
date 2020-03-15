@@ -22,19 +22,13 @@ import {
 import { Semester } from "state/models";
 import { hyphenDateFormatter, parseFormDateString } from "utils/datetime";
 import { get, post } from "utils/request";
-import {
-  Title,
-  RemoteContent,
-  Box,
-  Column,
-  Modal,
-  Sidebar
-} from "components/Basics";
+import { Title, Box, Column } from "components/Basics";
 import {
   ButtonGroup,
   Button,
   LinkButton,
-  SubmitButton
+  SubmitButton,
+  BackButton
 } from "components/Buttons";
 import {
   SelectInput,
@@ -46,6 +40,7 @@ import {
 } from "components/Forms";
 import { GlubHubContext, useGlubRoute } from "utils/context";
 import ErrorBox from "components/ErrorBox";
+import { RemoteContent, Modal, Sidebar } from "components/Complex";
 
 export const Semesters: React.FC<{ tab: SemesterTab | null }> = ({ tab }) => {
   const [semesters, updateSemesters] = useState<RemoteData<Semester[]>>(
@@ -289,22 +284,25 @@ const CreateSemesterSidebar: React.FC<CreateSemesterSidebarProps> = ({
       data={loaded({})}
       close={closeSidebar}
       render={() => (
-        <div className="column" style={{ textAlign: "center" }}>
-          <h2 className="subtitle is-2">Time marches on</h2>
-          <p>
-            Another day, another dollar. And also another semester. Make a new
-            semester baby now, and switch over to it whenever you want to later,
-            but before it turns 18.
-          </p>
-          <br />
-          <EditSemesterForm
-            form={form}
-            update={updateForm}
-            state={state}
-            submit={createSemester}
-            submitMessage="Break your water"
-          />
-        </div>
+        <>
+          <BackButton content="cancel" click={closeSidebar} />
+          <div className="column" style={{ textAlign: "center" }}>
+            <h2 className="subtitle is-2">Time marches on</h2>
+            <p>
+              Another day, another dollar. And also another semester. Make a new
+              semester baby now, and switch over to it whenever you want to
+              later, but before it turns 18.
+            </p>
+            <br />
+            <EditSemesterForm
+              form={form}
+              update={updateForm}
+              state={state}
+              submit={createSemester}
+              submitMessage="Break your water"
+            />
+          </div>
+        </>
       )}
     />
   );
@@ -360,21 +358,24 @@ const EditSemesterSidebar: React.FC<EditSemesterSidebarProps> = ({
       data={loaded({})}
       close={closeSidebar}
       render={() => (
-        <div className="column" style={{ textAlign: "center" }}>
-          <h2 className="subtitle is-2">Do it in pencil, not pen</h2>
-          <p>
-            Select the semester you want to make changes to, and then make the
-            changes. You cannot edit the past, sorry.
-          </p>
-          <br />
-          <EditSemesterForm
-            form={form}
-            update={updateForm}
-            state={state}
-            submit={editSemester}
-            submitMessage="Do this please"
-          />
-        </div>
+        <>
+          <BackButton content="cancel" click={closeSidebar} />
+          <div className="column" style={{ textAlign: "center" }}>
+            <h2 className="subtitle is-2">Do it in pencil, not pen</h2>
+            <p>
+              Select the semester you want to make changes to, and then make the
+              changes. You cannot edit the past, sorry.
+            </p>
+            <br />
+            <EditSemesterForm
+              form={form}
+              update={updateForm}
+              state={state}
+              submit={editSemester}
+              submitMessage="Do this please"
+            />
+          </div>
+        </>
       )}
     />
   );

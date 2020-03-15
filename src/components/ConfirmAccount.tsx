@@ -2,7 +2,7 @@ import React, { useContext, useState, useCallback } from "react";
 import { GlubHubContext } from "utils/context";
 import { DeleteButton, Button, ButtonGroup, SubmitButton } from "./Buttons";
 import { Enrollment } from "state/models";
-import { Section, Title4, Modal } from "./Basics";
+import { Section, Title4 } from "./Basics";
 import {
   InputWrapper,
   TextInput,
@@ -12,6 +12,7 @@ import {
   sectionType
 } from "./Forms";
 import { post } from "utils/request";
+import { Modal } from "./Complex";
 
 export const ConfirmAccountHeader: React.FC = () => {
   const { user } = useContext(GlubHubContext);

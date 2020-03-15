@@ -13,13 +13,7 @@ import {
   isLoaded,
   resultToSubmissionState
 } from "state/types";
-import {
-  Container,
-  Section,
-  Columns,
-  Sidebar,
-  RequiresPermission
-} from "components/Basics";
+import { Container, Section, Columns } from "components/Basics";
 import { Song } from "state/models";
 import { SongSidebar } from "./Sidebar";
 import ErrorBox from "components/ErrorBox";
@@ -31,6 +25,7 @@ import { ButtonGroup, Button } from "components/Buttons";
 import { get, postReturning, NewId, deleteRequest } from "utils/request";
 import { routeRepertoire, RepertoireTab, repertoireEdit } from "state/route";
 import { Edit } from "./Edit";
+import { Sidebar, RequiresPermission } from "components/Complex";
 
 interface RepertoireProps {
   songId: number | null;

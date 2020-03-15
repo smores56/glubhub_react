@@ -11,15 +11,11 @@ import {
 } from "state/types";
 import { Uniform, emptyUniform } from "state/models";
 import { get, post, deleteRequest, postReturning, NewId } from "utils/request";
-import {
-  Title,
-  Box,
-  RemoteContent,
-  SubmissionStateBox
-} from "components/Basics";
+import { Title, Box } from "components/Basics";
 import { TextInput, stringType, TextareaInput } from "components/Forms";
 import DeleteModal from "components/DeleteModal";
 import { DeleteButton, Button } from "components/Buttons";
+import { RemoteContent, SubmissionStateBox } from "components/Complex";
 
 export const Uniforms: React.FC = () => {
   const [uniforms, setUniforms] = useState<RemoteData<Uniform[]>>(loading);

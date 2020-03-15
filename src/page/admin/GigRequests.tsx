@@ -12,17 +12,11 @@ import {
 } from "state/types";
 import { GigRequest } from "state/models";
 import { get, post } from "utils/request";
-import {
-  Title,
-  RemoteContent,
-  Box,
-  SubmissionStateBox,
-  EmailLink,
-  PhoneLink
-} from "components/Basics";
+import { Title, Box, EmailLink, PhoneLink } from "components/Basics";
 import { dateFormatter, timeFormatter } from "utils/datetime";
 import { ButtonGroup, Button, LinkButton } from "components/Buttons";
 import { routeAdmin, adminCreateEvent, routeEvents } from "state/route";
+import { RemoteContent, SubmissionStateBox } from "components/Complex";
 
 export const GigRequests: React.FC = () => {
   const [requests, updateRequests] = useState<RemoteData<GigRequest[]>>(
@@ -144,29 +138,31 @@ const GigRequestTable: React.FC<GigRequestTableProps> = ({
   reopen,
   dismiss
 }) => (
-  <table className="table" style={{ width: "100%" }}>
-    <thead>
-      <tr style={{ width: "100%" }}>
-        <th>When Submitted</th>
-        <th>Event Name</th>
-        <th>Event Date</th>
-        <th>Contact</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      {requests.map(request => (
-        <>
-          <SingleGigRequest request={request} />
-          <GigRequestButtons
-            request={request}
-            reopen={reopen}
-            dismiss={dismiss}
-          />
-        </>
-      ))}
-    </tbody>
-  </table>
+  <div className="table-container">
+    <table className="table" style={{ width: "100%" }}>
+      <thead>
+        <tr style={{ width: "100%" }}>
+          <th>When Submitted</th>
+          <th>Event Name</th>
+          <th>Event Date</th>
+          <th>Contact</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {requests.map(request => (
+          <>
+            <SingleGigRequest request={request} />
+            <GigRequestButtons
+              request={request}
+              reopen={reopen}
+              dismiss={dismiss}
+            />
+          </>
+        ))}
+      </tbody>
+    </table>
+  </div>
 );
 
 const SingleGigRequest: React.FC<{ request: GigRequest }> = ({ request }) => (

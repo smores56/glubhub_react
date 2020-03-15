@@ -14,17 +14,7 @@ import { Transaction, Fee, emptyTransactionBatch, Member } from "state/models";
 import { useGlubRoute, GlubHubContext } from "utils/context";
 import { RemoteData, loading } from "state/types";
 import { get, post } from "utils/request";
-import {
-  Title,
-  Columns,
-  Box,
-  Column,
-  RemoteContent,
-  SubmissionStateBox,
-  Modal,
-  Sidebar,
-  MemberName
-} from "components/Basics";
+import { Title, Columns, Box, Column } from "components/Basics";
 import {
   MoneyTab,
   routeAdmin,
@@ -45,6 +35,14 @@ import ErrorBox from "components/ErrorBox";
 import { BackButton, LinkButton, Button } from "components/Buttons";
 import { fullName } from "utils/helpers";
 import { simpleDateWithYearFormatter } from "utils/datetime";
+import {
+  RemoteContent,
+  SubmissionStateBox,
+  MemberName,
+  Modal,
+  Sidebar
+} from "components/Complex";
+import { Table } from "components/Table";
 
 export const Money: React.FC<{ tab: MoneyTab | null }> = ({ tab }) => {
   const [fees, updateFees] = useState<RemoteData<Fee[]>>(loading);
@@ -208,7 +206,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   resolve
 }) => (
   <>
-    <table className="table is-striped is-fullwidth">
+    <Table striped fullwidth scrollable>
       <tbody>
         {transactions
           .sort((t1, t2) => t1.time - t2.time)
@@ -234,7 +232,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             </tr>
           ))}
       </tbody>
-    </table>
+    </Table>
     <SubmissionStateBox state={state} />
   </>
 );

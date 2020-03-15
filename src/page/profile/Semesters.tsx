@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Member, ActiveSemester } from "state/models";
 import { RemoteData, loading, resultToRemote, mapLoaded } from "state/types";
 import { get } from "utils/request";
-import { RemoteContent } from "components/Basics";
+import { RemoteContent } from "components/Complex";
 import { roundToTwoDigits } from "utils/helpers";
 
 export const Semesters: React.FC<{ member: Member }> = ({ member }) => {

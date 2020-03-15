@@ -18,15 +18,7 @@ import {
   mapLoaded,
   isLoaded
 } from "state/types";
-import {
-  Section,
-  Sidebar,
-  Title,
-  RequiresPermission,
-  Columns,
-  AttendanceIcon,
-  Divider
-} from "components/Basics";
+import { Section, Title, Columns, Divider } from "components/Basics";
 import { get } from "utils/request";
 import { eventIsOver } from "utils/helpers";
 import { useGlubRoute } from "utils/context";
@@ -43,6 +35,11 @@ import { Attendees } from "./Attendees";
 import { Attendance } from "./Attendance";
 import { RequestAbsence } from "./RequestAbsence";
 import { simpleDateFormatter } from "utils/datetime";
+import {
+  Sidebar,
+  RequiresPermission,
+  AttendanceIcon
+} from "components/Complex";
 
 interface EventsProps {
   eventId: number | null;

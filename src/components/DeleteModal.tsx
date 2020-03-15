@@ -1,5 +1,5 @@
 import React from "react";
-import { SubmissionState } from "state/types";
+import { SubmissionState, isSending, failedToSend } from "state/types";
 import ErrorBox from "./ErrorBox";
 import { DeleteButton, Button } from "./Buttons";
 
@@ -24,19 +24,17 @@ const DeleteModal: React.FC<DeleteModalProps> = props => (
   </div>
 );
 
-const ModalButtons: React.FC<DeleteModalProps> = props => (
+const ModalButtons: React.FC<DeleteModalProps> = ({
+  confirm,
+  state,
+  cancel
+}) => (
   <footer className="modal-card-foot">
-    <Button
-      onClick={props.confirm}
-      loading={props.state.status === "sending"}
-      color="is-danger"
-    >
+    <Button onClick={confirm} loading={isSending(state)} color="is-danger">
       Delete
     </Button>
-    <Button onClick={props.cancel}>Cancel</Button>
-    {props.state.status === "errorSending" && (
-      <ErrorBox error={props.state.error} />
-    )}
+    <Button onClick={cancel}>Cancel</Button>
+    {failedToSend(state) && <ErrorBox error={state.error} />}
   </footer>
 );
 

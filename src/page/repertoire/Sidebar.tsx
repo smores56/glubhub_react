@@ -4,9 +4,10 @@ import { BackButton, Button } from "components/Buttons";
 import { editRepertoire } from "state/permissions";
 import { playPitch, pitchToUnicode } from "utils/helpers";
 import { Song, SongLinkSection, Pitch, SongMode } from "state/models";
-import { RequiresPermission, Title, Tooltip } from "components/Basics";
+import { Title, Tooltip } from "components/Basics";
 import { useGlubRoute } from "utils/context";
 import { routeRepertoire, repertoireEdit } from "state/route";
+import { RequiresPermission } from "components/Complex";
 
 interface SongSidebarProps {
   song: Song;

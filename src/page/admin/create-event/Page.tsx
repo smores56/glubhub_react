@@ -17,7 +17,7 @@ import {
 import { Semester, GigRequest, GlubEventType } from "state/models";
 import { get, postReturning, NewId } from "utils/request";
 import { GlubHubContext, useGlubRoute } from "utils/context";
-import { Title, RemoteContent, Box, Columns, Column } from "components/Basics";
+import { Title, Box, Columns, Column } from "components/Basics";
 import {
   TextInput,
   stringType,
@@ -43,6 +43,7 @@ import {
   formJson
 } from "./state";
 import { routeEvents } from "state/route";
+import { RemoteContent } from "components/Complex";
 
 export const CreateEvent: React.FC<{ gigRequestId: number | null }> = ({
   gigRequestId

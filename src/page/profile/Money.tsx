@@ -10,9 +10,10 @@ import {
   resultToRemote
 } from "state/types";
 import { post, get } from "utils/request";
-import { Column, RemoteContent, SubmissionStateBox } from "components/Basics";
+import { RemoteContent, SubmissionStateBox } from "components/Complex";
 import { Button } from "components/Buttons";
 import { simpleDateWithYearFormatter } from "utils/datetime";
+import { Column } from "components/Basics";
 
 export const Money: React.FC<{ member: Member }> = ({ member }) => {
   const [transactions, updateTransactions] = useState<

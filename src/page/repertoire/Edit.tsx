@@ -18,7 +18,7 @@ import {
   FileInput
 } from "components/Forms";
 import { ALL_PITCHES } from "state/constants";
-import { SubmissionStateBox, Divider } from "components/Basics";
+import { Divider } from "components/Basics";
 import {
   post,
   deleteRequest,
@@ -34,6 +34,7 @@ import ErrorBox from "components/ErrorBox";
 import { fileToBase64 } from "utils/helpers";
 import { useGlubRoute } from "utils/context";
 import { routeRepertoire, repertoireDetails } from "state/route";
+import { SubmissionStateBox } from "components/Complex";
 
 interface EditProps {
   song: Song;

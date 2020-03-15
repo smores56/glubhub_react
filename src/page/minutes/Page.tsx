@@ -24,20 +24,13 @@ import {
 import { MeetingMinutes } from "state/models";
 import { useGlubRoute } from "utils/context";
 import { get, postReturning, NewId } from "utils/request";
-import {
-  Section,
-  Container,
-  Columns,
-  RequiresPermission,
-  Column,
-  RemoteContent,
-  Box
-} from "components/Basics";
+import { Section, Container, Columns, Column, Box } from "components/Basics";
 import { SelectableList } from "components/List";
 import { editMinutes, viewCompleteMinutes } from "state/permissions";
 import { ButtonGroup, Button } from "components/Buttons";
 import { EditMinutes } from "./Edit";
 import ErrorBox from "components/ErrorBox";
+import { RemoteContent, RequiresPermission } from "components/Complex";
 
 interface MinutesProps {
   minutesId: number | null;

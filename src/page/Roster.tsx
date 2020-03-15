@@ -36,18 +36,20 @@ export const Roster: React.FC = () => {
     <Section>
       <Container>
         <Box>
-          <table className="table is-fullwidth">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Section</th>
-                <th>E-mail</th>
-                <th>Phone</th>
-                <th>Location</th>
-              </tr>
-            </thead>
-            <tbody>{members.map(memberRow)}</tbody>
-          </table>
+          <div className="table-container">
+            <table className="table is-fullwidth">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Section</th>
+                  <th>E-mail</th>
+                  <th>Phone</th>
+                  <th>Location</th>
+                </tr>
+              </thead>
+              <tbody>{members.map(memberRow)}</tbody>
+            </table>
+          </div>
         </Box>
       </Container>
     </Section>

@@ -1,7 +1,8 @@
 import React, { PropsWithChildren } from "react";
 import { RemoteData } from "state/types";
-import { Box, RemoteContent, Title, Column } from "./Basics";
+import { Box, Title, Column } from "./Basics";
 import { GOLD_COLOR } from "../state/constants";
+import { RemoteContent } from "./Complex";
 
 interface SelectableListProps<T> {
   listItems: RemoteData<T[][]>;

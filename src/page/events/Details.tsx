@@ -13,16 +13,12 @@ import {
   isSending,
   failedToSend
 } from "state/types";
-import {
-  RequiresPermission,
-  Divider,
-  PhoneLink,
-  EmailLink
-} from "components/Basics";
+import { Divider, PhoneLink, EmailLink } from "components/Basics";
 import { Button } from "components/Buttons";
 import { fullDateTimeFormatter, timeFormatter } from "utils/datetime";
 import { GlubHubContext, useGlubRoute } from "utils/context";
 import ErrorBox from "components/ErrorBox";
+import { RequiresPermission } from "components/Complex";
 
 interface DetailsProps {
   event: GlubEvent;

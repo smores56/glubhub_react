@@ -10,14 +10,10 @@ import {
 } from "state/types";
 import { DocumentLink, emptyDocumentLink } from "state/models";
 import { get, post, deleteRequest } from "utils/request";
-import {
-  Title,
-  RemoteContent,
-  SubmissionStateBox,
-  Box
-} from "components/Basics";
+import { Title, Box } from "components/Basics";
 import { TextInput, stringType } from "components/Forms";
 import { Button, DeleteButton } from "components/Buttons";
+import { RemoteContent, SubmissionStateBox } from "components/Complex";
 
 export const DocumentLinks: React.FC = () => {
   const [links, updateLinks] = useState<RemoteData<DocumentLink[]>>(loading);

@@ -19,7 +19,6 @@ import {
 import {
   Section,
   Container,
-  RemoteContent,
   Title,
   Columns,
   Column,
@@ -35,6 +34,7 @@ import { collect3, get, post } from "utils/request";
 import { GlubHubContext, useGlubRoute } from "utils/context";
 import { routeEvents, eventCarpools } from "state/route";
 import { LinkButton, Button } from "components/Buttons";
+import { RemoteContent } from "components/Complex";
 
 interface CarpoolData {
   event: GlubEvent;

@@ -8,7 +8,7 @@ import {
   isSending
 } from "state/types";
 import { post, deleteRequest } from "utils/request";
-import { RequiresPermission } from "components/Basics";
+import { RequiresPermission } from "components/Complex";
 import { editMinutes } from "state/permissions";
 import ErrorBox from "components/ErrorBox";
 import DeleteModal from "components/DeleteModal";

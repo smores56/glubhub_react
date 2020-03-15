@@ -11,7 +11,7 @@ import {
 import { fullName } from "utils/helpers";
 import { get, post } from "utils/request";
 import { EventAttendee } from "state/models";
-import { RemoteContent, SubmissionStateBox } from "components/Basics";
+import { RemoteContent, SubmissionStateBox } from "components/Complex";
 import { CheckboxInput, TextInput, numberType } from "components/Forms";
 import { NO_SECTION, SECTION_ORDER } from "state/constants";
 

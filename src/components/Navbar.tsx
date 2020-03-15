@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useGlubRoute } from "utils/context";
 import { DocumentLink, Member, Info } from "state/models";
 import { visibleAdminTabs, fullName } from "utils/helpers";
@@ -23,9 +23,15 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ user, info }) => {
   const { location } = useGlubRoute();
   const [expanded, setExpanded] = useState(false);
+
   const toggleExpanded = useCallback(() => {
     setExpanded(!expanded);
   }, [expanded, setExpanded]);
+
+  const collapseBurgerKey = location ? renderRoute(location) : "";
+  useEffect(() => {
+    setExpanded(false);
+  }, [collapseBurgerKey]);
 
   const singleLink = (route: GlubRoute) => (
     <a

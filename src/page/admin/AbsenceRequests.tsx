@@ -9,18 +9,17 @@ import {
   loaded,
   mapLoaded
 } from "state/types";
-import {
-  Title,
-  Box,
-  RemoteContent,
-  SubmissionStateBox,
-  MemberName
-} from "components/Basics";
+import { Title, Box } from "components/Basics";
 import { get, post } from "utils/request";
 import { ButtonGroup, Button } from "components/Buttons";
 import { AbsenceRequest, GlubEvent } from "state/models";
 import { renderRoute, routeEvents, routeProfile } from "state/route";
 import { dateFormatter, timeFormatter } from "utils/datetime";
+import {
+  RemoteContent,
+  SubmissionStateBox,
+  MemberName
+} from "components/Complex";
 
 export const AbsenceRequests: React.FC = () => {
   const [requestsAndEvents, updateRequestsAndEvents] = useState<

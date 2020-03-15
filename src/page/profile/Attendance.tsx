@@ -12,7 +12,7 @@ import {
   loaded
 } from "state/types";
 import { get, post } from "utils/request";
-import { RemoteContent, SubmissionStateBox } from "components/Basics";
+import { RemoteContent, SubmissionStateBox } from "components/Complex";
 import { routeEvents, renderRoute } from "state/route";
 import { CheckboxInput, TextInput, numberType } from "components/Forms";
 import { dateFormatter } from "utils/datetime";

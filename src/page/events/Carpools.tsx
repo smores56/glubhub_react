@@ -10,7 +10,7 @@ import {
   RemoteContent,
   RequiresPermission,
   AttendanceIcon
-} from "components/Basics";
+} from "components/Complex";
 import { get } from "utils/request";
 import { fullName } from "utils/helpers";
 import { editCarpool } from "state/permissions";
