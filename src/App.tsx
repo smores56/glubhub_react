@@ -76,7 +76,7 @@ const App: React.FC = () => {
         />
         <ConfirmAccountHeader />
         <div style={{ paddingBottom: "50px" }} />
-        <div className="center" style={{ height: "100%" }}>
+        <div className="center" style={{ height: "100%", backgroundColor:"#fafafa" }}>
           <RemoteContent
             data={appData}
             render={appData => (
