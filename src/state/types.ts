@@ -1,6 +1,7 @@
 import { GlubHubError } from "./error";
 import { GlubResponseType } from "utils/request";
 import { SUBMISSION_STATE_BOX_ID } from "./constants";
+import { useMemo } from "react";
 
 export type RemoteData<T> =
   | { status: "notAsked" }
@@ -12,13 +13,13 @@ export const notAsked: RemoteData<any> = { status: "notAsked" };
 export const loading: RemoteData<any> = { status: "loading" };
 export const loaded = <T extends any>(data: T): RemoteData<T> => ({
   status: "loaded",
-  data
+  data,
 });
 export const errorLoading = <T extends any>(
   error: GlubHubError
 ): RemoteData<T> => ({
   status: "errorLoading",
-  error
+  error,
 });
 
 export type SubmissionState =
@@ -30,7 +31,7 @@ export const notSentYet: SubmissionState = { status: "notSentYet" };
 export const sending: SubmissionState = { status: "sending" };
 export const errorSending = (error: GlubHubError): SubmissionState => ({
   status: "errorSending",
-  error
+  error,
 });
 
 export const mapLoaded = <T, U>(
@@ -82,3 +83,17 @@ export const failedToSend = (
   data: SubmissionState
 ): data is { status: "errorSending"; error: GlubHubError } =>
   data.status === "errorSending";
+
+export const useCombinedSubmissionStates = (...states: SubmissionState[]) =>
+  useMemo(() => {
+    if (states.some((s) => s.status === "sending")) {
+      return sending;
+    }
+
+    const errorState = states.find((s) => s.status === "errorSending");
+    if (errorState) {
+      return errorState;
+    } else {
+      return notSentYet;
+    }
+  }, [...states]);

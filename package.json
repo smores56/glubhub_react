@@ -4,6 +4,8 @@
   "private": true,
   "homepage": "https://gleeclub.gatech.edu/glubhub",
   "dependencies": {
+    "@apollo/react-common": "^3.1.3",
+    "@apollo/react-hooks": "^3.1.5",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",
     "@testing-library/user-event": "^7.2.1",
@@ -12,7 +14,11 @@
     "@types/node": "^12.12.28",
     "@types/react": "^16.9.21",
     "@types/react-dom": "^16.9.5",
+    "apollo-boost": "^0.4.9",
+    "apollo-link-context": "^1.0.20",
     "d3": "^5.15.0",
+    "graphql": "^15.0.0",
+    "graphql-tag": "^2.10.3",
     "moment": "^2.24.0",
     "react": "^16.12.0",
     "react-copy-to-clipboard": "^5.0.2",
@@ -29,8 +35,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "zip": "react-scripts build && zip -r -X build.zip ./build",
-    "upload": "react-scripts build && zip -r -X build.zip ./build && curl \"https://gleeclub.gatech.edu/cgi-bin/api/upload_frontend\" -H \"token: $GREASE_TOKEN\" -H \"Content-Type: application/zip\" --data-binary \"@build.zip\""
+    "zip": "react-scripts build && tar -zcvf build.tar.gz ./build",
+    "upload": "react-scripts build && tar -zcvf build.tar.gz ./build && curl \"https://gleeclub.gatech.edu/cgi-bin/api/upload_frontend\" -H \"token: $GREASE_TOKEN\" --data-binary \"@build.tar.gz\""
   },
   "eslintConfig": {
     "extends": "react-app"

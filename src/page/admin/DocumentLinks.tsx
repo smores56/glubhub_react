@@ -1,96 +1,61 @@
-import React, { useState, useEffect, useCallback } from "react";
-import {
-  RemoteData,
-  loading,
-  notSentYet,
-  resultToRemote,
-  sending,
-  loaded,
-  resultToSubmissionState,
-  isLoaded
-} from "state/types";
+import React, { useState } from "react";
+import { useCombinedSubmissionStates } from "state/types";
 import { DocumentLink, emptyDocumentLink } from "state/models";
-import { get, post, deleteRequest } from "utils/request";
 import { Title, Box } from "components/Basics";
 import { TextInput, stringType } from "components/Forms";
 import { Button, DeleteButton } from "components/Buttons";
 import { RemoteContent, SubmissionStateBox } from "components/Complex";
+import { useRemoteQuery, useStateMutation } from "graphql/remote_query";
+import {
+  DOCUMENTS,
+  UPDATE_DOCUMENT,
+  DELETE_DOCUMENT,
+  CREATE_DOCUMENT,
+} from "graphql/queries";
 
 export const DocumentLinks: React.FC = () => {
-  const [links, updateLinks] = useState<RemoteData<DocumentLink[]>>(loading);
+  const { data } = useRemoteQuery<{ documents: DocumentLink[]; }>(DOCUMENTS);
   const [newLink, updateNewLink] = useState<DocumentLink>(emptyDocumentLink);
-  const [state, setState] = useState(notSentYet);
 
-  const updateLink = useCallback(
-    async (index: number, link: DocumentLink) => {
-      if (!isLoaded(links)) return;
-
-      setState(sending);
-      const update = await post(`google_docs/${links.data[index].name}`, link);
-
-      setState(resultToSubmissionState(update));
-      if (update.successful) {
-        updateLinks(loaded(links.data.map((l, i) => (i === index ? link : l))));
-      }
-    },
-    [links, setState, updateLinks]
-  );
-
-  const deleteLink = useCallback(
-    async (index: number) => {
-      if (!isLoaded(links)) return;
-
-      const link = links.data[index];
-      if (!link) return;
-
-      setState(sending);
-      const result = await deleteRequest(`google_docs/${link.name}`);
-
-      setState(resultToSubmissionState(result));
-      if (result.successful) {
-        updateLinks(loaded(links.data.filter((_, i) => i !== index)));
-      }
-    },
-    [links, setState, updateLinks]
-  );
-
-  const createLink = useCallback(async () => {
-    if (!isLoaded(links) || !newLink.name || !newLink.url) return;
-
-    setState(sending);
-    const result = await post(`google_docs`, newLink);
-
-    setState(resultToSubmissionState(result));
-    if (result.successful) {
-      updateLinks(loaded([...links.data, newLink]));
-      updateNewLink(emptyDocumentLink);
+  const [updateDocument, { state: updateState }] = useStateMutation<
+    any,
+    DocumentLink
+  >(UPDATE_DOCUMENT, { refetchQueries: [{ query: DOCUMENTS }] });
+  const [
+    deleteDocument,
+    { state: deleteState },
+  ] = useStateMutation(DELETE_DOCUMENT, {
+    refetchQueries: [{ query: DOCUMENTS }],
+  });
+  const [createDocument, { state: createState }] = useStateMutation(
+    CREATE_DOCUMENT,
+    {
+      onCompleted: () => updateNewLink(emptyDocumentLink),
+      refetchQueries: [{ query: DOCUMENTS }],
     }
-  }, [links, newLink, setState, updateLinks, updateNewLink]);
+  );
 
-  useEffect(() => {
-    const loadLinks = async () => {
-      const links = await get<DocumentLink[]>(`google_docs`);
-      updateLinks(resultToRemote(links));
-    };
-
-    loadLinks();
-  }, [updateLinks]);
+  const state = useCombinedSubmissionStates(
+    updateState,
+    deleteState,
+    createState
+  );
 
   return (
     <>
       <Title>Document Links</Title>
       <Box>
         <RemoteContent
-          data={links}
-          render={links => (
+          data={data}
+          render={(data) => (
             <table style={{ borderSpacing: "5px", borderCollapse: "separate" }}>
-              {links.map((link, index) => (
+              {data.documents.map((link) => (
                 <tr key={link.name}>
                   <td style={{ paddingRight: "10px" }}>
                     <span
                       style={{
                         display: "inline-block",
-                        verticalAlign: "middle"
+                        verticalAlign: "middle",
                       }}
                     >
                       {link.name}
@@ -100,7 +65,9 @@ export const DocumentLinks: React.FC = () => {
                     <TextInput
                       type={stringType}
                       value={link.url}
-                      onInput={url => updateLink(index, { ...link, url })}
+                      onInput={(url) =>
+                        updateDocument({ variables: { ...link, url } })
+                      }
                       placeholder="URL"
                     />
                   </td>
@@ -108,10 +75,14 @@ export const DocumentLinks: React.FC = () => {
                     <span
                       style={{
                         display: "inline-block",
-                        verticalAlign: "middle"
+                        verticalAlign: "middle",
                       }}
                     >
-                      <DeleteButton click={() => deleteLink(index)} />
+                      <DeleteButton
+                        click={() =>
+                          deleteDocument({ variables: { name: link.name } })
+                        }
+                      />
                     </span>
                   </td>
                 </tr>
@@ -124,7 +95,11 @@ export const DocumentLinks: React.FC = () => {
               <NewLinkRow
                 newLink={newLink}
                 update={updateNewLink}
-                create={createLink}
+                create={() => {
+                  if (newLink.name && newLink.url) {
+                    createDocument({ variables: newLink });
+                  }
+                }}
               />
             </table>
           )}
@@ -147,7 +122,7 @@ const NewLinkRow: React.FC<NewLinkRowProps> = ({ newLink, update, create }) => (
       <TextInput
         type={stringType}
         value={newLink.name}
-        onInput={name => update({ ...newLink, name })}
+        onInput={(name) => update({ ...newLink, name })}
         placeholder="Name"
       />
     </td>
@@ -155,7 +130,7 @@ const NewLinkRow: React.FC<NewLinkRowProps> = ({ newLink, update, create }) => (
       <TextInput
         type={stringType}
         value={newLink.url}
-        onInput={url => update({ ...newLink, url })}
+        onInput={(url) => update({ ...newLink, url })}
         placeholder="URL"
       />
     </td>

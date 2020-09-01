@@ -65,7 +65,7 @@ interface GlubEventAttendanceFields {
   absenceRequest: AbsenceRequest | null;
 }
 
-export interface GlubEvent extends GlubSimpleEvent, GlubEventAttendanceFields {}
+export interface GlubEvent extends GlubSimpleEvent, GlubEventAttendanceFields { }
 
 export interface SimpleGradeChange {
   change: number;
@@ -262,7 +262,7 @@ export interface AbsenceRequest {
   state: AbsenceRequestState;
 }
 
-export type AbsenceRequestState = "Approved" | "Denied" | "Pending";
+export type AbsenceRequestState = "APPROVED" | "DENIED" | "PENDING";
 
 export interface GigRequest {
   id: number;
@@ -279,7 +279,7 @@ export interface GigRequest {
   status: GigRequestStatus;
 }
 
-export type GigRequestStatus = "Accepted" | "Dismissed" | "Pending";
+export type GigRequestStatus = "ACCEPTED" | "DISMISSED" | "PENDING";
 
 export interface TransactionBatch {
   members: string[];

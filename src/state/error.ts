@@ -123,43 +123,47 @@ export type GlubHubError =
   | ConnectionError
   | UnknownError;
 
-export const parseError = async (error: Response): Promise<GlubHubError> => {
+export const parseErrorResponse = async (
+  error: Response
+): Promise<GlubHubError> => {
   try {
     const errorBody = await error.json();
-    const message = errorBody?.message;
-
-    switch (message) {
-      case "resource not found":
-        return errorBody as NotFoundError;
-
-      case "member already logged in":
-        return errorBody as AlreadyLoggedInError;
-
-      case "login required":
-        return errorBody as UnauthorizedError;
-
-      case "member not active yet":
-        return errorBody as NotActiveYetError;
-
-      case "access forbidden":
-        return errorBody as ForbiddenError;
-
-      case "server error":
-        return errorBody as ServerError;
-
-      case "bad request":
-        return errorBody as BadRequestError;
-
-      case "database error":
-        return errorBody as DatabaseError;
-
-      case "error connecting to database":
-        return errorBody as ConnectionError;
-
-      default:
-        return unknownError(error.status, `${errorBody}`);
-    }
+    return parseError(errorBody, error.status);
   } catch (e) {
     return unknownError(error.status, `${e}`);
+  }
+};
+
+export const parseError = (error: any, status: number): GlubHubError => {
+  switch (error?.message) {
+    case "resource not found":
+      return error as NotFoundError;
+
+    case "member already logged in":
+      return error as AlreadyLoggedInError;
+
+    case "login required":
+      return error as UnauthorizedError;
+
+    case "member not active yet":
+      return error as NotActiveYetError;
+
+    case "access forbidden":
+      return error as ForbiddenError;
+
+    case "server error":
+      return error as ServerError;
+
+    case "bad request":
+      return error as BadRequestError;
+
+    case "database error":
+      return error as DatabaseError;
+
+    case "error connecting to database":
+      return error as ConnectionError;
+
+    default:
+      return unknownError(status, `${error}`);
   }
 };

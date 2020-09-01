@@ -1,5 +1,5 @@
 import { API_URL } from "state/constants";
-import { parseError, unknownError, GlubHubError } from "state/error";
+import { parseErrorResponse, unknownError, GlubHubError } from "state/error";
 import { getToken } from "./helpers";
 
 export interface NewId {
@@ -11,8 +11,8 @@ export interface NewToken {
 }
 
 export type GlubResponseType<T> =
-  | { successful: true; data: T }
-  | { successful: false; error: GlubHubError };
+  | { successful: true; data: T; }
+  | { successful: false; error: GlubHubError; };
 
 export const success = <T>(data: T): GlubResponseType<T> => ({
   successful: true,
@@ -62,7 +62,7 @@ const makeRequest = async <T extends any, R>(
         return { successful: true, data: (null as unknown) as R };
       }
     } else {
-      const error = await parseError(resp);
+      const error = await parseErrorResponse(resp);
       return { successful: false, error };
     }
   } catch {

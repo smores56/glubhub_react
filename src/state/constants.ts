@@ -6,6 +6,10 @@ export const GREASE_OLD_TOKEN_NAME = "grease-old-token";
 
 export const API_URL = "https://gleeclub.gatech.edu/cgi-bin/api/";
 
+export const GRAPHQL_URL = API_URL + "graphql";
+
+export const GRAPHIQL_URL = API_URL + "graphiql";
+
 export const GOLD_COLOR = "#b4a46a";
 
 export const SUBMISSION_STATE_BOX_ID = "submission-box";

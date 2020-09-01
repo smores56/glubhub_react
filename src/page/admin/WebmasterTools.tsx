@@ -7,12 +7,20 @@ import {
   failedToSend
 } from "state/types";
 import { getToken } from "utils/helpers";
-import { parseError, unknownError } from "state/error";
-import { Column, Title, Box, Columns, Divider } from "components/Basics";
+import { parseErrorResponse, unknownError } from "state/error";
+import {
+  Column,
+  Title,
+  Box,
+  Columns,
+  Divider,
+  Title4
+} from "components/Basics";
 import { FileInput } from "components/Forms";
-import { Button } from "components/Buttons";
+import { Button, ButtonGroup } from "components/Buttons";
 import ErrorBox from "components/ErrorBox";
 import CopyToClipboard from "react-copy-to-clipboard";
+import { GRAPHIQL_URL } from "state/constants";
 
 export const WebmasterTools: React.FC = () => {
   return (
@@ -31,12 +39,17 @@ export const WebmasterTools: React.FC = () => {
           />
           <Divider vertical />
           <Column>
-            <b>Copy your token:</b>
+            <b>Buttons and Whistles:</b>
             <br />
             <br />
-            <CopyToClipboard text={getToken() || ""}>
-              <Button>Uno Tokeno</Button>
-            </CopyToClipboard>
+            <ButtonGroup>
+              <CopyToClipboard text={getToken() || ""}>
+                <Button>Uno Tokeno</Button>
+              </CopyToClipboard>
+              <a className="button" href={GRAPHIQL_URL}>
+                GraphiQL
+              </a>
+            </ButtonGroup>
           </Column>
         </Columns>
       </Box>
@@ -74,7 +87,7 @@ export const WebmasterFile: React.FC<WebmasterFileProps> = ({
         setState(notSentYet);
         setFile(null);
       } else {
-        const error = await parseError(resp);
+        const error = await parseErrorResponse(resp);
         setState(errorSending(error));
       }
     } catch {

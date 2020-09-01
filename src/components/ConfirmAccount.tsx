@@ -23,7 +23,12 @@ export const ConfirmAccountHeader: React.FC = () => {
   const isActive = !!user?.enrollment;
 
   if (!user || isActive || ignoreConfirm) {
-    return <></>;
+    return <section
+      style={{ margin: "2em", marginBottom: "-1em", paddingTop: "40px" }}
+    >
+
+      {`${user} ${isActive} ${ignoreConfirm}`}
+    </section>;
   }
 
   return (

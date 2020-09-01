@@ -8,7 +8,7 @@ import {
   sending,
   resultToSubmissionState,
   loaded,
-  mapLoaded
+  mapLoaded,
 } from "state/types";
 import { GigRequest } from "state/models";
 import { get, post } from "utils/request";
@@ -27,7 +27,7 @@ export const GigRequests: React.FC = () => {
 
   const dismissRequest = useCallback(
     async (request: GigRequest) => {
-      if (!isLoaded(requests) || request.status !== "Pending") return;
+      if (!isLoaded(requests) || request.status !== "PENDING") return;
       setState(sending);
 
       const result = await post(`gig_requests/${request.id}/dismiss`, {});
@@ -36,8 +36,8 @@ export const GigRequests: React.FC = () => {
       if (result.successful) {
         updateRequests(
           loaded(
-            requests.data.map(r =>
-              r.id === request.id ? { ...r, status: "Dismissed" } : r
+            requests.data.map((r) =>
+              r.id === request.id ? { ...r, status: "DISMISSED" } : r
             )
           )
         );
@@ -48,7 +48,7 @@ export const GigRequests: React.FC = () => {
 
   const reopenRequest = useCallback(
     async (request: GigRequest) => {
-      if (!isLoaded(requests) || request.status !== "Dismissed") return;
+      if (!isLoaded(requests) || request.status !== "DISMISSED") return;
       setState(sending);
 
       const result = await post(`gig_requests/${request.id}/reopen`, {});
@@ -57,8 +57,8 @@ export const GigRequests: React.FC = () => {
       if (result.successful) {
         updateRequests(
           loaded(
-            requests.data.map(r =>
-              r.id === request.id ? { ...r, status: "Pending" } : r
+            requests.data.map((r) =>
+              r.id === request.id ? { ...r, status: "PENDING" } : r
             )
           )
         );
@@ -81,10 +81,10 @@ export const GigRequests: React.FC = () => {
       <Title>Gig Requests</Title>
       <Box>
         <RemoteContent
-          data={mapLoaded(requests, all =>
-            all.filter(r => r.status === "Pending")
+          data={mapLoaded(requests, (all) =>
+            all.filter((r) => r.status === "PENDING")
           )}
-          render={requests => (
+          render={(requests) => (
             <GigRequestTable
               requests={requests}
               reopen={reopenRequest}
@@ -97,10 +97,10 @@ export const GigRequests: React.FC = () => {
       <Title>Accepted Gig Requests</Title>
       <Box>
         <RemoteContent
-          data={mapLoaded(requests, all =>
-            all.filter(r => r.status === "Accepted")
+          data={mapLoaded(requests, (all) =>
+            all.filter((r) => r.status === "ACCEPTED")
           )}
-          render={requests => (
+          render={(requests) => (
             <GigRequestTable
               requests={requests}
               reopen={reopenRequest}
@@ -112,10 +112,10 @@ export const GigRequests: React.FC = () => {
       <Title>Dismissed Gig Requests</Title>
       <Box>
         <RemoteContent
-          data={mapLoaded(requests, all =>
-            all.filter(r => r.status === "Dismissed")
+          data={mapLoaded(requests, (all) =>
+            all.filter((r) => r.status === "DISMISSED")
           )}
-          render={requests => (
+          render={(requests) => (
             <GigRequestTable
               requests={requests}
               reopen={reopenRequest}
@@ -137,7 +137,7 @@ interface GigRequestTableProps {
 const GigRequestTable: React.FC<GigRequestTableProps> = ({
   requests,
   reopen,
-  dismiss
+  dismiss,
 }) => (
   <Table scrollable style={{ width: "100%" }}>
     <thead>
@@ -150,7 +150,7 @@ const GigRequestTable: React.FC<GigRequestTableProps> = ({
       </tr>
     </thead>
     <tbody>
-      {requests.map(request => (
+      {requests.map((request) => (
         <>
           <SingleGigRequest request={request} />
           <GigRequestButtons
@@ -203,13 +203,13 @@ interface GigRequestButtonsProps {
 const GigRequestButtons: React.FC<GigRequestButtonsProps> = ({
   request,
   reopen,
-  dismiss
+  dismiss,
 }) => {
   let leftButton: JSX.Element;
   let rightButton: JSX.Element;
 
   switch (request.status) {
-    case "Pending":
+    case "PENDING":
       leftButton = (
         <Button onClick={() => dismiss(request)}>We do not deign</Button>
       );
@@ -223,7 +223,7 @@ const GigRequestButtons: React.FC<GigRequestButtonsProps> = ({
       );
       break;
 
-    case "Accepted":
+    case "ACCEPTED":
       leftButton = <Button>Too late to go back now</Button>;
       rightButton = (
         <LinkButton route={routeEvents(request.event, null)}>
@@ -232,7 +232,7 @@ const GigRequestButtons: React.FC<GigRequestButtonsProps> = ({
       );
       break;
 
-    case "Dismissed":
+    case "DISMISSED":
       leftButton = <Button>We did not deign</Button>;
       rightButton = <Button onClick={() => reopen(request)}>Hol up</Button>;
       break;

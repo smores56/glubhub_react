@@ -8,74 +8,77 @@ import {
   checkSubmissionResult,
   loaded,
   mapLoaded,
-  isLoaded
+  isLoaded,
 } from "state/types";
 import { Title, Box } from "components/Basics";
 import { get, post } from "utils/request";
 import { ButtonGroup, Button } from "components/Buttons";
-import { AbsenceRequest, GlubEvent } from "state/models";
+import { AbsenceRequest, GlubEvent, AbsenceRequestState } from "state/models";
 import { renderRoute, routeEvents, routeProfile } from "state/route";
 import { dateFormatter, timeFormatter } from "utils/datetime";
 import {
   RemoteContent,
   SubmissionStateBox,
-  MemberName
+  MemberName,
 } from "components/Complex";
 import { Table } from "components/Table";
+import { useRemoteQuery } from "graphql/query";
+import {
+  ABSENCE_REQUESTS_FOR_SEMESTER,
+  RESPOND_TO_ABSENCE_REQUEST,
+} from "graphql/queries";
+import { useStateMutation } from "graphql/remote_query";
+
+interface AbsenceRequestWithEvent {
+  member: string;
+  time: number;
+  reason: string;
+  state: AbsenceRequestState;
+  event: {
+    id: number;
+    name: string;
+    callTime: string;
+    location: string | null;
+  };
+}
+
+interface RespondToRequest {
+  approved: boolean;
+  eventId: number;
+  member: string;
+}
 
 export const AbsenceRequests: React.FC = () => {
-  const [requestsAndEvents, updateRequestsAndEvents] = useState<
-    RemoteData<[AbsenceRequest, GlubEvent][]>
-  >(loading);
-  const [state, setState] = useState(notSentYet);
-
-  const respondToAbsenceRequest = useCallback(
-    async (request: AbsenceRequest, action: "approve" | "deny") => {
-      if (!isLoaded(requestsAndEvents)) return;
-      setState(sending);
-
-      const url = `absence_requests/${request.event}/${request.member}/${action}`;
-      const update = await post(url, {});
-
-      checkSubmissionResult<null>(update, setState);
-      if (update.successful) {
-        updateRequestsAndEvents(
-          loaded(
-            requestsAndEvents.data.map(([r, e]) => [
-              r.event === request.event && r.member === request.member
-                ? { ...r, state: action === "approve" ? "Approved" : "Denied" }
-                : r,
-              e
-            ])
-          )
-        );
-      }
-    },
-    [requestsAndEvents, updateRequestsAndEvents, setState]
+  const { data } = useRemoteQuery<AbsenceRequestWithEvent[]>(
+    ABSENCE_REQUESTS_FOR_SEMESTER
+  );
+  const [respondToRequest, { state }] = useStateMutation<any, RespondToRequest>(
+    RESPOND_TO_ABSENCE_REQUEST,
+    { refetchQueries: [{ query: ABSENCE_REQUESTS_FOR_SEMESTER }] }
   );
 
-  useEffect(() => {
-    const loadAbsenceRequests = async () => {
-      const result = await get<[AbsenceRequest, GlubEvent][]>(
-        `absence_requests`
-      );
-      updateRequestsAndEvents(resultToRemote(result));
-    };
-
-    loadAbsenceRequests();
-  }, [updateRequestsAndEvents]);
+  const respondToAbsenceRequest = useCallback(
+    async (request: AbsenceRequestWithEvent, action: "approve" | "deny") => {
+      await respondToRequest({
+        variables: {
+          approved: action === "approve",
+          member: request.member,
+          eventId: request.event.id,
+        },
+      });
+    },
+    [respondToRequest]
+  );
 
   return (
     <div style={{ width: "100%" }}>
       <Title>Open Absence Requests</Title>
       <Box>
         <RemoteContent
-          data={mapLoaded(requestsAndEvents, x =>
-            x.filter(([r, e]) => r.state === "Pending")
-          )}
-          render={requestsAndEvents => (
+          data={mapLoaded(data, (x) => x.filter((r) => r.state === "PENDING"))}
+          render={(requests) => (
             <AbsenceRequestTable
-              requestsAndEvents={requestsAndEvents}
+              requests={requests}
               respond={respondToAbsenceRequest}
             />
           )}
@@ -84,12 +87,10 @@ export const AbsenceRequests: React.FC = () => {
       <Title>Closed Absence Requests</Title>
       <Box>
         <RemoteContent
-          data={mapLoaded(requestsAndEvents, x =>
-            x.filter(([r, e]) => r.state !== "Pending")
-          )}
-          render={requestsAndEvents => (
+          data={mapLoaded(data, (x) => x.filter((r) => r.state !== "PENDING"))}
+          render={(requests) => (
             <AbsenceRequestTable
-              requestsAndEvents={requestsAndEvents}
+              requests={requests}
               respond={respondToAbsenceRequest}
             />
           )}
@@ -101,18 +102,18 @@ export const AbsenceRequests: React.FC = () => {
 };
 
 type RespondToAbsenceRequestFn = (
-  request: AbsenceRequest,
+  request: AbsenceRequestWithEvent,
   action: "approve" | "deny"
 ) => Promise<void>;
 
 interface AbsenceRequestTableProps {
-  requestsAndEvents: [AbsenceRequest, GlubEvent][];
+  requests: AbsenceRequestWithEvent[];
   respond: RespondToAbsenceRequestFn;
 }
 
 const AbsenceRequestTable: React.FC<AbsenceRequestTableProps> = ({
-  requestsAndEvents,
-  respond
+  requests,
+  respond,
 }) => (
   <Table scrollable style={{ width: "100%" }}>
     <thead>
@@ -125,9 +126,9 @@ const AbsenceRequestTable: React.FC<AbsenceRequestTableProps> = ({
       </tr>
     </thead>
     <tbody>
-      {requestsAndEvents.map(([request, event]) => (
+      {requests.map((request) => (
         <>
-          <AbsenceRequestRow request={request} event={event} />
+          <AbsenceRequestRow request={request} />
           <AbsenceRequestButtons request={request} respond={respond} />
         </>
       ))}
@@ -136,14 +137,10 @@ const AbsenceRequestTable: React.FC<AbsenceRequestTableProps> = ({
 );
 
 interface AbsenceRequestRowProps {
-  request: AbsenceRequest;
-  event: GlubEvent;
+  request: AbsenceRequestWithEvent;
 }
 
-const AbsenceRequestRow: React.FC<AbsenceRequestRowProps> = ({
-  request,
-  event
-}) => (
+const AbsenceRequestRow: React.FC<AbsenceRequestRowProps> = ({ request }) => (
   <tr key={request.time} className="no-bottom-border">
     <td>
       {dateFormatter(request.time)}
@@ -151,14 +148,16 @@ const AbsenceRequestRow: React.FC<AbsenceRequestRowProps> = ({
       {timeFormatter(request.time)}
     </td>
     <td>
-      <a href={renderRoute(routeEvents(event.id, null))}>{event.name}</a>
+      <a href={renderRoute(routeEvents(request.event.id, null))}>
+        {request.event.name}
+      </a>
     </td>
     <td>
-      {dateFormatter(event.callTime)}
+      {dateFormatter(request.event.callTime)}
       <br />
-      {timeFormatter(event.callTime)}
+      {timeFormatter(request.event.callTime)}
       <br />
-      {event.location || ""}
+      {request.event.location || ""}
     </td>
     <td>
       <a href={renderRoute(routeProfile(request.member, null))}>
@@ -172,19 +171,19 @@ const AbsenceRequestRow: React.FC<AbsenceRequestRowProps> = ({
 );
 
 interface AbsenceRequestButtonsProps {
-  request: AbsenceRequest;
+  request: AbsenceRequestWithEvent;
   respond: RespondToAbsenceRequestFn;
 }
 
 const AbsenceRequestButtons: React.FC<AbsenceRequestButtonsProps> = ({
   request,
-  respond
+  respond,
 }) => {
   let leftButton: JSX.Element;
   let rightButton: JSX.Element;
 
   switch (request.state) {
-    case "Pending":
+    case "PENDING":
       leftButton = (
         <Button onClick={() => respond(request, "deny")}>Get fukt nerd</Button>
       );
@@ -195,7 +194,7 @@ const AbsenceRequestButtons: React.FC<AbsenceRequestButtonsProps> = ({
       );
       break;
 
-    case "Approved":
+    case "APPROVED":
       leftButton = (
         <Button onClick={() => respond(request, "deny")}>
           Jk get fukt nerd
@@ -204,7 +203,7 @@ const AbsenceRequestButtons: React.FC<AbsenceRequestButtonsProps> = ({
       rightButton = <Button>Mercy bestowed</Button>;
       break;
 
-    case "Denied":
+    case "DENIED":
       leftButton = <Button>Nerd got fukt</Button>;
       rightButton = (
         <Button

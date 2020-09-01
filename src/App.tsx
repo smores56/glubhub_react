@@ -1,7 +1,7 @@
 import "./App.css";
 import React, { useState, useCallback, useEffect } from "react";
 
-import { useGlubRoute, GlubHubContext } from "utils/context";
+import { useGlubRoute, GlubHubContext, gqlClient } from "utils/context";
 import { Admin } from "page/admin/Page";
 import { EditCarpools } from "page/events/EditCarpools";
 import { EditProfile } from "page/EditProfile";
@@ -23,13 +23,14 @@ import {
   loading,
   errorLoading,
   loaded,
-  isLoaded
+  isLoaded,
 } from "state/types";
 import { Member, Info, Semester } from "state/models";
 import { getToken, setToken } from "utils/helpers";
 import { collect4, get, success } from "utils/request";
 import { RemoteContent } from "components/Complex";
 import { routeLogin } from "state/route";
+import { ApolloProvider } from "@apollo/react-hooks";
 
 const history = createBrowserHistory();
 
@@ -54,6 +55,8 @@ const App: React.FC = () => {
         : Promise.resolve(success([] as Member[]))
     );
 
+    console.log(result);
+
     if (result.successful) {
       const [user, info, currentSemester, members] = result.data;
       setAppData(loaded({ user, members, info, currentSemester }));
@@ -70,41 +73,48 @@ const App: React.FC = () => {
 
   return (
     <Router history={history}>
-      <div id="app">
-        <Navbar
-          {...(isLoaded(appData) ? appData.data : { user: null, info: null })}
-        />
-        <ConfirmAccountHeader />
-        <div style={{ paddingBottom: "50px" }} />
-        <div className="center" style={{ height: "100%", backgroundColor:"#fafafa" }}>
-          <RemoteContent
-            data={appData}
-            render={appData => (
-              <GlubHubContext.Provider
-                value={{
-                  ...appData,
-                  refreshAll,
-                  updateUser: user => setAppData(loaded({ ...appData, user })),
-                  updateMembers: members =>
-                    setAppData(loaded({ ...appData, members })),
-                  updateInfo: info => setAppData(loaded({ ...appData, info })),
-                  updateCurrentSemester: currentSemester =>
-                    setAppData(loaded({ ...appData, currentSemester }))
-                }}
-              >
-                <CurrentPage loggedIn={!!appData.user} />
-              </GlubHubContext.Provider>
-            )}
+      <ApolloProvider client={gqlClient}>
+        <div id="app">
+          <Navbar
+            {...(isLoaded(appData) ? appData.data : { user: null, info: null })}
           />
+          <ConfirmAccountHeader />
+          <div style={{ paddingBottom: "50px" }} />
+          <div
+            className="center"
+            style={{ height: "100%", backgroundColor: "#fafafa" }}
+          >
+            <RemoteContent
+              data={appData}
+              render={(appData) => (
+                <GlubHubContext.Provider
+                  value={{
+                    ...appData,
+                    refreshAll,
+                    updateUser: (user) =>
+                      setAppData(loaded({ ...appData, user })),
+                    updateMembers: (members) =>
+                      setAppData(loaded({ ...appData, members })),
+                    updateInfo: (info) =>
+                      setAppData(loaded({ ...appData, info })),
+                    updateCurrentSemester: (currentSemester) =>
+                      setAppData(loaded({ ...appData, currentSemester })),
+                  }}
+                >
+                  <CurrentPage loggedIn={!!appData.user} />
+                </GlubHubContext.Provider>
+              )}
+            />
+          </div>
         </div>
-      </div>
+      </ApolloProvider>
     </Router>
   );
 };
 
 export default App;
 
-const CurrentPage: React.FC<{ loggedIn: boolean }> = ({ loggedIn }) => {
+const CurrentPage: React.FC<{ loggedIn: boolean; }> = ({ loggedIn }) => {
   const { location, goToRoute } = useGlubRoute();
 
   if (!loggedIn) {

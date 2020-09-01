@@ -2,6 +2,11 @@ import { createContext, Context } from "react";
 import { Member, Info, Semester } from "state/models";
 import { GlubRoute, parseRoute, renderRoute } from "state/route";
 import { useLocation, useHistory } from "react-router-dom";
+import { ApolloClient } from "apollo-boost";
+import { createHttpLink } from "apollo-link-http";
+import { setContext } from "apollo-link-context";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { getToken } from "./helpers";
 
 interface GlubHubContextData {
   user: Member | null;
@@ -25,11 +30,11 @@ const initialContext: GlubHubContextType = {
   members: [],
   info: null!,
   currentSemester: null!,
-  updateUser: () => {},
-  updateMembers: () => {},
-  updateInfo: () => {},
-  updateCurrentSemester: () => {},
-  refreshAll: async () => {}
+  updateUser: () => { },
+  updateMembers: () => { },
+  updateInfo: () => { },
+  updateCurrentSemester: () => { },
+  refreshAll: async () => { },
 };
 
 export const GlubHubContext: Context<GlubHubContextType> = createContext(
@@ -55,7 +60,23 @@ export const useGlubRoute = (): GlubRouteHooks => {
 
   return {
     location: glubLocation,
-    goToRoute: route => history.push(renderRoute(route)),
-    replaceRoute: route => history.replace(renderRoute(route))
+    goToRoute: (route) => history.push(renderRoute(route)),
+    replaceRoute: (route) => history.replace(renderRoute(route)),
   };
 };
+
+const httpLink = createHttpLink({
+  uri: "http://localhost:2000/graphql",
+});
+
+const authLink = setContext((_, { headers }) => ({
+  headers: {
+    ...headers,
+    token: "7db7794a-0310-4e13-95b7-7b151565d8f0",
+  },
+}));
+
+export const gqlClient = new ApolloClient({
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache(),
+});
