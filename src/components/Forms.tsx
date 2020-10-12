@@ -127,6 +127,7 @@ export interface SelectInputProps<T> extends InputAttributes {
   selected: T;
   type: FormInputType<T>;
   onInput: (t: T) => void;
+  leftAligned?: boolean;
 }
 
 export const SelectInput = <T extends any>(
@@ -134,7 +135,7 @@ export const SelectInput = <T extends any>(
 ) => (
   <InputWrapper {...props}>
     <FieldWrapper {...props}>
-      <div className={"select control" + (props.loading ? " is-loading" : "")}>
+      <div className={"select control" + (props.loading ? " is-loading" : "") + (props.leftAligned ? " is-pulled-left" : "")}>
         <select
           onInput={event =>
             props.onInput(props.type.fromString(event.currentTarget.value))

@@ -95,18 +95,17 @@ const GradesBlock: React.FC<GradesBlockProps> = ({
 }) => {
   const { user } = useContext(GlubHubContext);
 
+  const grade = typeof finalGrade === 'number' ? finalGrade : 100;
+
   return (
     <Section>
       <Container>
         <Title>Score</Title>
         <p>
-          Right now you have a <strong>{finalGrade}</strong>.
+          Right now you have a <strong>{grade}</strong>.
           <br />
           <span className="has-text-grey-light is-italic">
-            {attendanceMessage(
-              user?.enrollment || null,
-              finalGrade ? finalGrade : 100
-            )}
+            {attendanceMessage(user?.enrollment || null, grade)}
           </span>
         </p>
         {events.length ? (

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback } from "react";
+import React, { useContext, useState, useCallback, useEffect } from "react";
 import { GlubHubContext } from "utils/context";
 import { DeleteButton, Button, ButtonGroup, SubmitButton } from "./Buttons";
 import { Enrollment } from "state/models";
@@ -23,7 +23,7 @@ export const ConfirmAccountHeader: React.FC = () => {
   const isActive = !!user?.enrollment;
 
   if (!user || isActive || ignoreConfirm) {
-    return <></>;
+    return <> </>;
   }
 
   return (
@@ -86,7 +86,7 @@ export const ConfirmAccountModal: React.FC<ConfirmAccountModalProps> = ({
       ...form,
       section: form.section || "",
       conflicts: "",
-      dietaryRestrictions: ""
+      dietary_restrictions: ""
     };
 
     const result = await post("members/confirm", body);
@@ -98,7 +98,6 @@ export const ConfirmAccountModal: React.FC<ConfirmAccountModalProps> = ({
 
   return (
     <Modal close={close}>
-      <Section>
         <form onSubmit={confirmAccount}>
           <Title4>Confirm Your Account</Title4>
           <InputWrapper horizontal title="Location">
@@ -109,6 +108,8 @@ export const ConfirmAccountModal: React.FC<ConfirmAccountModalProps> = ({
               placeholder="Glenn"
               required
             />
+          </InputWrapper>
+          <InputWrapper horizontal title=" ">
             <Control>
               <ButtonGroup connected>
                 <Button
@@ -128,13 +129,17 @@ export const ConfirmAccountModal: React.FC<ConfirmAccountModalProps> = ({
               </ButtonGroup>
             </Control>
           </InputWrapper>
-          <InputWrapper horizontal title="Enrollment">
+          <InputWrapper horizontal title="Voice Part">
             <SelectInput
               type={sectionType(info)}
               values={info?.sections || []}
               selected={form.section}
               onInput={section => updateForm({ ...form, section })}
+              expanded
+              leftAligned
             />
+          </InputWrapper >
+          <InputWrapper horizontal title="Enrollment">
             <Control>
               <ButtonGroup connected>
                 <Button
@@ -155,10 +160,9 @@ export const ConfirmAccountModal: React.FC<ConfirmAccountModalProps> = ({
             </Control>
           </InputWrapper>
           <ButtonGroup alignment="is-right">
-            <SubmitButton color="is-primary">Save</SubmitButton>
+            <SubmitButton color="is-primary">Confirm</SubmitButton>
           </ButtonGroup>
         </form>
-      </Section>
     </Modal>
   );
 };

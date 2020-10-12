@@ -74,7 +74,30 @@ const App: React.FC = () => {
         <Navbar
           {...(isLoaded(appData) ? appData.data : { user: null, info: null })}
         />
-        <ConfirmAccountHeader />
+        <GlubHubContext.Provider
+          value={
+            isLoaded(appData) ? ({
+              ...(appData.data),
+              refreshAll,
+              updateUser: _ => {},
+              updateMembers: _ => {},
+              updateInfo: _ => {},
+              updateCurrentSemester: _ => {},
+            }) : ({
+              user: null,
+              info: null!,
+              currentSemester: null!,
+              members: [],
+              refreshAll,
+              updateUser: _ => {},
+              updateMembers: _ => {},
+              updateInfo: _ => {},
+              updateCurrentSemester: _ => {},
+           })
+          }
+        >
+          <ConfirmAccountHeader />
+        </GlubHubContext.Provider>
         <div style={{ paddingBottom: "50px" }} />
         <div className="center" style={{ height: "100%", backgroundColor:"#fafafa" }}>
           <RemoteContent
