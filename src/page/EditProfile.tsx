@@ -70,8 +70,8 @@ export const EditProfile: React.FC = () => {
       if (user) {
         goToRoute(routeProfile(user.email, null));
       } else {
-        alert(`You have successfully created an account with email ${body.email}!`);
         goToRoute(routeLogin);
+        alert(`You have successfully created an account with email ${body.email}!`);
       }
     }
   }, [setState, form, user, goToRoute]);
