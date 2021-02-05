@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useCallback, useContext, FormEvent } from "react";
 import {
   notSentYet,
   loaded,
@@ -33,7 +33,7 @@ import {
   CheckboxInput
 } from "components/Forms";
 import ErrorBox from "components/ErrorBox";
-import { BackButton, LinkButton, Button } from "components/Buttons";
+import { BackButton, LinkButton, SubmitButton, Button } from "components/Buttons";
 import { fullName } from "utils/helpers";
 import { simpleDateWithYearFormatter } from "utils/datetime";
 import {
@@ -206,37 +206,37 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   state,
   resolve
 }) => (
-  <>
-    <Table striped fullwidth scrollable>
-      <tbody>
-        {transactions
-          .sort((t1, t2) => t1.time - t2.time)
-          .map(transaction => (
-            <tr className="no-bottom-border">
-              <td>{simpleDateWithYearFormatter(transaction.time)}</td>
-              <td>
-                <MemberName email={transaction.member} />
-              </td>
-              <td>{transaction.type}</td>
-              <td>{`${transaction.amount}`}</td>
-              <td>{transaction.resolved ? "Resolved" : "Outstanding"}</td>
-              <td>
-                <Button
-                  size="is-small"
-                  color={!transaction.resolved ? "is-primary" : undefined}
-                  onClick={() => resolve(transaction.id, !transaction.resolved)}
-                >
-                  {transaction.resolved ? "Unresolve" : "Resolve"}
-                </Button>
-              </td>
-              <td>{transaction.description}</td>
-            </tr>
-          ))}
-      </tbody>
-    </Table>
-    <SubmissionStateBox state={state} />
-  </>
-);
+    <>
+      <Table striped fullwidth scrollable>
+        <tbody>
+          {transactions
+            .sort((t1, t2) => t1.time - t2.time)
+            .map(transaction => (
+              <tr className="no-bottom-border">
+                <td>{simpleDateWithYearFormatter(transaction.time)}</td>
+                <td>
+                  <MemberName email={transaction.member} />
+                </td>
+                <td>{transaction.type}</td>
+                <td>{`${transaction.amount}`}</td>
+                <td>{transaction.resolved ? "Resolved" : "Outstanding"}</td>
+                <td>
+                  <Button
+                    size="is-small"
+                    color={!transaction.resolved ? "is-primary" : undefined}
+                    onClick={() => resolve(transaction.id, !transaction.resolved)}
+                  >
+                    {transaction.resolved ? "Unresolve" : "Resolve"}
+                  </Button>
+                </td>
+                <td>{transaction.description}</td>
+              </tr>
+            ))}
+        </tbody>
+      </Table>
+      <SubmissionStateBox state={state} />
+    </>
+  );
 
 const BeholdThe: React.FC<{ text: string }> = ({ text }) => (
   <p style={{ marginBottom: "10px" }}>
@@ -362,7 +362,8 @@ const BatchTransactions: React.FC = () => {
     [batch, updateBatch]
   );
 
-  const sendBatch = useCallback(async () => {
+  const sendBatch = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
     setState(sending);
 
     const result = await post(`fees/create_batch`, batch);
@@ -419,13 +420,12 @@ const BatchTransactions: React.FC = () => {
             </Box>
           </InputWrapper>
           <br />
-          <Button
+          <SubmitButton
             color="is-primary"
             loading={isSending(state)}
-            onClick={sendBatch}
           >
             My mind on my money and my money on my mind
-          </Button>
+          </SubmitButton>
           {failedToSend(state) && <ErrorBox error={state.error} />}
         </form>
       )}
@@ -444,11 +444,11 @@ const MemberBatchRow: React.FC<MemberBatchRowProps> = ({
   selected,
   select
 }) => (
-  <li>
-    <CheckboxInput
-      content={fullName(member)}
-      checked={selected}
-      onChange={() => select(member.email)}
-    />
-  </li>
-);
+    <li>
+      <CheckboxInput
+        content={fullName(member)}
+        checked={selected}
+        onChange={() => select(member.email)}
+      />
+    </li>
+  );

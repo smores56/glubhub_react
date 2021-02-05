@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, FormEvent } from "react";
 import { Song, SongMode, SongLink } from "state/models";
 import {
   notSentYet,
@@ -188,7 +188,9 @@ const EditFileType: React.FC<EditFileTypeProps> = ({
   const [newFile, updateNewFile] = useState(emptyFileLink);
   const [state, setState] = useState(notSentYet);
 
-  const addLinkToSong = useCallback(async () => {
+  const addLinkToSong = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
+
     if (!newFile.name || !newFile.file) return;
     setState(sending);
 
@@ -263,7 +265,8 @@ const NewPerformanceSection: React.FC<NewPerformanceSectionProps> = ({
   const [newPerformance, updateNewPerformance] = useState(emptyUrlLink);
   const [state, setState] = useState(notSentYet);
 
-  const addPerformanceToSong = useCallback(async () => {
+  const addPerformanceToSong = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
     setState(sending);
 
     const body = {
