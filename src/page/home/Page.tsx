@@ -32,27 +32,29 @@ export const Home: React.FC = () => {
   }, [setEvents]);
 
   return (
-    <RemoteContent
-      data={events}
-      render={events => (
-        <>
-          <GradesBlock
-            finalGrade={events[events.length - 1]?.change?.partialScore}
-            events={events}
-            hoverEvent={setHovered}
-          />
-          {hovered && <EventHoverBox hovered={hovered} />}
-          <Section>
-            <Container>
-              <Columns>
-                <UpcomingEvents allEvents={events} />
-                <Volunteerism pastEvents={events} />
-              </Columns>
-            </Container>
-          </Section>
-        </>
-      )}
-    />
+    <div className="container fullheight">
+      <RemoteContent
+        data={events}
+        render={events => (
+          <>
+            <GradesBlock
+              finalGrade={events[events.length - 1]?.change?.partialScore}
+              events={events}
+              hoverEvent={setHovered}
+            />
+            {hovered && <EventHoverBox hovered={hovered} />}
+            <Section>
+              <Container>
+                <Columns>
+                  <UpcomingEvents allEvents={events} />
+                  <Volunteerism pastEvents={events} />
+                </Columns>
+              </Container>
+            </Section>
+          </>
+        )}
+      />
+    </div>
   );
 };
 
@@ -121,12 +123,12 @@ const GradesBlock: React.FC<GradesBlockProps> = ({
             </p>
           </>
         ) : (
-          <>
-            <p>New semester, new you! Make it count.</p>
-            <br />
-            <br />
-          </>
-        )}
+            <>
+              <p>New semester, new you! Make it count.</p>
+              <br />
+              <br />
+            </>
+          )}
       </Container>
     </Section>
   );
@@ -162,15 +164,15 @@ const EventHoverBox: React.FC<{ hovered: HoveredEvent }> = ({ hovered }) => (
 const UpcomingEvents: React.FC<{ allEvents: GlubEvent[] }> = ({
   allEvents
 }) => (
-  <Column>
-    <Title>This Week</Title>
-    <Box>
-      <div className="timeline">
-        <ThisWeek events={allEvents} />
-      </div>
-    </Box>
-  </Column>
-);
+    <Column>
+      <Title>This Week</Title>
+      <Box>
+        <div className="timeline">
+          <ThisWeek events={allEvents} />
+        </div>
+      </Box>
+    </Column>
+  );
 
 const Volunteerism: React.FC<{ pastEvents: GlubEvent[] }> = ({
   pastEvents
@@ -185,11 +187,11 @@ const Volunteerism: React.FC<{ pastEvents: GlubEvent[] }> = ({
   const gigList = metGigRequirement
     ? volunteerGigsAttended
     : [
-        ...volunteerGigsAttended,
-        ...new Array<GlubEvent | null>(currentSemester.gigRequirement).fill(
-          null
-        )
-      ].slice(0, currentSemester.gigRequirement);
+      ...volunteerGigsAttended,
+      ...new Array<GlubEvent | null>(currentSemester.gigRequirement).fill(
+        null
+      )
+    ].slice(0, currentSemester.gigRequirement);
 
   return (
     <Column>
@@ -202,14 +204,14 @@ const Volunteerism: React.FC<{ pastEvents: GlubEvent[] }> = ({
             semester. Glub salutes you and your volunteerism.
           </p>
         ) : (
-          <p>
-            OK so you've only been to{" "}
-            {romanNumeral(volunteerGigsAttended.length)} volunteer gigs this
+            <p>
+              OK so you've only been to{" "}
+              {romanNumeral(volunteerGigsAttended.length)} volunteer gigs this
             semester and you need to go to{" "}
-            {romanNumeral(currentSemester.gigRequirement)}. So. Uh, you know, do
-            that.
+              {romanNumeral(currentSemester.gigRequirement)}. So. Uh, you know, do
+              that.
           </p>
-        )}
+          )}
         <p style={{ textAlign: "center" }}>
           {gigList.map(gig => (
             <>
