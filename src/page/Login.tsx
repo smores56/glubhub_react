@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from "react";
+import React, { useState, useCallback, useContext, FormEvent } from "react";
 import { Md5 } from "ts-md5";
 import { setToken } from "utils/helpers";
 import { Column, Box } from "components/Basics";
@@ -26,7 +26,9 @@ export const Login: React.FC = () => {
     [refreshAll, goToRoute]
   );
 
-  const submit = useCallback(async () => {
+  const submit = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
+
     setState(sending);
     const body = { email, passHash: Md5.hashStr(password) };
     const resp = await postReturning<typeof body, NewToken>("login", body);

@@ -63,7 +63,7 @@ export const roundToTwoDigits = (x: number): number =>
 export const fileToBase64 = async (file: File): Promise<string> =>
   new Promise(resolve => {
     const reader = new FileReader();
-    reader.onloadend = event => resolve(event.target!.result as string);
+    reader.onloadend = event => resolve((event.target!.result as string).replace(/^data:(.*,)?/, ''));
     reader.readAsDataURL(file);
   });
 

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback } from "react";
+import React, { useContext, useState, useCallback, FormEvent } from "react";
 import { GlubHubContext } from "utils/context";
 import {
   notSentYet,
@@ -35,7 +35,9 @@ export const Details: React.FC<DetailsProps> = ({ member, update }) => {
   const [form, updateForm] = useState<ProfileForm | null>(null);
   const [state, setState] = useState(notSentYet);
 
-  const updateMember = useCallback(async () => {
+  const updateMember = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
+
     if (!form) return;
 
     setState(sending);
@@ -123,7 +125,7 @@ interface EditProfileFormProps {
   form: ProfileForm;
   state: SubmissionState;
   cancel: () => void;
-  submit: () => void;
+  submit: (event: FormEvent) => void;
   update: (form: ProfileForm) => void;
 }
 

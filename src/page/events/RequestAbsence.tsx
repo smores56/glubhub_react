@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from "react";
+import React, { useState, useCallback, useContext, FormEvent } from "react";
 import ErrorBox from "components/ErrorBox";
 import { post, success } from "utils/request";
 import { GlubHubContext } from "utils/context";
@@ -26,7 +26,8 @@ export const RequestAbsence: React.FC<RequestAbsenceProps> = props => {
   const [reason, setReason] = useState("");
   const [state, setState] = useState(notSentYet);
 
-  const submit = useCallback(async () => {
+  const submit = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
     setState(sending);
 
     const body = { reason };

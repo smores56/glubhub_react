@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, FormEvent } from "react";
 import {
   RemoteData,
   loaded,
@@ -55,7 +55,9 @@ export const CreateEvent: React.FC<{ gigRequestId: number | null }> = ({
   const [semesters, setSemesters] = useState<RemoteData<Semester[]>>(loading);
   const [state, setState] = useState(notSentYet);
 
-  const submit = useCallback(async () => {
+  const submit = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
+
     if (!isLoaded(form)) return;
     setState(sending);
 
