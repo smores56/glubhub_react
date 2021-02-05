@@ -88,7 +88,7 @@ export const ConfirmAccountModal: React.FC<ConfirmAccountModalProps> = ({
       ...form,
       section: form.section || "",
       conflicts: "",
-      dietary_restrictions: ""
+      dietaryRestrictions: ""
     };
 
     const result = await post("members/confirm", body);
