@@ -201,6 +201,7 @@ const ChangeSemesterModal: React.FC<ChangeSemesterModalProps> = ({
 
     if (result.successful) {
       updateCurrentSemester(selected);
+      window.location.reload(true);
       closeModal();
     }
   }, [selected, currentSemester, updateCurrentSemester, closeModal]);
@@ -263,7 +264,9 @@ const CreateSemesterSidebar: React.FC<CreateSemesterSidebarProps> = ({
     [replaceRoute]
   );
 
-  const createSemester = useCallback(async () => {
+  const createSemester = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
+
     setState(sending);
     const newSemester = semesterJson(form);
     const result = await post(`semesters`, newSemester);
