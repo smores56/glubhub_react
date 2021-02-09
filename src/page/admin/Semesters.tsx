@@ -61,7 +61,7 @@ export const Semesters: React.FC<{ tab: SemesterTab | null }> = ({ tab }) => {
       <Title>Edit the Semester</Title>
       <RemoteContent
         data={semesters}
-        render={semesters => (
+        render={(semesters) => (
           <>
             <EditSemesterPrelude />
             <ButtonGroup alignment="is-centered">
@@ -396,44 +396,44 @@ const EditSemesterForm: React.FC<EditSemesterFormProps> = ({
   submit,
   update
 }) => (
-  <form onSubmit={submit}>
-    <Column narrow>
-      <TextInput
-        type={stringType}
-        value={form.name}
-        onInput={name => update({ ...form, name })}
-        title="Semester Name"
-        placeholder="Fall 20XX"
-        required
-      />
-      <TextInput
-        type={dateType}
-        value={form.startDate}
-        onInput={startDate => update({ ...form, startDate })}
-        title="The first day of the rest of your life"
-        required
-      />
-      <TextInput
-        type={dateType}
-        value={form.endDate}
-        onInput={endDate => update({ ...form, endDate })}
-        title="The last day of the rest of your life"
-        required
-      />
-      <TextInput
-        type={numberType}
-        value={form.gigRequirement}
-        onInput={gigRequirement => update({ ...form, gigRequirement })}
-        title="Number of required volunteer gigs"
-        placeholder="5"
-        required
-      />
-      <br />
-      <SubmitButton color="is-primary" loading={isSending(state)}>
-        {submitMessage}
-      </SubmitButton>
-      <br />
-      {failedToSend(state) && <ErrorBox error={state.error} />}
-    </Column>
-  </form>
-);
+    <form onSubmit={submit}>
+      <Column narrow>
+        <TextInput
+          type={stringType}
+          value={form.name}
+          onInput={name => update({ ...form, name })}
+          title="Semester Name"
+          placeholder="Fall 20XX"
+          required
+        />
+        <TextInput
+          type={dateType}
+          value={form.startDate}
+          onInput={startDate => update({ ...form, startDate })}
+          title="The first day of the rest of your life"
+          required
+        />
+        <TextInput
+          type={dateType}
+          value={form.endDate}
+          onInput={endDate => update({ ...form, endDate })}
+          title="The last day of the rest of your life"
+          required
+        />
+        <TextInput
+          type={numberType}
+          value={form.gigRequirement}
+          onInput={gigRequirement => update({ ...form, gigRequirement })}
+          title="Number of required volunteer gigs"
+          placeholder="5"
+          required
+        />
+        <br />
+        <SubmitButton color="is-primary" loading={isSending(state)}>
+          {submitMessage}
+        </SubmitButton>
+        <br />
+        {failedToSend(state) && <ErrorBox error={state.error} />}
+      </Column>
+    </form>
+  );
