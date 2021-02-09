@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, FormEvent } from "react";
 import {
   SemesterTab,
   semesterChange,
@@ -201,6 +201,7 @@ const ChangeSemesterModal: React.FC<ChangeSemesterModalProps> = ({
 
     if (result.successful) {
       updateCurrentSemester(selected);
+      window.location.reload(true);
       closeModal();
     }
   }, [selected, currentSemester, updateCurrentSemester, closeModal]);
@@ -263,7 +264,9 @@ const CreateSemesterSidebar: React.FC<CreateSemesterSidebarProps> = ({
     [replaceRoute]
   );
 
-  const createSemester = useCallback(async () => {
+  const createSemester = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
+
     setState(sending);
     const newSemester = semesterJson(form);
     const result = await post(`semesters`, newSemester);
@@ -328,7 +331,9 @@ const EditSemesterSidebar: React.FC<EditSemesterSidebarProps> = ({
     [replaceRoute]
   );
 
-  const editSemester = useCallback(async () => {
+  const editSemester = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
+
     setState(sending);
     const editedSemester = semesterJson(form);
     const result = await post(`semesters`, editedSemester);
@@ -385,7 +390,7 @@ interface EditSemesterFormProps {
   form: SemesterForm;
   state: SubmissionState;
   submitMessage: string;
-  submit: () => void;
+  submit: (event: FormEvent) => void;
   update: (form: SemesterForm) => void;
 }
 

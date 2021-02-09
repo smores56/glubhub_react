@@ -72,7 +72,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user, info }) => {
             <a
               className={
                 "navbar-item" +
-                (location?.route === "profile" ? " is-active" : "")
+                (location?.route === "profile" && location.email === user.email ? " is-active" : "")
               }
               href={renderRoute(routeProfile(user.email, null))}
             >
@@ -121,24 +121,24 @@ const AdminLinks: React.FC<{ user: Member | null }> = ({ user }) => {
 const DocumentLinks: React.FC<{ documents: DocumentLink[] }> = ({
   documents
 }) => (
-  <div className="navbar-item has-dropdown is-hoverable">
-    {/* eslint-disable-next-line */}
-    <a className="navbar-link">Documents</a>
-    <div className="navbar-dropdown">
-      {documents.map(document => (
-        <a
-          key={document.name}
-          className="navbar-item"
-          target="_blank"
-          rel="noopener noreferrer"
-          href={document.url}
-        >
-          {document.name}
-        </a>
-      ))}
+    <div className="navbar-item has-dropdown is-hoverable">
+      {/* eslint-disable-next-line */}
+      <a className="navbar-link">Documents</a>
+      <div className="navbar-dropdown">
+        {documents.map(document => (
+          <a
+            key={document.name}
+            className="navbar-item"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={document.url}
+          >
+            {document.name}
+          </a>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
 
 const HomeLogo: React.FC = () => (
   <a href={renderRoute(routeHome)} className="navbar-item">
@@ -157,16 +157,16 @@ const BurgerButton: React.FC<BurgerButtonProps> = ({
   expanded,
   toggleExpanded
 }) => (
-  // eslint-disable-next-line
-  <a
-    role="button"
-    aria-label="menu"
-    aria-expanded={expanded}
-    className={"navbar-burger" + (expanded ? " is-active" : "")}
-    onClick={toggleExpanded}
-  >
-    <span aria-hidden="true" />
-    <span aria-hidden="true" />
-    <span aria-hidden="true" />
-  </a>
-);
+    // eslint-disable-next-line
+    <a
+      role="button"
+      aria-label="menu"
+      aria-expanded={expanded}
+      className={"navbar-burger" + (expanded ? " is-active" : "")}
+      onClick={toggleExpanded}
+    >
+      <span aria-hidden="true" />
+      <span aria-hidden="true" />
+      <span aria-hidden="true" />
+    </a>
+  );

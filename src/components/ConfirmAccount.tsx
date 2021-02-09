@@ -1,8 +1,8 @@
-import React, { useContext, useState, useCallback, useEffect } from "react";
+import React, { useContext, useState, useCallback, FormEvent } from "react";
 import { GlubHubContext } from "utils/context";
 import { DeleteButton, Button, ButtonGroup, SubmitButton } from "./Buttons";
 import { Enrollment } from "state/models";
-import { Section, Title4 } from "./Basics";
+import { Title4 } from "./Basics";
 import {
   InputWrapper,
   TextInput,
@@ -81,12 +81,14 @@ export const ConfirmAccountModal: React.FC<ConfirmAccountModalProps> = ({
     section: info?.sections[0] || null
   });
 
-  const confirmAccount = useCallback(async () => {
+  const confirmAccount = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
+
     const body = {
       ...form,
       section: form.section || "",
       conflicts: "",
-      dietary_restrictions: ""
+      dietaryRestrictions: ""
     };
 
     const result = await post("members/confirm", body);
@@ -98,71 +100,71 @@ export const ConfirmAccountModal: React.FC<ConfirmAccountModalProps> = ({
 
   return (
     <Modal close={close}>
-        <form onSubmit={confirmAccount}>
-          <Title4>Confirm Your Account</Title4>
-          <InputWrapper horizontal title="Location">
-            <TextInput
-              type={stringType}
-              value={form.location}
-              onInput={location => updateForm({ ...form, location })}
-              placeholder="Glenn"
-              required
-            />
-          </InputWrapper>
-          <InputWrapper horizontal title=" ">
-            <Control>
-              <ButtonGroup connected>
-                <Button
-                  element="a"
-                  color={form.onCampus ? "is-primary" : undefined}
-                  onClick={() => updateForm({ ...form, onCampus: true })}
-                >
-                  On-campus
+      <form onSubmit={confirmAccount}>
+        <Title4>Confirm Your Account</Title4>
+        <InputWrapper horizontal title="Location">
+          <TextInput
+            type={stringType}
+            value={form.location}
+            onInput={location => updateForm({ ...form, location })}
+            placeholder="Glenn"
+            required
+          />
+        </InputWrapper>
+        <InputWrapper horizontal title=" ">
+          <Control>
+            <ButtonGroup connected>
+              <Button
+                element="a"
+                color={form.onCampus ? "is-primary" : undefined}
+                onClick={() => updateForm({ ...form, onCampus: true })}
+              >
+                On-campus
                 </Button>
-                <Button
-                  element="a"
-                  color={!form.onCampus ? "is-primary" : undefined}
-                  onClick={() => updateForm({ ...form, onCampus: false })}
-                >
-                  Off-campus
+              <Button
+                element="a"
+                color={!form.onCampus ? "is-primary" : undefined}
+                onClick={() => updateForm({ ...form, onCampus: false })}
+              >
+                Off-campus
                 </Button>
-              </ButtonGroup>
-            </Control>
-          </InputWrapper>
-          <InputWrapper horizontal title="Voice Part">
-            <SelectInput
-              type={sectionType(info)}
-              values={info?.sections || []}
-              selected={form.section}
-              onInput={section => updateForm({ ...form, section })}
-              expanded
-              leftAligned
-            />
-          </InputWrapper >
-          <InputWrapper horizontal title="Enrollment">
-            <Control>
-              <ButtonGroup connected>
-                <Button
-                  element="a"
-                  color={form.enrollment === "Class" ? "is-primary" : undefined}
-                  onClick={() => updateForm({ ...form, enrollment: "Class" })}
-                >
-                  Class
+            </ButtonGroup>
+          </Control>
+        </InputWrapper>
+        <InputWrapper horizontal title="Voice Part">
+          <SelectInput
+            type={sectionType(info)}
+            values={info?.sections || []}
+            selected={form.section}
+            onInput={section => updateForm({ ...form, section })}
+            expanded
+            leftAligned
+          />
+        </InputWrapper >
+        <InputWrapper horizontal title="Enrollment">
+          <Control>
+            <ButtonGroup connected>
+              <Button
+                element="a"
+                color={form.enrollment === "Class" ? "is-primary" : undefined}
+                onClick={() => updateForm({ ...form, enrollment: "Class" })}
+              >
+                Class
                 </Button>
-                <Button
-                  element="a"
-                  color={form.enrollment === "Club" ? "is-primary" : undefined}
-                  onClick={() => updateForm({ ...form, enrollment: "Club" })}
-                >
-                  Club
+              <Button
+                element="a"
+                color={form.enrollment === "Club" ? "is-primary" : undefined}
+                onClick={() => updateForm({ ...form, enrollment: "Club" })}
+              >
+                Club
                 </Button>
-              </ButtonGroup>
-            </Control>
-          </InputWrapper>
-          <ButtonGroup alignment="is-right">
-            <SubmitButton color="is-primary">Confirm</SubmitButton>
-          </ButtonGroup>
-        </form>
+            </ButtonGroup>
+          </Control>
+        </InputWrapper>
+        <ButtonGroup alignment="is-right">
+          <SubmitButton color="is-primary">Confirm</SubmitButton>
+        </ButtonGroup>
+      </form>
     </Modal>
   );
 };

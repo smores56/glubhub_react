@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from "react";
+import React, { useState, useContext, useCallback, FormEvent } from "react";
 import { GlubHubContext, useGlubRoute } from "utils/context";
 import {
   notSentYet,
@@ -43,7 +43,8 @@ export const EditProfile: React.FC = () => {
   );
   const [state, setState] = useState(notSentYet);
 
-  const submit = useCallback(async () => {
+  const submit = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
     setState(sending);
 
     const enteredPassword = !!(form.password || form.confirmPassword);
@@ -66,7 +67,12 @@ export const EditProfile: React.FC = () => {
 
     setState(resultToSubmissionState(result));
     if (result.successful) {
-      goToRoute(user ? routeProfile(user.email, null) : routeLogin);
+      if (user) {
+        goToRoute(routeProfile(user.email, null));
+      } else {
+        goToRoute(routeLogin);
+        alert(`You have successfully created an account with email ${body.email}!`);
+      }
     }
   }, [setState, form, user, goToRoute]);
 
@@ -120,7 +126,7 @@ interface FormFieldsProps {
   form: ProfileForm;
   user: Member | null;
   state: SubmissionState;
-  submit: () => void;
+  submit: (event: FormEvent) => void;
   update: (form: ProfileForm) => void;
 }
 
@@ -131,125 +137,125 @@ const FormFields: React.FC<FormFieldsProps> = ({
   submit,
   update
 }) => (
-  <form onSubmit={submit}>
-    <Title4>Really Important Stuff</Title4>
-    <InputWrapper horizontal title="Name">
+    <form onSubmit={submit}>
+      <Title4>Really Important Stuff</Title4>
+      <InputWrapper horizontal title="Name">
+        <TextInput
+          type={stringType}
+          value={form.firstName}
+          onInput={firstName => update({ ...form, firstName })}
+          required
+          placeholder="First"
+        />
+        <TextInput
+          type={stringType}
+          value={form.preferredName}
+          onInput={preferredName => update({ ...form, preferredName })}
+          placeholder="Preferred (optional)"
+        />
+        <TextInput
+          type={stringType}
+          value={form.lastName}
+          onInput={lastName => update({ ...form, lastName })}
+          required
+          placeholder="Last"
+        />
+      </InputWrapper>
+      <TextInput
+        type={emailType}
+        value={form.email}
+        onInput={email => update({ ...form, email })}
+        horizontal
+        required
+        title="E-mail"
+        placeholder="gburdell3@gatech.edu"
+      />
+      <TextInput
+        type={phoneType}
+        value={form.phoneNumber}
+        onInput={phoneNumber => update({ ...form, phoneNumber })}
+        horizontal
+        required
+        title="Phone Number"
+        placeholder="6788675309"
+      />
+      <InputWrapper horizontal title="Password">
+        <TextInput
+          type={passwordType}
+          value={form.password}
+          onInput={password => update({ ...form, password })}
+          required
+          placeholder="Password"
+        />
+        <TextInput
+          type={passwordType}
+          value={form.confirmPassword}
+          onInput={confirmPassword => update({ ...form, confirmPassword })}
+          required
+          placeholder="Confirm Password"
+        />
+      </InputWrapper>
+      <InputWrapper horizontal title="Location">
+        <LocationFieldBlock form={form} update={update} />
+      </InputWrapper>
       <TextInput
         type={stringType}
-        value={form.firstName}
-        onInput={firstName => update({ ...form, firstName })}
+        value={form.major}
+        onInput={major => update({ ...form, major })}
         required
-        placeholder="First"
+        horizontal
+        title="Major"
+        placeholder="Undecided Engineering"
       />
       <TextInput
         type={stringType}
-        value={form.preferredName}
-        onInput={preferredName => update({ ...form, preferredName })}
-        placeholder="Preferred (optional)"
-      />
-      <TextInput
-        type={stringType}
-        value={form.lastName}
-        onInput={lastName => update({ ...form, lastName })}
+        value={form.hometown}
+        onInput={hometown => update({ ...form, hometown })}
         required
-        placeholder="Last"
+        horizontal
+        title="Hometown"
+        placeholder="Winslow, Arizona"
       />
-    </InputWrapper>
-    <TextInput
-      type={emailType}
-      value={form.email}
-      onInput={email => update({ ...form, email })}
-      horizontal
-      required
-      title="E-mail"
-      placeholder="gburdell3@gatech.edu"
-    />
-    <TextInput
-      type={phoneType}
-      value={form.phoneNumber}
-      onInput={phoneNumber => update({ ...form, phoneNumber })}
-      horizontal
-      required
-      title="Phone Number"
-      placeholder="6788675309"
-    />
-    <InputWrapper horizontal title="Password">
-      <TextInput
-        type={passwordType}
-        value={form.password}
-        onInput={password => update({ ...form, password })}
-        required
-        placeholder="Password"
-      />
-      <TextInput
-        type={passwordType}
-        value={form.confirmPassword}
-        onInput={confirmPassword => update({ ...form, confirmPassword })}
-        required
-        placeholder="Confirm Password"
-      />
-    </InputWrapper>
-    <InputWrapper horizontal title="Location">
-      <LocationFieldBlock form={form} update={update} />
-    </InputWrapper>
-    <TextInput
-      type={stringType}
-      value={form.major}
-      onInput={major => update({ ...form, major })}
-      required
-      horizontal
-      title="Major"
-      placeholder="Undecided Engineering"
-    />
-    <TextInput
-      type={stringType}
-      value={form.hometown}
-      onInput={hometown => update({ ...form, hometown })}
-      required
-      horizontal
-      title="Hometown"
-      placeholder="Winslow, Arizona"
-    />
-    <InputWrapper horizontal title="Car">
-      <CarFieldBlock form={form} update={update} />
-    </InputWrapper>
-    <InputWrapper horizontal title="Enrollment">
-      <EnrollmentBlock form={form} update={update} user={user} />
-    </InputWrapper>
+      <InputWrapper horizontal title="Car">
+        <CarFieldBlock form={form} update={update} />
+      </InputWrapper>
+      <InputWrapper horizontal title="Enrollment">
+        <EnrollmentBlock form={form} update={update} user={user} />
+      </InputWrapper>
 
-    <Title4>Nice to Know</Title4>
-    <TextInput
-      type={stringType}
-      value={form.about}
-      onInput={about => update({ ...form, about })}
-      horizontal
-      title="About"
-      placeholder="I like big butts and I cannot lie"
-    />
-    <TextInput
-      type={stringType}
-      value={form.picture}
-      onInput={picture => update({ ...form, picture })}
-      horizontal
-      title="Picture URL"
-      placeholder="https://create.mylittlepony.movie/images/ponyparticon_bodybig.png"
-    />
-    <TextInput
-      type={numberType}
-      value={form.arrivedAtTech}
-      onInput={arrivedAtTech =>
-        update({
-          ...form,
-          arrivedAtTech: arrivedAtTech || new Date().getFullYear()
-        })
-      }
-      horizontal
-      title="Arrived at Tech"
-      placeholder="2099"
-    />
-    <ActionButtons user={user} state={state} />
-  </form>
-);
+      <Title4>Nice to Know</Title4>
+      <TextInput
+        type={stringType}
+        value={form.about}
+        onInput={about => update({ ...form, about })}
+        horizontal
+        title="About"
+        placeholder="I like big butts and I cannot lie"
+      />
+      <TextInput
+        type={stringType}
+        value={form.picture}
+        onInput={picture => update({ ...form, picture })}
+        horizontal
+        title="Picture URL"
+        placeholder="https://create.mylittlepony.movie/images/ponyparticon_bodybig.png"
+      />
+      <TextInput
+        type={numberType}
+        value={form.arrivedAtTech}
+        onInput={arrivedAtTech =>
+          update({
+            ...form,
+            arrivedAtTech: arrivedAtTech || new Date().getFullYear()
+          })
+        }
+        horizontal
+        title="Arrived at Tech"
+        placeholder="2099"
+      />
+      <ActionButtons user={user} state={state} />
+    </form>
+  );
 
 interface ActionButtonsProps {
   user: Member | null;
@@ -279,7 +285,7 @@ const CarFieldBlock: React.FC<ProfileFormProps> = ({ form, update }) => (
       checked={form.passengers > 0}
       onChange={hasCar => update({ ...form, passengers: hasCar ? 1 : 0 })}
     />
-    {form.passengers && (
+    {form.passengers > 0 ? (
       <TextInput
         type={numberType}
         value={form.passengers}
@@ -287,7 +293,7 @@ const CarFieldBlock: React.FC<ProfileFormProps> = ({ form, update }) => (
         placeholder="How many?"
         suffix="passengers"
       />
-    )}
+    ) : ""}
   </div>
 );
 
@@ -360,13 +366,13 @@ const EnrollmentOption: React.FC<EnrollmentOptionProps> = ({
   update,
   enrollment
 }) => (
-  <Button
-    color={form.enrollment === enrollment ? "is-primary" : undefined}
-    onClick={() => update({ ...form, enrollment })}
-  >
-    {enrollment || "Inactive"}
-  </Button>
-);
+    <Button
+      color={form.enrollment === enrollment ? "is-primary" : undefined}
+      onClick={() => update({ ...form, enrollment })}
+    >
+      {enrollment || "Inactive"}
+    </Button>
+  );
 
 interface ProfileForm {
   firstName: string;

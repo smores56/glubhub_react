@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, FormEvent } from "react";
 import { GlubEvent, Semester, Info } from "state/models";
 import {
   RemoteData,
@@ -55,7 +55,8 @@ export const EditEvent: React.FC<EditEventProps> = ({ event, updateEvent }) => {
   const [semesters, setSemesters] = useState<RemoteData<Semester[]>>(loading);
   const [state, setState] = useState(notSentYet);
 
-  const submit = useCallback(async () => {
+  const submit = useCallback(async (e: FormEvent) => {
+    e.preventDefault();
     setState(sending);
 
     const body = buildUpdateBody(eventForm, gigForm);
@@ -124,68 +125,68 @@ const LeftColumn: React.FC<FormData> = ({
   updateEvent,
   updateGig
 }) => (
-  <Column>
-    <TextInput
-      type={stringType}
-      value={event.name}
-      onInput={name => updateEvent({ ...event, name })}
-      title="Event Name"
-      placeholder="Flashmobbing the HOMO SEX IS SIN people"
-      helpText="Make it descriptive, make it short."
-      required
-    />
-    <TextInput
-      type={stringType}
-      value={event.location}
-      onInput={location => updateEvent({ ...event, location })}
-      title="Event Location"
-      placeholder="Your mom's house 😂"
-      helpText="ha gottem"
-    />
-    <TextInput
-      type={dateType}
-      value={event.callDate}
-      onInput={callDate => updateEvent({ ...event, callDate })}
-      title="Date of Event"
-      required
-    />
-    <TextInput
-      type={timeType}
-      value={event.callTime}
-      onInput={callTime => updateEvent({ ...event, callTime })}
-      title="Call Time"
-      helpText="4:20 lamo"
-      required
-    />
-    <TextInput
-      type={timeType}
-      value={gig.performanceTime}
-      onInput={performanceTime => updateGig({ ...gig, performanceTime })}
-      title="Event Time"
-      helpText="4:21 lamo"
-    />
-    <TextInput
-      type={timeType}
-      value={event.releaseTime}
-      onInput={releaseTime => updateEvent({ ...event, releaseTime })}
-      title="Release Time"
-      helpText="4:22 lamo"
-    />
-    <TextInput
-      type={dateType}
-      value={event.releaseDate}
-      onInput={releaseDate => updateEvent({ ...event, releaseDate })}
-      title="Release Date"
-    />
-    <TextInput
-      type={numberType}
-      value={event.points}
-      onInput={points => updateEvent({ ...event, points })}
-      title="How many points is this worth?"
-      placeholder="69"
-    />
-  </Column>
-);
+    <Column>
+      <TextInput
+        type={stringType}
+        value={event.name}
+        onInput={name => updateEvent({ ...event, name })}
+        title="Event Name"
+        placeholder="Flashmobbing the HOMO SEX IS SIN people"
+        helpText="Make it descriptive, make it short."
+        required
+      />
+      <TextInput
+        type={stringType}
+        value={event.location}
+        onInput={location => updateEvent({ ...event, location })}
+        title="Event Location"
+        placeholder="Your mom's house 😂"
+        helpText="ha gottem"
+      />
+      <TextInput
+        type={dateType}
+        value={event.callDate}
+        onInput={callDate => updateEvent({ ...event, callDate })}
+        title="Date of Event"
+        required
+      />
+      <TextInput
+        type={timeType}
+        value={event.callTime}
+        onInput={callTime => updateEvent({ ...event, callTime })}
+        title="Call Time"
+        helpText="4:20 lamo"
+        required
+      />
+      <TextInput
+        type={timeType}
+        value={gig.performanceTime}
+        onInput={performanceTime => updateGig({ ...gig, performanceTime })}
+        title="Event Time"
+        helpText="4:21 lamo"
+      />
+      <TextInput
+        type={timeType}
+        value={event.releaseTime}
+        onInput={releaseTime => updateEvent({ ...event, releaseTime })}
+        title="Release Time"
+        helpText="4:22 lamo"
+      />
+      <TextInput
+        type={dateType}
+        value={event.releaseDate}
+        onInput={releaseDate => updateEvent({ ...event, releaseDate })}
+        title="Release Date"
+      />
+      <TextInput
+        type={numberType}
+        value={event.points}
+        onInput={points => updateEvent({ ...event, points })}
+        title="How many points is this worth?"
+        placeholder="69"
+      />
+    </Column>
+  );
 
 const allSemesters = (data: FormData): string[] =>
   isLoaded(data.semesters)
@@ -231,48 +232,48 @@ const RightColumn: React.FC<FormData> = ({
   updateGig,
   state
 }) => (
-  <Column>
-    <CheckboxInput
-      checked={gig.public}
-      content="This event is public, so I want it to show up on the external site"
-      onChange={pub => updateGig({ ...gig, public: pub })}
-    />
-    {gig.public && (
-      <>
-        <TextInput
-          type={stringType}
-          value={gig.summary}
-          onInput={summary => updateGig({ ...gig, summary })}
-          title="Public Summary"
-          placeholder="Friends? Countrymen? Bueller?"
-          helpText="Careful, real people will see this"
-        />
-        <TextareaInput
-          value={gig.description}
-          onInput={description => updateGig({ ...gig, description })}
-          title="Public Description"
-          helpText="Careful, real people will see this"
-          placeholder="We the people, in order to kick a more perfect ass, I don't know where this is going"
-        />
-      </>
-    )}
-    <CheckboxInput
-      checked={!event.defaultAttend}
-      content="No one has to come to this event (forum, fundatory, etc)"
-      onChange={defaultNotAttend =>
-        updateEvent({ ...event, defaultAttend: !defaultNotAttend })
-      }
-    />
-    <CheckboxInput
-      checked={event.gigCount}
-      content="This event counts as a volunteer gig"
-      onChange={gigCount => updateEvent({ ...event, gigCount })}
-    />
-    <br />
-    <br />
-    <SubmitButton color="is-primary" loading={isSending(state)}>
-      Update
+    <Column>
+      <CheckboxInput
+        checked={gig.public}
+        content="This event is public, so I want it to show up on the external site"
+        onChange={pub => updateGig({ ...gig, public: pub })}
+      />
+      {gig.public && (
+        <>
+          <TextInput
+            type={stringType}
+            value={gig.summary}
+            onInput={summary => updateGig({ ...gig, summary })}
+            title="Public Summary"
+            placeholder="Friends? Countrymen? Bueller?"
+            helpText="Careful, real people will see this"
+          />
+          <TextareaInput
+            value={gig.description}
+            onInput={description => updateGig({ ...gig, description })}
+            title="Public Description"
+            helpText="Careful, real people will see this"
+            placeholder="We the people, in order to kick a more perfect ass, I don't know where this is going"
+          />
+        </>
+      )}
+      <CheckboxInput
+        checked={!event.defaultAttend}
+        content="No one has to come to this event (forum, fundatory, etc)"
+        onChange={defaultNotAttend =>
+          updateEvent({ ...event, defaultAttend: !defaultNotAttend })
+        }
+      />
+      <CheckboxInput
+        checked={event.gigCount}
+        content="This event counts as a volunteer gig"
+        onChange={gigCount => updateEvent({ ...event, gigCount })}
+      />
+      <br />
+      <br />
+      <SubmitButton color="is-primary" loading={isSending(state)}>
+        Update
     </SubmitButton>
-    {failedToSend(state) && <ErrorBox error={state.error} />}
-  </Column>
-);
+      {failedToSend(state) && <ErrorBox error={state.error} />}
+    </Column>
+  );

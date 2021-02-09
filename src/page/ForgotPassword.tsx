@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, FormEvent } from "react";
 import {
   notSentYet,
   errorSending,
@@ -21,7 +21,9 @@ export const ForgotPassword: React.FC = () => {
   const [confirmEmail, setConfirmEmail] = useState("");
   const [state, setState] = useState(notSentYet);
 
-  const submit = useCallback(async () => {
+  const submit = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
+
     if (email !== confirmEmail) {
       alert("Your emails don't match.");
       return;
@@ -33,7 +35,7 @@ export const ForgotPassword: React.FC = () => {
     if (result.successful) {
       alert(
         "Check your email for a password reset link, " +
-          "it should be there in a few minutes."
+        "it should be there in a few minutes."
       );
       goToRoute(routeLogin);
     } else {

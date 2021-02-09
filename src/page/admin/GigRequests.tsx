@@ -167,13 +167,13 @@ const GigRequestTable: React.FC<GigRequestTableProps> = ({
 const SingleGigRequest: React.FC<{ request: GigRequest }> = ({ request }) => (
   <tr key={request.id} className="no-bottom-border">
     <td>
-      {dateFormatter(request.time)}
+      {simpleDateWithYearFormatter(request.time)}
       <br />
       {timeFormatter(request.time)}
     </td>
     <td>{request.name}</td>
     <td>
-      {dateFormatter(request.startTime)}
+      {simpleDateWithYearFormatter(request.startTime)}
       <br />
       {timeFormatter(request.startTime)}
       <br />

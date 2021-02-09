@@ -99,7 +99,7 @@ const App: React.FC = () => {
           <ConfirmAccountHeader />
         </GlubHubContext.Provider>
         <div style={{ paddingBottom: "50px" }} />
-        <div className="center" style={{ height: "100%", backgroundColor:"#fafafa" }}>
+        <div className="center">
           <RemoteContent
             data={appData}
             render={appData => (

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, FormEvent } from "react";
 import { Md5 } from "ts-md5";
 import { post } from "utils/request";
 import { routeLogin } from "state/route";
@@ -24,7 +24,9 @@ export const ResetPassword: React.FC<{ token: string | null }> = ({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [state, setState] = useState(notSentYet);
 
-  const submit = useCallback(async () => {
+  const submit = useCallback(async (event: FormEvent) => {
+    event.preventDefault();
+
     if (password !== confirmPassword) {
       alert("Your passwords don't match.");
       return;
